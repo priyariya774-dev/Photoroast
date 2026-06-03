@@ -2007,10 +2007,18 @@ ORDER BY id DESC
 `,
 (err,result)=>{
 
-if(err){
-return res.status(500).json(err);
-}
+// if(err){
+// return res.status(500).json(err);
+// }
 
+if(err){
+console.log("PHOTOS ERROR:", err);
+
+return res.status(500).json({
+message: err.message,
+code: err.code
+});
+}
 res.json(result);
 
 }
