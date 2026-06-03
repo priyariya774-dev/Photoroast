@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>
+Gallery
+</title>
+<script src="error-handler.js"></script>
+<script src="public-header.js" defer></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+padding:14px;
+background:#ffffff;
+}
+
+h1{
+text-align:center;
+margin-bottom:18px;
+font-size:28px;
+line-height:1.15;
+}
+
+.category-tabs{
+display:grid;
+grid-template-columns:1fr;
+gap:14px;
+max-width:1180px;
+margin:0 auto 18px;
+}
+
+.category-card{
+position:relative;
+aspect-ratio:16/11;
+min-height:auto;
+padding:0;
+border:none;
+border-radius:12px;
+background:#f1f1ed;
+color:#171717;
+font-weight:bold;
+box-shadow:0 2px 10px rgba(0,0,0,.08);
+cursor:pointer;
+overflow:hidden;
+text-align:left;
+}
+
+.category-card.active{
+outline:3px solid #ff8a00;
+box-shadow:0 8px 24px rgba(255,138,0,.28);
+}
+
+.category-card img{
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
+object-fit:cover;
+opacity:1;
+}
+
+.category-card::after{
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(
+180deg,
+rgba(0,0,0,0) 42%,
+rgba(0,0,0,.56) 100%
+);
+}
+
+.category-card span{
+position:absolute;
+left:16px;
+right:16px;
+bottom:16px;
+z-index:2;
+font-size:20px;
+line-height:1.2;
+}
+
+.category-card small{
+display:block;
+font-size:13px;
+font-weight:normal;
+color:#eee;
+margin-top:5px;
+}
+
+.category-more{
+position:absolute;
+top:10px;
+right:10px;
+z-index:4;
+width:38px;
+height:38px;
+border:none;
+border-radius:50%;
+background:rgba(255,255,255,.92);
+color:#171717;
+font-size:22px;
+line-height:1;
+font-weight:bold;
+cursor:pointer;
+box-shadow:0 8px 22px rgba(0,0,0,.16);
+}
+
+.category-card.active span{
+color:#ffd56b;
+}
+
+.grid{
+
+display:grid;
+grid-template-columns:1fr;
+gap:14px;
+justify-content:center;
+align-items:start;
+
+}
+
+.card{
+
+width:100%;
+
+background:white;
+
+border-radius:12px;
+
+overflow:hidden;
+
+box-shadow:
+0 10px 28px rgba(0,0,0,.08);
+position:relative;
+align-self:start;
+
+}
+
+.featured-mode .card{
+cursor:pointer;
+}
+
+.featured-mode .card.selected{
+outline:4px solid #ff8a00;
+box-shadow:0 10px 28px rgba(255,138,0,.28);
+}
+
+.select-badge{
+display:none;
+position:absolute;
+top:12px;
+right:12px;
+z-index:3;
+padding:7px 10px;
+border-radius:999px;
+background:#ffffff;
+color:#171717;
+border:1px solid rgba(23,23,23,.12);
+font-size:13px;
+font-weight:bold;
+}
+
+.featured-mode .select-badge{
+display:block;
+}
+
+.featured-save-bar{
+display:none;
+position:sticky;
+top:0;
+z-index:20;
+max-width:1180px;
+margin:0 auto 14px;
+padding:12px;
+background:white;
+border-radius:12px;
+box-shadow:0 8px 24px rgba(0,0,0,.12);
+align-items:center;
+justify-content:space-between;
+gap:12px;
+}
+
+.featured-save-bar.show{
+display:flex;
+}
+
+.featured-save-bar p{
+font-size:14px;
+font-weight:bold;
+}
+
+.featured-save-bar button{
+padding:10px 14px;
+border:none;
+border-radius:10px;
+background:#ffffff;
+color:#171717;
+border:1px solid rgba(23,23,23,.12);
+font-weight:bold;
+cursor:pointer;
+}
+
+.gallery-admin-menu{
+position:fixed;
+z-index:30000;
+display:none;
+min-width:220px;
+padding:8px;
+background:#fff;
+border:1px solid rgba(23,23,23,.14);
+box-shadow:0 18px 48px rgba(0,0,0,.18);
+}
+
+.gallery-admin-menu.show{
+display:block;
+}
+
+.gallery-admin-menu p{
+padding:8px 10px;
+font-size:12px;
+font-weight:bold;
+color:#666;
+}
+
+.gallery-admin-menu button{
+display:block;
+width:100%;
+padding:11px 12px;
+border:0;
+background:#fff;
+color:#171717;
+text-align:left;
+font-size:14px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.gallery-admin-menu button:hover{
+background:#f7f7f4;
+}
+
+.gallery-admin-dialog{
+position:fixed;
+inset:0;
+z-index:31000;
+display:none;
+align-items:center;
+justify-content:center;
+padding:16px;
+background:rgba(0,0,0,.42);
+}
+
+.gallery-admin-dialog.show{
+display:flex;
+}
+
+.gallery-admin-panel{
+width:min(760px,100%);
+max-height:88vh;
+overflow:auto;
+padding:18px;
+background:#fff;
+border:1px solid rgba(23,23,23,.14);
+box-shadow:0 24px 70px rgba(0,0,0,.24);
+}
+
+.gallery-admin-panel h3{
+font-family:Georgia,'Times New Roman',serif;
+font-size:26px;
+margin-bottom:8px;
+}
+
+.gallery-admin-panel p{
+color:#5d5851;
+font-size:14px;
+line-height:1.6;
+margin-bottom:12px;
+}
+
+.gallery-admin-actions{
+display:grid;
+grid-template-columns:1fr;
+gap:8px;
+margin:12px 0;
+}
+
+.gallery-admin-actions button{
+padding:12px;
+border:1px solid rgba(23,23,23,.14);
+background:#fff;
+color:#171717;
+font-weight:bold;
+cursor:pointer;
+}
+
+.gallery-choice-grid{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:10px;
+margin-top:12px;
+}
+
+.gallery-choice-grid button{
+padding:0;
+border:1px solid rgba(23,23,23,.14);
+background:#fff;
+overflow:hidden;
+cursor:pointer;
+}
+
+.gallery-choice-grid img{
+display:block;
+width:100%;
+aspect-ratio:4/3;
+object-fit:cover;
+}
+
+.gallery-choice-grid span{
+display:block;
+padding:8px;
+font-size:12px;
+font-weight:bold;
+}
+
+/* MEDIA BOX */
+
+.media-box{
+
+width:100%;
+aspect-ratio:16/10;
+
+overflow:hidden;
+position:relative;
+
+background:#f1f1ed;
+
+}
+
+.media-box.portrait{
+aspect-ratio:9/16;
+}
+
+.media-box.cinematic{
+aspect-ratio:16/10;
+}
+
+/* IMAGE + VIDEO */
+
+.media{
+
+position:absolute;
+top:0;
+left:0;
+
+width:100%;
+height:100%;
+
+object-fit:cover;
+
+transition:.2s;
+
+}
+
+/* YOUTUBE */
+
+.card iframe{
+
+width:100%;
+aspect-ratio:16/10;
+
+border:none;
+background:#f1f1ed;
+
+display:block;
+
+}
+
+.card-content{
+padding:15px;
+}
+
+.card h3{
+margin-bottom:8px;
+}
+
+.card p{
+color:#5d5851;
+font-size:14px;
+line-height:1.5;
+}
+
+.empty{
+
+text-align:center;
+font-size:22px;
+color:gray;
+margin-top:50px;
+width:100%;
+
+}
+
+@media(min-width:768px){
+
+body{
+padding:20px;
+}
+
+.category-detail{
+display:none;
+max-width:1180px;
+margin:0 auto 18px;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+}
+
+.category-detail.show{
+display:flex;
+}
+
+.category-detail h2{
+font-size:24px;
+line-height:1.15;
+}
+
+.back-btn{
+padding:10px 14px;
+border:none;
+border-radius:10px;
+background:#ffffff;
+color:#171717;
+border:1px solid rgba(23,23,23,.12);
+font-weight:bold;
+cursor:pointer;
+}
+
+h1{
+font-size:34px;
+margin-bottom:24px;
+}
+
+.category-tabs{
+grid-template-columns:1fr;
+gap:12px;
+margin-bottom:24px;
+max-width:720px;
+}
+
+.category-card{
+aspect-ratio:16/9;
+}
+
+.grid{
+display:block;
+columns:2;
+column-gap:18px;
+max-width:1180px;
+margin:0 auto;
+}
+
+.card{
+display:inline-block;
+break-inside:avoid;
+margin:0 0 18px;
+}
+
+.media-box,
+.card iframe{
+aspect-ratio:16/10;
+}
+
+.media-box.portrait{
+aspect-ratio:4/5;
+}
+
+}
+
+@media(min-width:1100px){
+
+.category-tabs{
+grid-template-columns:1fr;
+max-width:760px;
+}
+
+.category-card{
+aspect-ratio:16/7;
+}
+
+.grid{
+display:block;
+columns:3;
+column-gap:18px;
+max-width:1180px;
+margin:0 auto;
+}
+
+.card{
+margin-bottom:18px;
+}
+
+.media-box,
+.card iframe{
+aspect-ratio:16/10;
+}
+
+.media-box.portrait{
+aspect-ratio:4/5;
+}
+
+}
+
+</style>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<h1>
+
+Client Gallery
+
+</h1>
+
+<div
+class="featured-save-bar"
+id="featuredSaveBar">
+<p id="featuredCount">0 / 5 selected for Featured Gallery</p>
+<button
+type="button"
+onclick="saveFeaturedImages()">
+Save Featured
+</button>
+</div>
+
+<div
+class="category-tabs"
+id="categoryTabs">
+</div>
+
+<div
+class="category-detail"
+id="categoryDetail">
+<h2 id="categoryTitle"></h2>
+<button
+type="button"
+class="back-btn"
+onclick="showCategories()">
+Back
+</button>
+</div>
+
+<div
+class="grid"
+id="gallery">
+
+</div>
+
+<div class="gallery-admin-menu" id="galleryAdminMenu"></div>
+<div class="gallery-admin-dialog" id="galleryAdminDialog"></div>
+
+<script>
+
+
+const categories = [
+{
+label:"Wedding",
+aliases:["Wedding"]
+},
+{
+label:"Pre wedding",
+aliases:["Pre wedding","Pre-wedding","Prewedding"]
+},
+{
+label:"Post wedding",
+aliases:["Post wedding","Post-wedding","Postwedding"]
+},
+{
+label:"Reception",
+aliases:["Reception"]
+},
+{
+label:"Private Events",
+aliases:["Private Events","Private Event","Private"]
+},
+{
+label:"Birthday party",
+aliases:["Birthday party","Birthday Party","Birthday"]
+}
+];
+
+let allMedia = [];
+let categoryCoverMap = {};
+let activeCategory = "";
+let activeAdminCategory = "";
+let activeAdminPhotoId = null;
+const isFeaturedMode =
+new URLSearchParams(window.location.search).get("featured") === "1";
+const isGalleryAdminMode =
+localStorage.getItem("auth") === "true"
+&&
+new URLSearchParams(window.location.search).get("adminEdit") === "1";
+let selectedFeaturedIds = [];
+
+if(isFeaturedMode){
+document.body.classList.add("featured-mode");
+}
+
+function normalizeCategory(value){
+return String(value || "")
+.trim()
+.toLowerCase()
+.replace(/[\s_-]+/g," ");
+}
+
+function escapeHtml(value){
+return String(value || "")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+}
+
+function escapeJs(value){
+return String(value || "").replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+}
+
+function showAdminDialog(title,content){
+const dialog = document.getElementById("galleryAdminDialog");
+
+dialog.innerHTML = `
+<div class="gallery-admin-panel">
+<h3>${title}</h3>
+${content}
+<div class="gallery-admin-actions">
+<button type="button" data-admin-close>Close</button>
+</div>
+</div>
+`;
+
+dialog.classList.add("show");
+}
+
+function closeAdminDialog(){
+const dialog = document.getElementById("galleryAdminDialog");
+dialog.classList.remove("show");
+dialog.innerHTML = "";
+}
+
+function closeAdminMenu(){
+document.getElementById("galleryAdminMenu").classList.remove("show");
+}
+
+async function readJsonResponse(res){
+const data = await res.json().catch(()=>({}));
+
+if(!res.ok){
+throw new Error(data.message || "Update failed");
+}
+
+return data;
+}
+
+async function uploadCategoryFiles(category,files){
+const formData = new FormData();
+
+files.forEach(file=>formData.append("galleryImages",file));
+formData.append("category",category);
+formData.append("title",category);
+formData.append("description","");
+
+const res = await fetch("/upload-gallery",{
+method:"POST",
+body:formData
+});
+
+return readJsonResponse(res);
+}
+
+function getCategoryConfig(category){
+return categories.find(item=>item.label === category) || {
+label:category,
+aliases:[category]
+};
+}
+
+function isInCategory(media,category){
+const config = getCategoryConfig(category);
+const mediaCategory = normalizeCategory(media.category);
+
+return config.aliases.some(alias=>
+normalizeCategory(alias) === mediaCategory
+);
+}
+
+function getCategoryMedia(category){
+return allMedia.filter(item=>
+isInCategory(item,category)
+&&
+(item.type === "photo" || item.type === "image")
+);
+}
+
+function getVisibleCategories(){
+const visibleCategories = [...categories];
+
+allMedia.forEach(item=>{
+if(!(item.type === "photo" || item.type === "image")){
+return;
+}
+
+const itemCategory = item.category || "General";
+const alreadyListed =
+visibleCategories.some(categoryItem=>
+categoryItem.aliases.some(alias=>
+normalizeCategory(alias) === normalizeCategory(itemCategory)
+)
+);
+
+if(!alreadyListed){
+visibleCategories.push({
+label:itemCategory,
+aliases:[itemCategory]
+});
+}
+});
+
+return visibleCategories.filter(categoryItem=>
+getCategoryMedia(categoryItem.label).length > 0
+);
+}
+
+function renderCategoryTabs(){
+const tabs =
+document.getElementById("categoryTabs");
+
+tabs.innerHTML = "";
+
+getVisibleCategories().forEach(categoryItem=>{
+const category = categoryItem.label;
+const cover =
+getCategoryCover(category);
+const count =
+getCategoryMedia(category).length;
+const countText =
+isFeaturedMode ? `<small>${count} upload${count === 1 ? "" : "s"}</small>` : "";
+const adminMenuButton =
+isGalleryAdminMode
+? `<button type="button" class="category-more" onclick="openCategoryAdminMenu(event,'${escapeJs(category)}')" aria-label="Manage ${escapeHtml(category)}">...</button>`
+: "";
+
+tabs.innerHTML += `
+<div
+class="category-card ${category === activeCategory ? 'active' : ''}"
+role="button"
+tabindex="0"
+onclick="showCategory('${escapeJs(category)}')">
+${cover ? `<img src="${cover}" alt="${category}">` : ""}
+${adminMenuButton}
+<span>
+${category}
+${countText}
+</span>
+</div>
+`;
+});
+
+if(tabs.innerHTML === ""){
+tabs.innerHTML = `
+<div class="empty">
+No gallery images uploaded yet
+</div>
+`;
+}
+}
+
+function getCategoryCover(category){
+const chosenCover =
+categoryCoverMap[normalizeCategory(category)];
+
+if(chosenCover){
+return "/uploads/" + chosenCover;
+}
+
+const categoryMedia =
+allMedia.find(item=>
+isInCategory(item,category)
+&&
+item.filename
+&&
+item.type !== "video"
+);
+
+if(categoryMedia){
+return "/uploads/" + categoryMedia.filename;
+}
+
+const anyMedia =
+allMedia.find(item=>
+isInCategory(item,category)
+&&
+item.filename
+);
+
+if(anyMedia){
+return "/uploads/" + anyMedia.filename;
+}
+
+return "";
+}
+
+async function loadCategoryCovers(){
+try{
+const res =
+await fetch("/category-covers?t=" + new Date().getTime());
+
+const data =
+await res.json();
+
+categoryCoverMap = {};
+
+data.forEach(item=>{
+if(item.filename){
+categoryCoverMap[normalizeCategory(item.category)] = item.filename;
+}
+});
+
+}catch(err){
+console.log(err);
+categoryCoverMap = {};
+}
+}
+
+function showCategory(category){
+activeCategory = category;
+document.getElementById("categoryTabs").style.display = "none";
+document.getElementById("categoryDetail").classList.add("show");
+document.getElementById("categoryTitle").innerText = category;
+updateFeaturedBar();
+renderGallery();
+document.getElementById("gallery").scrollIntoView({
+behavior:"smooth",
+block:"start"
+});
+}
+
+function showCategories(){
+activeCategory = "";
+document.getElementById("categoryTabs").style.display = "grid";
+document.getElementById("categoryDetail").classList.remove("show");
+document.getElementById("gallery").innerHTML = "";
+updateFeaturedBar();
+}
+
+function openCategoryAdminMenu(event,category){
+if(!isGalleryAdminMode){
+return;
+}
+
+event.preventDefault();
+event.stopPropagation();
+
+activeAdminCategory = category;
+
+const menu = document.getElementById("galleryAdminMenu");
+menu.innerHTML = `
+<p>${escapeHtml(category)}</p>
+<button type="button" data-gallery-action="upload-category">Upload new image</button>
+<button type="button" data-gallery-action="change-cover">Change display image</button>
+`;
+
+menu.style.left =
+Math.min(event.clientX,window.innerWidth - 240) + "px";
+menu.style.top =
+Math.min(event.clientY,window.innerHeight - 140) + "px";
+menu.classList.add("show");
+}
+
+function openPhotoAdminMenu(event,photoId){
+if(!isGalleryAdminMode){
+return;
+}
+
+event.preventDefault();
+event.stopPropagation();
+
+activeAdminPhotoId = Number(photoId);
+
+const menu = document.getElementById("galleryAdminMenu");
+menu.innerHTML = `
+<p>Gallery image</p>
+<button type="button" data-gallery-action="delete-photo">Delete</button>
+<button type="button" data-gallery-action="set-hero">Set as hero image</button>
+<button type="button" data-gallery-action="set-featured">Set as featured image</button>
+`;
+
+menu.style.left =
+Math.min(event.clientX,window.innerWidth - 240) + "px";
+menu.style.top =
+Math.min(event.clientY,window.innerHeight - 180) + "px";
+menu.classList.add("show");
+}
+
+function openCategoryUploadDialog(category){
+showAdminDialog(
+"Upload New Image",
+`
+<p>Add a new image inside ${escapeHtml(category)}.</p>
+<input id="galleryCategoryUploadInput" type="file" accept="image/*" multiple>
+<div id="galleryCategoryUploadBody"></div>
+<div class="gallery-admin-actions">
+<button type="button" data-gallery-dialog-action="save-category-upload">Upload image</button>
+</div>
+`
+);
+}
+
+function openCoverDialog(category){
+const photos = getCategoryMedia(category);
+
+showAdminDialog(
+"Change Display Image",
+`
+<p>Choose one image from ${escapeHtml(category)}, or upload a new display image.</p>
+<input id="galleryCoverUploadInput" type="file" accept="image/*" hidden>
+<div class="gallery-admin-actions">
+<button type="button" data-gallery-dialog-action="upload-cover-file">Upload new display image</button>
+</div>
+<div class="gallery-choice-grid">
+${photos.map(photo=>`
+<button type="button" data-cover-photo-id="${photo.id}">
+<img src="/uploads/${photo.filename}" alt="">
+<span>${escapeHtml(photo.title || photo.category || "Gallery image")}</span>
+</button>
+`).join("")}
+</div>
+`
+);
+}
+
+async function reloadGallery(){
+const res = await fetch("/photos?t=" + Date.now());
+allMedia =
+(await readJsonResponse(res)).filter(item=>
+item.type === "photo" || item.type === "image"
+);
+await loadCategoryCovers();
+renderCategoryTabs();
+
+if(activeCategory){
+renderGallery();
+}
+}
+
+async function setPhotoAsHero(photoId){
+const res = await fetch("/hero-from-gallery",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+photoId,
+heading:"PhotoRoast",
+description:"Where every frame feels like a memory worth keeping"
+})
+});
+
+const data = await readJsonResponse(res);
+alert(data.message || "Image set as hero image");
+}
+
+async function setPhotoAsFeatured(photoId){
+const res = await fetch("/featured-image/" + photoId,{
+method:"POST"
+});
+
+const data = await readJsonResponse(res);
+alert(data.message || "Image set as featured image");
+}
+
+
+
+// =====================
+// YOUTUBE CONVERTER
+// =====================
+
+function convertYoutube(url){
+
+if(!url){
+return "";
+
+}
+
+let videoId = "";
+
+
+// SHORT URL
+
+if(url.includes("youtu.be/")){
+
+videoId =
+
+url
+.split("youtu.be/")[1]
+.split("?")[0];
+
+}
+
+
+// NORMAL URL
+
+else if(url.includes("watch?v=")){
+
+videoId =
+
+url
+.split("watch?v=")[1]
+.split("&")[0];
+
+}
+
+
+// SHORTS
+
+else if(url.includes("/shorts/")){
+
+videoId =
+
+url
+.split("/shorts/")[1]
+.split("?")[0];
+
+}
+
+
+// EMBED URL
+
+else if(url.includes("/embed/")){
+
+return url;
+
+}
+
+const embedUrl =
+
+`https://www.youtube.com/embed/${videoId}?rel=0`;
+
+return embedUrl;
+
+}
+
+function setMediaRatio(media){
+const box =
+media.closest(".media-box");
+
+if(!box){
+return;
+}
+
+const width =
+media.naturalWidth || media.videoWidth || 0;
+
+const height =
+media.naturalHeight || media.videoHeight || 0;
+
+box.classList.remove("portrait","cinematic");
+box.style.aspectRatio = "";
+
+if(width && height && window.matchMedia("(min-width: 768px)").matches){
+box.style.aspectRatio = `${width} / ${height}`;
+return;
+}
+
+if(height > width){
+box.classList.add("portrait");
+return;
+}
+
+box.classList.add("cinematic");
+}
+
+window.addEventListener("resize",function(){
+document.querySelectorAll(".media").forEach(media=>{
+setMediaRatio(media);
+});
+});
+
+function isSelectableFeaturedImage(item){
+return item.filename && (item.type === "photo" || item.type === "image");
+}
+
+function updateFeaturedBar(){
+const bar =
+document.getElementById("featuredSaveBar");
+
+if(!isFeaturedMode){
+bar.classList.remove("show");
+return;
+}
+
+bar.classList.add("show");
+document.getElementById("featuredCount").innerText =
+selectedFeaturedIds.length + " / 5 selected for Featured Gallery";
+}
+
+function toggleFeaturedImage(id){
+if(!isFeaturedMode){
+return;
+}
+
+const media =
+allMedia.find(item=>Number(item.id) === Number(id));
+
+if(!media || !isSelectableFeaturedImage(media)){
+alert("Please choose only image uploads for featured gallery");
+return;
+}
+
+if(selectedFeaturedIds.includes(id)){
+selectedFeaturedIds =
+selectedFeaturedIds.filter(item=>item !== id);
+}else{
+if(selectedFeaturedIds.length>=5){
+alert("Only 5 images can be shown in featured gallery");
+return;
+}
+
+selectedFeaturedIds.push(id);
+}
+
+updateFeaturedBar();
+renderGallery();
+}
+
+async function saveFeaturedImages(){
+if(!isFeaturedMode){
+return;
+}
+
+if(selectedFeaturedIds.length===0){
+alert("Please choose featured images first");
+return;
+}
+
+try{
+const res =
+await fetch("/featured-images",{
+method:"PUT",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+ids:selectedFeaturedIds
+})
+});
+
+const data =
+await res.json();
+
+alert(data.message || "Featured images updated");
+
+}catch(err){
+console.log(err);
+alert("Featured images update failed");
+}
+}
+
+async function loadFeaturedSelection(){
+if(!isFeaturedMode){
+return;
+}
+
+try{
+const res =
+await fetch("/featured-images?t=" + new Date().getTime());
+
+const data =
+await res.json();
+
+selectedFeaturedIds =
+data.map(item=>Number(item.id));
+
+updateFeaturedBar();
+
+}catch(err){
+console.log(err);
+}
+}
+
+
+
+
+// =====================
+// RENDER GALLERY
+// =====================
+
+function renderGallery(){
+const g =
+
+document.getElementById(
+"gallery"
+);
+
+g.innerHTML="";
+
+if(!activeCategory){
+return;
+}
+
+const filtered =
+getCategoryMedia(activeCategory);
+
+if(!filtered || filtered.length===0){
+
+g.innerHTML = `
+
+<div class="empty">
+
+No ${activeCategory} media uploaded
+
+</div>
+
+`;
+
+return;
+
+}
+
+filtered.forEach(p=>{
+
+let media = "";
+
+
+// =====================
+// YOUTUBE
+// =====================
+
+if(
+p.youtube
+||
+p.type==="youtube"
+){
+
+const embedUrl =
+
+convertYoutube(
+p.youtube
+);
+
+media = `
+
+<iframe
+
+src="${embedUrl}"
+
+title="YouTube video player"
+
+allow="
+accelerometer;
+autoplay;
+clipboard-write;
+encrypted-media;
+gyroscope;
+picture-in-picture;
+web-share
+"
+
+referrerpolicy="strict-origin-when-cross-origin"
+
+allowfullscreen>
+
+</iframe>
+
+`;
+
+}
+
+
+// =====================
+// VIDEO
+// =====================
+
+else if(
+p.type==="video"
+){
+
+media = `
+
+<div class="media-box">
+
+<video
+controls
+class="media"
+onloadedmetadata="setMediaRatio(this)"
+
+style="
+transform:
+translate(${p.posX || 0}px,
+${p.posY || 0}px)
+scale(${p.scale || 1});
+"
+
+>
+
+<source
+
+src=
+"/uploads/${p.filename}"
+
+>
+
+</video>
+
+</div>
+
+`;
+
+}
+
+
+// =====================
+// IMAGE
+// =====================
+
+else{
+
+media = `
+
+<div class="media-box">
+
+<img
+
+class="media"
+onload="setMediaRatio(this)"
+
+src=
+"/uploads/${p.filename}"
+
+alt="${p.title || ""}"
+
+style="
+transform:
+translate(${p.posX || 0}px,
+${p.posY || 0}px)
+scale(${p.scale || 1});
+"
+
+>
+
+</div>
+
+`;
+
+}
+
+
+g.innerHTML += `
+
+<div
+class="card ${selectedFeaturedIds.includes(Number(p.id)) ? 'selected' : ''}"
+data-photo-id="${p.id}"
+${isGalleryAdminMode ? `oncontextmenu="openPhotoAdminMenu(event,${p.id})"` : ""}
+${isFeaturedMode ? `onclick="toggleFeaturedImage(${p.id})"` : ""}>
+
+<div class="select-badge">
+${selectedFeaturedIds.includes(Number(p.id)) ? "Selected" : "Select"}
+</div>
+
+${media}
+
+<div class="card-content">
+
+<h3>
+
+${p.title || ""}
+
+</h3>
+
+<p>
+
+${p.description || ""}
+
+</p>
+
+<p>
+${p.category || ""}
+</p>
+
+</div>
+
+</div>
+
+`;
+
+});
+}
+
+// =====================
+// LOAD GALLERY
+// =====================
+
+async function load(){
+
+try{
+
+const res =
+
+await fetch(
+"/photos"
+);
+
+allMedia =
+(await res.json()).filter(item=>
+item.type === "photo" || item.type === "image"
+);
+
+await loadCategoryCovers();
+await loadFeaturedSelection();
+renderCategoryTabs();
+showCategories();
+
+}catch(err){
+
+console.error(err);
+
+alert(
+"Gallery Load Failed"
+);
+
+}
+
+}
+
+
+load();
+
+document.getElementById("galleryAdminMenu").addEventListener("click",async function(event){
+const action = event.target.dataset.galleryAction;
+
+if(!action){
+return;
+}
+
+closeAdminMenu();
+
+try{
+if(action === "upload-category"){
+openCategoryUploadDialog(activeAdminCategory);
+return;
+}
+
+if(action === "change-cover"){
+openCoverDialog(activeAdminCategory);
+return;
+}
+
+if(action === "delete-photo"){
+if(!confirm("Delete this gallery image?")){
+return;
+}
+
+const res = await fetch("/delete/" + activeAdminPhotoId,{
+method:"DELETE"
+});
+
+const data = await readJsonResponse(res);
+alert(data.message || "Gallery image deleted");
+await reloadGallery();
+return;
+}
+
+if(action === "set-hero"){
+await setPhotoAsHero(activeAdminPhotoId);
+return;
+}
+
+if(action === "set-featured"){
+await setPhotoAsFeatured(activeAdminPhotoId);
+await loadFeaturedSelection();
+return;
+}
+}catch(err){
+alert(err.message || "Update failed");
+}
+});
+
+document.getElementById("galleryAdminDialog").addEventListener("click",async function(event){
+if(event.target === this || event.target.hasAttribute("data-admin-close")){
+closeAdminDialog();
+return;
+}
+
+const action = event.target.dataset.galleryDialogAction;
+const coverPhotoId =
+event.target.closest("[data-cover-photo-id]")?.dataset.coverPhotoId;
+
+try{
+if(action === "save-category-upload"){
+const input = document.getElementById("galleryCategoryUploadInput");
+const files = Array.from(input?.files || []);
+
+if(files.length===0){
+alert("Choose image first");
+return;
+}
+
+const data = await uploadCategoryFiles(activeAdminCategory,files);
+alert(data.message || "Gallery image uploaded");
+await reloadGallery();
+closeAdminDialog();
+return;
+}
+
+if(action === "upload-cover-file"){
+document.getElementById("galleryCoverUploadInput").click();
+return;
+}
+
+if(coverPhotoId){
+const res = await fetch("/category-covers",{
+method:"PUT",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+category:activeAdminCategory,
+photoId:coverPhotoId
+})
+});
+
+const data = await readJsonResponse(res);
+alert(data.message || "Display image updated");
+await reloadGallery();
+closeAdminDialog();
+}
+}catch(err){
+alert(err.message || "Update failed");
+}
+});
+
+document.getElementById("galleryAdminDialog").addEventListener("change",async function(event){
+if(event.target.id !== "galleryCoverUploadInput"){
+return;
+}
+
+try{
+const files = Array.from(event.target.files || []);
+
+if(files.length===0){
+return;
+}
+
+const data = await uploadCategoryFiles(activeAdminCategory,[files[0]]);
+const photoId = Array.isArray(data.ids) ? data.ids[0] : null;
+
+if(!photoId){
+throw new Error("Display image uploaded, but could not select it automatically");
+}
+
+const res = await fetch("/category-covers",{
+method:"PUT",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+category:activeAdminCategory,
+photoId
+})
+});
+
+const coverData = await readJsonResponse(res);
+alert(coverData.message || "Display image updated");
+await reloadGallery();
+closeAdminDialog();
+}catch(err){
+alert(err.message || "Upload failed");
+}
+});
+
+document.addEventListener("click",function(event){
+if(!document.getElementById("galleryAdminMenu").contains(event.target)){
+closeAdminMenu();
+}
+});
+
+</script>
+
+</body>
+
+</html>

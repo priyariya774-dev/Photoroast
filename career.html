@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career - PhotoRoast</title>
+<script src="error-handler.js"></script>
+<script src="public-header.js" defer></script>
+
+<style>
+
+body{
+font-family:Arial;
+background:#ffffff;
+color:#171717;
+padding:14px;
+min-height:100vh;
+}
+
+h1{
+color:#ffd56b;
+text-align:center;
+margin-bottom:18px;
+font-size:28px;
+line-height:1.15;
+}
+
+.jobs, .form-box{
+max-width:800px;
+margin:auto;
+width:100%;
+}
+
+.job-card{
+background:#ffffff;
+padding:16px;
+margin-bottom:15px;
+border-radius:12px;
+border:1px solid rgba(255,215,120,.1);
+cursor:pointer;
+transition:0.3s;
+}
+
+.job-card:hover{
+transform:translateY(-2px);
+border-color:#ffd56b;
+}
+
+.job-card h3{
+color:#ffd56b;
+margin-bottom:5px;
+}
+
+.job-card p{
+color:#ccc;
+font-size:14px;
+}
+
+.form-box{
+display:none;
+background:#ffffff;
+padding:16px;
+border-radius:12px;
+margin-top:20px;
+}
+
+input, textarea{
+width:100%;
+padding:13px;
+margin-top:10px;
+border:none;
+border-radius:8px;
+background:#ffffff;
+color:#171717;
+outline:none;
+font-size:15px;
+box-sizing:border-box;
+}
+
+button{
+margin-top:15px;
+padding:12px;
+width:100%;
+background:linear-gradient(135deg,#ff1e1e,#ff8a00);
+border:none;
+color:#171717;
+font-weight:bold;
+border-radius:8px;
+cursor:pointer;
+}
+
+@media(min-width:768px){
+
+body{
+padding:24px;
+}
+
+h1{
+font-size:36px;
+margin-bottom:26px;
+}
+
+.jobs{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:16px;
+}
+
+.job-card{
+margin-bottom:0;
+}
+
+.form-box{
+padding:24px;
+}
+
+}
+
+@media(min-width:1024px){
+
+.jobs{
+grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+}
+
+.back{
+background:#ffffff;
+margin-bottom:10px;
+}
+
+</style>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<h1>Career at PhotoRoast</h1>
+
+<!-- JOB LIST -->
+<div class="jobs" id="jobList">
+
+    <div class="job-card" onclick="openForm('Photographer')">
+        <h3>Traditional Video Editor</h3>
+        <p>Capture weddings, events and cinematic shoots</p>
+    </div>
+
+    <div class="job-card" onclick="openForm('Video Editor')">
+        <h3>Candid Video Editor</h3>
+        <p>Edit cinematic reels and wedding films</p>
+    </div>
+
+    <div class="job-card" onclick="openForm('Intern')">
+        <h3>Photo Editing</h3>
+        <p>Edit Pictures </p>
+    </div>
+
+</div>
+
+<!-- APPLICATION FORM -->
+<div class="form-box" id="formBox">
+
+    <button class="back" onclick="goBack()">← Back to Jobs</button>
+
+    <h2 id="jobTitle">Apply</h2>
+
+    <form onsubmit="submitForm(event)">
+
+        <input type="text" id="name" placeholder="Your Name" required>
+
+        <input type="email" id="email" placeholder="Email">
+
+        <textarea id="details" placeholder="Why do you want this job?" rows="5"></textarea>
+
+        <input type="file" id="resume" accept=".pdf,.doc,.docx" required>
+
+        <button type="submit">Submit Application</button>
+
+    </form>
+
+</div>
+
+<script>
+
+let selectedJob = "";
+
+function openForm(job){
+
+selectedJob = job;
+
+document.getElementById("jobList").style.display = "none";
+
+document.getElementById("formBox").style.display = "block";
+
+document.getElementById("jobTitle").innerText = "Apply for " + job;
+
+}
+
+function goBack(){
+
+document.getElementById("jobList").style.display = "block";
+
+document.getElementById("formBox").style.display = "none";
+
+}
+
+function submitForm(e){
+
+e.preventDefault();
+
+const name = document.getElementById("name").value;
+
+const email = document.getElementById("email").value;
+
+const details = document.getElementById("details").value;
+
+const resume = document.getElementById("resume").files[0];
+
+console.log("JOB:", selectedJob);
+console.log("NAME:", name);
+console.log("EMAIL:", email);
+console.log("DETAILS:", details);
+console.log("RESUME FILE:", resume);
+
+alert("Application submitted successfully!");
+
+goBack();
+
+e.target.reset();
+
+}
+
+</script>
+
+</body>
+</html>

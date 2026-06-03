@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+<script src="../error-handler.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:Arial;
+padding:14px;
+background:#f5f5f5;
+}
+
+.top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+flex-wrap:wrap;
+gap:10px;
+}
+
+.logout{
+padding:10px 15px;
+background:black;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+
+.category{
+margin-top:30px;
+}
+
+.images{
+display:grid;
+grid-template-columns:1fr;
+gap:14px;
+}
+
+.card{
+background:white;
+padding:10px;
+border-radius:10px;
+width:250px;
+width:100%;
+box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+.card img,
+.card video{
+width:100%;
+border-radius:10px;
+}
+
+.card h3{
+margin-top:10px;
+}
+
+.card p{
+font-size:14px;
+color:gray;
+margin-top:5px;
+}
+
+.buttons{
+margin-top:10px;
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+}
+
+.delete{
+background:red;
+color:white;
+border:none;
+padding:8px;
+border-radius:6px;
+cursor:pointer;
+}
+
+.edit{
+background:green;
+color:white;
+border:none;
+padding:8px;
+border-radius:6px;
+cursor:pointer;
+}
+
+@media(min-width:768px){
+
+.images{
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:18px;
+}
+
+}
+
+@media(min-width:1024px){
+
+.images{
+grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+}
+
+</style>
+<link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+<script>
+
+if(localStorage.getItem("auth")!=="true"){
+window.location.href="login.html";
+}
+
+</script>
+
+
+<div class="top">
+
+<h1>Dashboard</h1>
+
+<button class="logout" onclick="logout()">
+Logout
+</button>
+
+</div>
+
+
+<div id="gallery"></div>
+
+
+
+<script>
+
+async function logout(){
+try{
+await fetch("/logout",{method:"POST"});
+}catch(err){}
+localStorage.removeItem("auth");
+window.location.href="login.html";
+}
+
+
+
+async function loadImages(){
+
+const response =
+await fetch(
+"/photos"
+);
+
+const photos =
+await response.json();
+
+const gallery =
+document.getElementById(
+"gallery"
+);
+
+gallery.innerHTML="";
+
+const grouped={};
+
+
+photos.forEach(photo=>{
+
+if(!grouped[photo.category]){
+
+grouped[photo.category]=[];
+
+}
+
+grouped[photo.category].push(photo);
+
+});
+
+
+
+for(let category in grouped){
+
+gallery.innerHTML += `
+
+<div class="category">
+
+<h2>${category}</h2>
+
+<div class="images">
+
+${grouped[category]
+
+.map(photo=>{
+
+const file=
+photo.filename.toLowerCase();
+
+const media =
+
+file.endsWith(".mp4") ||
+
+file.endsWith(".webm")
+
+?
+
+`<video controls>
+<source
+src="/uploads/${photo.filename}">
+</video>`
+
+:
+
+`<img
+src="/uploads/${photo.filename}">`;
+
+
+
+return `
+
+<div class="card">
+
+${media}
+
+<h3>${photo.title}</h3>
+
+<p>${photo.description}</p>
+
+<div class="buttons">
+
+<button
+class="delete"
+onclick="deleteMedia('${photo.filename}')">
+
+Delete
+
+</button>
+
+</div>
+
+</div>
+
+`;
+
+}).join("")}
+
+</div>
+
+</div>
+
+`;
+
+}
+
+}
+
+
+
+async function deleteMedia(file){
+
+await fetch(
+
+`/delete/${file}`,
+
+{
+method:"DELETE"
+}
+
+);
+
+loadImages();
+
+}
+
+
+
+loadImages();
+
+</script>
+
+</body>
+</html>

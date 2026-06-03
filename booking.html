@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>
+Book Your Shoot
+</title>
+<script src="error-handler.js"></script>
+<script src="public-header.js" defer></script>
+
+<link
+href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Poppins',sans-serif;
+background:#ffffff;
+color:#171717;
+min-height:100vh;
+padding:14px;
+display:flex;
+justify-content:center;
+align-items:flex-start;
+}
+
+.booking-container{
+width:100%;
+max-width:650px;
+background:#ffffff;
+padding:22px 16px;
+border-radius:18px;
+border:1px solid rgba(23,23,23,.12);
+box-shadow:0 16px 42px rgba(0,0,0,.08);
+margin:12px 0;
+}
+
+.booking-header{
+text-align:center;
+margin-bottom:30px;
+}
+
+.booking-header h2{
+font-size:28px;
+color:#ffd56b;
+margin-bottom:10px;
+line-height:1.15;
+}
+
+.booking-header p{
+color:#bbb;
+font-size:15px;
+line-height:1.7;
+}
+
+form{
+width:100%;
+}
+
+.form-group{
+margin-bottom:18px;
+}
+
+label{
+display:block;
+margin-bottom:8px;
+font-size:14px;
+color:#ffd56b;
+font-weight:500;
+}
+
+input,
+textarea{
+width:100%;
+padding:13px 14px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,.12);
+background:#ffffff;
+color:#171717;
+font-size:14px;
+outline:none;
+transition:.3s;
+font-family:'Poppins',sans-serif;
+}
+
+input:focus,
+textarea:focus{
+border-color:#ffd56b;
+box-shadow:0 0 0 3px rgba(255,215,107,.1);
+}
+
+textarea{
+resize:none;
+min-height:130px;
+}
+
+button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:14px;
+background:linear-gradient(
+135deg,
+#ffb300,
+#ff7b00
+);
+color:#111;
+font-size:15px;
+font-weight:700;
+cursor:pointer;
+transition:.3s;
+margin-top:10px;
+}
+
+button:hover{
+transform:translateY(-2px);
+opacity:.95;
+}
+
+@media(min-width:768px){
+.booking-container{
+padding:32px 28px;
+border-radius:22px;
+margin:28px 0;
+}
+
+.booking-header h2{
+font-size:36px;
+}
+
+.booking-header p{
+font-size:15px;
+}
+
+input,
+textarea{
+font-size:15px;
+padding:14px 16px;
+}
+
+button{
+padding:15px;
+font-size:16px;
+}
+
+}
+
+@media(min-width:1024px){
+
+body{
+align-items:center;
+padding:24px;
+}
+
+}
+
+</style>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="booking-container">
+
+<div class="booking-header">
+
+<h2>
+Book Your Shoot
+</h2>
+
+<p>
+Capture your beautiful moments with PhotoRoast.
+Fill the form below and we’ll contact you soon.
+</p>
+
+</div>
+
+<form id="bookingForm">
+
+<div class="form-group">
+
+<label>
+Full Name
+</label>
+
+<input
+type="text"
+id="name"
+placeholder="Enter your name"
+required>
+
+</div>
+
+<div class="form-group">
+
+<label>
+Phone Number
+</label>
+
+<input
+type="tel"
+id="phone"
+placeholder="Enter your phone number"
+required>
+
+</div>
+
+<div class="form-group">
+
+<label>
+Location
+</label>
+
+<input
+type="text"
+id="location"
+placeholder="Enter event location"
+required>
+
+</div>
+
+<div class="form-group">
+
+<label>
+How Many Events?
+</label>
+
+<input
+type="number"
+id="events"
+placeholder="Enter number of events"
+min="1"
+required>
+
+</div>
+
+<div class="form-group">
+
+<label>
+Select Event Dates
+</label>
+
+<input
+type="date"
+id="eventDate1"
+required>
+
+<div id="extraDates"></div>
+
+</div>
+
+<div class="form-group">
+
+<label>
+Email Address
+</label>
+
+<input
+type="email"
+id="email"
+placeholder="Enter your email"
+required>
+
+</div>
+
+<div class="form-group">
+
+<label>
+Your Requirements
+</label>
+
+<textarea
+id="message"
+placeholder="Tell us about your shoot requirements..."></textarea>
+
+</div>
+
+<button type="submit">
+Send Booking
+</button>
+
+</form>
+
+</div>
+
+<script>
+
+// ======================
+// MULTIPLE EVENT DATES
+// ======================
+
+document
+.getElementById("events")
+.addEventListener("input", function(){
+
+const count =
+parseInt(this.value) || 1;
+
+const container =
+document.getElementById("extraDates");
+
+container.innerHTML = "";
+
+// FIRST DATE already exists
+// so create remaining dates
+
+for(let i = 2; i <= count; i++){
+
+container.innerHTML += `
+
+<input
+type="date"
+class="extra-date"
+style="margin-top:12px;"
+required>
+
+`;
+
+}
+
+});
+
+
+// ======================
+// FORM SUBMIT
+// ======================
+
+document
+.getElementById("bookingForm")
+.addEventListener(
+"submit",
+async (e)=>{
+
+e.preventDefault();
+
+const dates = [];
+
+dates.push(
+document.getElementById("eventDate1").value
+);
+
+document
+.querySelectorAll(".extra-date")
+.forEach(input=>{
+
+dates.push(input.value);
+
+});
+
+const data = {
+
+name:
+document.getElementById("name").value,
+
+phone:
+document.getElementById("phone").value,
+
+location:
+document.getElementById("location").value,
+
+events:
+document.getElementById("events").value,
+
+eventDates:
+dates,
+
+email:
+document.getElementById("email").value,
+
+message:
+document.getElementById("message").value
+
+};
+
+try{
+
+const res = await fetch(
+
+"/bookings",
+
+{
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify(data)
+}
+
+);
+
+const result = await res.json();
+
+alert(
+result.message +
+"\n\nOpening WhatsApp..."
+);
+
+if(result.whatsapp){
+
+window.open(
+result.whatsapp,
+"_blank"
+);
+
+}
+
+document
+.getElementById("bookingForm")
+.reset();
+
+document.getElementById(
+"extraDates"
+).innerHTML = "";
+
+}catch(err){
+
+console.log(err);
+
+alert(
+"Booking failed"
+);
+
+}
+
+});
+
+</script>
+
+</body>
+
+</html>

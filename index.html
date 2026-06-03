@@ -1,0 +1,3336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>PhotoRoast</title>
+<script src="error-handler.js"></script>
+
+<link
+rel="preconnect"
+href="https://fonts.googleapis.com">
+
+<link
+rel="preconnect"
+href="https://fonts.gstatic.com"
+crossorigin>
+
+<link
+href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Cormorant+Garamond:wght@500;600;700&family=Dancing+Script:wght@600;700&family=Great+Vibes&family=Lora:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;600;700;800&family=Oswald:wght@400;600;700&family=Playfair+Display:wght@500;600;700;800&family=Poppins:wght@300;400;500;600;700&family=Raleway:wght@400;600;700;800&family=Roboto+Slab:wght@400;600;700&family=Syne:wght@400;500;600;700;800&display=swap"
+rel="stylesheet">
+
+<style>
+
+/* RESET */
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+html{
+scroll-behavior:smooth;
+}
+
+:root{
+--page-bg:#ffffff;
+--section-bg:#f7f7f4;
+--panel-bg:#ffffff;
+--header-bg:rgba(255,255,255,.94);
+--text-main:#171717;
+--text-soft:#4d4a45;
+--text-muted:#77716a;
+--accent:#ffd36e;
+--accent-2:#ff7a59;
+--accent-3:#d94f8a;
+--accent-4:#55d6c2;
+--glow-a:rgba(255,211,110,.12);
+--glow-b:rgba(255,122,89,.1);
+--glow-c:rgba(85,214,194,.08);
+--line:rgba(23,23,23,.12);
+--shadow:rgba(24,24,24,.12);
+--site-font:'Montserrat','Poppins','Segoe UI',Arial,sans-serif;
+--display-font:'Cormorant Garamond','Playfair Display',Georgia,serif;
+}
+
+body{
+
+font-family:
+var(--site-font);
+
+background:var(--page-bg);
+
+color:var(--text-main);
+
+overflow-x:hidden;
+
+}
+
+body.site-font-applied,
+body.site-font-applied p,
+body.site-font-applied a,
+body.site-font-applied button,
+body.site-font-applied input,
+body.site-font-applied textarea,
+body.site-font-applied select,
+body.site-font-applied label,
+body.site-font-applied span,
+body.site-font-applied .brand{
+font-family:var(--site-font) !important;
+}
+
+body.site-font-applied .main-menu a,
+body.site-font-applied .cta h2,
+body.site-font-applied .cta a{
+font-family:var(--site-font) !important;
+}
+
+body.site-font-applied h1,
+body.site-font-applied h2,
+body.site-font-applied h3,
+body.site-font-applied .brand,
+.hero-overlay h1,
+.section-title h2,
+.about h2,
+.cta h2{
+font-family:var(--display-font) !important;
+}
+
+/* BACKGROUND */
+
+body::before{
+
+content:"";
+
+position:fixed;
+
+top:-200px;
+left:-200px;
+
+width:450px;
+height:450px;
+
+background:radial-gradient(circle,var(--glow-a),transparent 70%);
+
+filter:blur(60px);
+
+z-index:-2;
+
+}
+
+body::after{
+
+content:"";
+
+position:fixed;
+
+bottom:-200px;
+right:-200px;
+
+width:450px;
+height:450px;
+
+background:radial-gradient(circle,var(--glow-b),transparent 70%);
+
+filter:blur(60px);
+
+z-index:-2;
+
+}
+
+/* HEADER */
+
+header{
+
+position:fixed;
+z-index:10000;
+top:0;
+left:0;
+
+width:100%;
+
+padding:10px 18px;
+min-height:64px;
+
+display:grid;
+grid-template-columns:48px minmax(0,1fr) 48px;
+justify-content:normal;
+align-items:center;
+column-gap:12px;
+
+background:
+transparent;
+
+backdrop-filter:
+blur(0);
+-webkit-backdrop-filter:
+blur(0);
+
+z-index:1000;
+
+border-bottom:
+1px solid transparent;
+
+transition:
+background .28s ease,
+backdrop-filter .28s ease,
+border-color .28s ease,
+box-shadow .28s ease;
+
+}
+
+header.scrolled{
+background:var(--header-bg);
+backdrop-filter:blur(14px);
+-webkit-backdrop-filter:blur(14px);
+border-bottom:1px solid var(--line);
+box-shadow:0 12px 30px rgba(0,0,0,.08);
+}
+
+.logo-area{
+
+display:flex;
+align-items:center;
+justify-content:center;
+gap:0;
+
+position:absolute;
+left:auto;
+top:auto;
+transform:none;
+grid-column:1;
+justify-self:start;
+position:relative;
+width:48px;
+height:48px;
+
+}
+
+/* LOGO */
+
+.logo-frame{
+
+width:42px;
+height:42px;
+
+border-radius:50%;
+
+overflow:hidden;
+
+border:2px solid var(--accent);
+
+position:relative;
+
+background:white;
+
+flex-shrink:0;
+
+box-shadow:
+0 0 18px var(--shadow);
+
+}
+
+#siteLogo{
+
+position:absolute;
+
+top:50%;
+left:50%;
+
+width:100%;
+height:auto;
+
+max-width:none;
+
+transform:
+translate(-50%,-50%)
+translate(0px,0px)
+scale(1);
+
+transform-origin:center;
+
+}
+
+/* BRAND */
+
+.brand{
+
+position:absolute;
+left:auto;
+top:auto;
+transform:none;
+grid-column:2;
+justify-self:center;
+text-align:center;
+z-index:2;
+width:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+min-height:56px;
+
+font-family:
+var(--display-font);
+
+font-size:26px;
+
+font-weight:700;
+
+letter-spacing:1.4px;
+
+color:var(--text-main);
+background:none;
+-webkit-text-fill-color:currentColor;
+text-shadow:none;
+
+}
+
+.menu-toggle{
+
+position:absolute;
+right:auto;
+top:auto;
+transform:none;
+grid-column:3;
+justify-self:end;
+z-index:10002;
+pointer-events:auto;
+width:56px;
+height:48px;
+width:48px;
+
+border:1px solid var(--line);
+border-radius:0;
+
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+gap:5px;
+
+background:transparent;
+
+cursor:pointer;
+
+transition:
+background .28s ease,
+border-color .28s ease,
+box-shadow .28s ease;
+
+}
+
+header.scrolled .menu-toggle,
+.menu-toggle.active{
+background:#ffffff;
+border-color:var(--line);
+box-shadow:0 10px 24px rgba(0,0,0,.08);
+}
+
+.menu-toggle span{
+
+width:21px;
+height:2px;
+
+background:var(--accent);
+
+border-radius:10px;
+
+transition:.3s;
+
+}
+
+.menu-toggle.active span:nth-child(1){
+transform:translateY(7px) rotate(45deg);
+}
+
+.menu-toggle.active span:nth-child(2){
+opacity:0;
+}
+
+.menu-toggle.active span:nth-child(3){
+transform:translateY(-7px) rotate(-45deg);
+}
+
+.floating-whatsapp,
+.floating-contact{
+position:fixed;
+right:18px;
+z-index:1200;
+width:58px;
+height:58px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#25d366;
+color:white;
+text-decoration:none;
+box-shadow:0 14px 32px rgba(0,0,0,.28);
+transition:transform .25s ease,box-shadow .25s ease;
+}
+
+.floating-whatsapp{
+bottom:18px;
+background:#25d366;
+}
+
+.floating-contact{
+bottom:88px;
+background:var(--accent);
+color:#050505;
+}
+
+.floating-whatsapp:hover,
+.floating-contact:hover{
+transform:translateY(-3px);
+}
+
+.floating-whatsapp:hover{
+box-shadow:0 18px 38px rgba(37,211,102,.35);
+}
+
+.floating-contact:hover{
+box-shadow:0 18px 38px rgba(255,211,110,.32);
+}
+
+.floating-whatsapp svg,
+.floating-contact svg{
+width:31px;
+height:31px;
+fill:currentColor;
+}
+
+.main-menu{
+
+position:absolute;
+z-index:10001;
+display:none;
+
+top:calc(100% + 10px);
+right:16px;
+
+width:min(260px,calc(100vw - 32px));
+
+display:none;
+flex-direction:column;
+
+background:#ffffff;
+
+border:1px solid var(--line);
+border-radius:16px;
+
+box-shadow:0 18px 50px rgba(0,0,0,.14);
+
+overflow:hidden;
+
+}
+
+.main-menu.open{
+display:flex !important;
+}
+
+.main-menu a{
+
+padding:15px 18px;
+
+color:var(--text-main);
+
+text-decoration:none;
+
+font-family:var(--site-font);
+font-size:14px;
+font-weight:600;
+
+border-bottom:1px solid rgba(23,23,23,.08);
+
+}
+
+.main-menu a:last-child{
+border-bottom:0;
+}
+
+.main-menu a:hover{
+background:color-mix(in srgb,var(--accent) 14%,transparent);
+color:var(--accent);
+}
+
+/* HERO */
+
+.hero{
+
+min-height:100vh;
+width:100%;
+
+position:relative;
+
+overflow:hidden;
+
+margin-top:0;
+
+display:flex;
+align-items:center;
+justify-content:center;
+padding:104px 18px 44px;
+
+background:linear-gradient(180deg,#ffffff 0%,#fbfaf7 100%);
+
+}
+
+.hero-slider{
+
+width:min(78vw,430px);
+aspect-ratio:4 / 5;
+
+display:grid;
+place-items:center;
+
+z-index:2;
+cursor:pointer;
+
+}
+
+.hero-slide{
+
+position:absolute;
+
+inset:0;
+
+opacity:0;
+
+transition:
+opacity 420ms ease,
+filter 420ms ease;
+
+overflow:hidden;
+border:0;
+border-radius:18px;
+background:#f1f1ed;
+box-shadow:0 24px 70px rgba(0,0,0,.16);
+
+filter:brightness(.98) saturate(1);
+transform-origin:center;
+will-change:opacity,filter;
+
+}
+
+.hero-slide.active{
+opacity:1;
+filter:brightness(1) saturate(1.04);
+z-index:5;
+}
+}
+
+.hero-slide::before,
+.hero-slide::after{
+display:none;
+}
+
+.hero-slide img{
+
+position:absolute;
+
+top:50%;
+left:50%;
+
+width:100%;
+height:100%;
+
+object-fit:cover;
+
+max-width:none;
+
+transform:
+translate(-50%,-50%)
+translate(0px,0px)
+scale(1);
+
+transform-origin:center;
+
+}
+
+.hero-slide img{
+opacity:.94;
+}
+
+.hero-slide.active img{
+opacity:1;
+}
+
+.hero::before,
+.hero::after{
+display:none;
+}
+
+/* HERO OVERLAY */
+
+.hero-overlay{
+
+position:absolute;
+
+left:0;
+right:0;
+bottom:26px;
+
+display:flex;
+flex-direction:column;
+justify-content:flex-end;
+align-items:center;
+
+text-align:center;
+
+padding:18px;
+
+background:transparent;
+
+z-index:10;
+pointer-events:none;
+
+}
+
+.hero-overlay h1{
+
+font-family:
+var(--display-font);
+
+font-size:46px;
+
+line-height:1.02;
+
+color:var(--text-main);
+background:none;
+-webkit-text-fill-color:currentColor;
+
+margin-bottom:10px;
+
+max-width:900px;
+
+}
+
+.hero-overlay p{
+
+font-size:13px;
+
+color:var(--text-soft);
+
+max-width:720px;
+
+line-height:1.9;
+
+}
+
+/* SECTION TITLE */
+
+.section-title{
+
+text-align:center;
+
+margin-bottom:35px;
+
+padding:0 20px;
+
+}
+
+.section-title h2{
+
+font-family:
+var(--display-font);
+
+font-size:42px;
+
+color:var(--text-main);
+background:none;
+-webkit-text-fill-color:currentColor;
+
+margin-bottom:10px;
+
+}
+
+.section-title p{
+
+font-size:13px;
+
+color:var(--text-muted);
+font-weight:600;
+letter-spacing:1.6px;
+text-transform:uppercase;
+
+}
+
+/* GALLERY */
+
+.home-gallery{
+
+padding:54px 0 72px;
+
+background:var(--section-bg);
+
+overflow:hidden;
+
+}
+
+.gallery-slider-box{
+
+overflow:hidden;
+
+width:100%;
+
+}
+
+.gallery-slider-track{
+
+display:flex;
+
+gap:18px;
+
+width:max-content;
+
+animation:autoScroll 35s linear infinite;
+
+padding-left:18px;
+
+}
+
+.gallery-card{
+
+min-width:250px;
+
+height:340px;
+
+border-radius:24px;
+
+overflow:hidden;
+
+background:color-mix(in srgb,var(--page-bg) 82%,white 6%);
+
+position:relative;
+
+flex-shrink:0;
+
+border:
+1px solid var(--line);
+
+transition:.35s;
+
+}
+
+.gallery-card img{
+
+width:100%;
+height:100%;
+
+object-fit:cover;
+
+transition:.4s;
+
+}
+
+.gallery-card:hover img{
+transform:scale(1.05);
+}
+
+.gallery-overlay{
+
+position:absolute;
+
+bottom:0;
+left:0;
+
+width:100%;
+
+padding:16px;
+
+background:
+linear-gradient(
+transparent,
+rgba(0,0,0,.95)
+);
+
+}
+
+.gallery-overlay h3{
+
+font-size:17px;
+
+color:var(--accent);
+
+margin-bottom:5px;
+
+}
+
+.gallery-overlay p{
+
+font-size:12px;
+
+color:var(--text-soft);
+
+line-height:1.6;
+
+}
+
+.section-empty{
+width:min(720px,calc(100vw - 40px));
+margin:0 auto;
+padding:26px 20px;
+text-align:center;
+border:1px solid var(--line);
+background:#ffffff;
+color:var(--text-soft);
+font-size:14px;
+line-height:1.7;
+}
+
+@keyframes autoScroll{
+
+0%{
+transform:translateX(0);
+}
+
+100%{
+transform:translateX(-50%);
+}
+
+}
+
+/* ABOUT */
+
+.about{
+
+padding:76px 20px 58px;
+
+text-align:center;
+
+}
+
+.about h2{
+
+font-family:
+var(--display-font);
+
+font-size:44px;
+
+color:var(--text-main);
+background:none;
+-webkit-text-fill-color:currentColor;
+
+margin-bottom:20px;
+
+}
+
+.about p{
+
+max-width:850px;
+
+margin:auto;
+
+line-height:1.9;
+
+color:var(--text-soft);
+
+font-size:17px;
+
+}
+
+/* REVIEWS */
+
+.reviews{
+
+padding:80px 20px;
+
+background:var(--section-bg);
+
+}
+
+.reviews-grid{
+
+display:grid;
+
+grid-template-columns:1fr;
+
+gap:22px;
+
+margin-top:40px;
+
+max-width:1040px;
+
+margin-left:auto;
+margin-right:auto;
+
+}
+
+.review-card{
+
+background:
+var(--panel-bg);
+
+backdrop-filter:
+blur(12px);
+
+border-radius:24px;
+
+overflow:hidden;
+
+border:
+1px solid var(--line);
+
+transition:.35s;
+
+box-shadow:
+0 18px 48px rgba(0,0,0,.08);
+
+}
+
+.review-card:hover{
+
+transform:
+translateY(-8px);
+
+box-shadow:
+0 10px 30px var(--shadow);
+
+}
+
+.review-card video{
+
+width:100%;
+
+aspect-ratio:16/9;
+
+object-fit:cover;
+
+background:#f1f1ed;
+
+display:block;
+
+border-bottom:
+1px solid var(--line);
+
+}
+
+.review-content{
+padding:18px;
+}
+
+.review-content h3{
+
+color:var(--accent);
+
+margin-bottom:10px;
+
+font-size:19px;
+
+font-family:
+'Syne',
+sans-serif;
+
+}
+
+.review-content p{
+
+font-size:13px;
+
+line-height:1.8;
+
+color:var(--text-soft);
+
+}
+
+/* CTA */
+
+.cta{
+
+margin:80px 20px;
+
+padding:60px 20px;
+
+background:
+linear-gradient(
+135deg,
+var(--accent-3),
+var(--accent-2),
+var(--accent)
+);
+
+border-radius:28px;
+
+text-align:center;
+
+box-shadow:
+0 15px 40px var(--shadow);
+
+}
+
+.cta h2{
+
+font-family:'Poppins',Arial,sans-serif;
+
+font-size:38px;
+
+margin-bottom:15px;
+
+}
+
+.cta p{
+
+font-size:15px;
+
+margin-bottom:25px;
+
+line-height:1.8;
+
+}
+
+.cta a{
+
+display:inline-block;
+
+padding:15px 30px;
+
+background:color-mix(in srgb,var(--page-bg) 88%,black 12%);
+
+color:var(--accent);
+
+text-decoration:none;
+
+border-radius:50px;
+
+font-weight:600;
+
+font-family:'Poppins',Arial,sans-serif;
+
+transition:.3s;
+
+}
+
+.cta a:hover{
+
+transform:scale(1.05);
+
+}
+
+/* FOOTER */
+
+footer{
+
+padding:30px 20px;
+
+text-align:center;
+
+background:#f7f7f4;
+
+color:var(--text-muted);
+
+font-size:14px;
+
+border-top:
+1px solid var(--line);
+
+}
+
+.footer-links{
+display:flex;
+flex-wrap:wrap;
+align-items:center;
+justify-content:center;
+gap:12px;
+margin-bottom:12px;
+}
+
+.footer-links a{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+gap:8px;
+padding:10px 14px;
+border-radius:999px;
+background:#ffffff;
+color:var(--text-main);
+text-decoration:none;
+font-weight:700;
+font-family:'Poppins',Arial,sans-serif;
+border:1px solid var(--line);
+}
+
+.footer-links .social-icon{
+width:44px;
+height:44px;
+padding:0;
+}
+
+.footer-links a:hover{
+background:rgba(255,211,110,.14);
+color:var(--accent);
+}
+
+.footer-links svg{
+width:18px;
+height:18px;
+fill:currentColor;
+}
+
+/* RESPONSIVE */
+
+.admin-edit-banner{
+position:fixed;
+left:12px;
+right:12px;
+bottom:12px;
+z-index:20000;
+padding:10px 12px;
+background:#171717;
+color:#fff;
+font-size:13px;
+text-align:center;
+box-shadow:0 12px 28px rgba(0,0,0,.18);
+}
+
+.admin-edit-menu{
+position:fixed;
+z-index:22000;
+display:none;
+min-width:230px;
+background:#fff;
+border:1px solid var(--line);
+box-shadow:0 18px 48px rgba(0,0,0,.18);
+padding:8px;
+}
+
+.admin-edit-menu.show{
+display:block;
+}
+
+.admin-edit-menu p{
+font-size:12px;
+font-weight:700;
+color:var(--text-muted);
+padding:8px 10px;
+}
+
+.admin-edit-menu button,
+.admin-edit-menu a{
+width:100%;
+display:block;
+padding:11px 12px;
+margin:0;
+border:0;
+background:#fff;
+color:#171717;
+text-align:left;
+text-decoration:none;
+font-size:14px;
+font-weight:700;
+box-shadow:none;
+}
+
+.admin-edit-menu button:hover,
+.admin-edit-menu a:hover{
+background:#f7f7f4;
+transform:none;
+filter:none;
+}
+
+.admin-edit-dialog{
+position:fixed;
+inset:0;
+z-index:23000;
+display:none;
+align-items:center;
+justify-content:center;
+padding:16px;
+background:rgba(0,0,0,.42);
+}
+
+.admin-edit-dialog.show{
+display:flex;
+}
+
+.admin-dialog-panel{
+width:min(760px,100%);
+max-height:88vh;
+overflow:auto;
+background:#fff;
+border:1px solid var(--line);
+box-shadow:0 24px 70px rgba(0,0,0,.24);
+padding:18px;
+}
+
+.admin-dialog-panel h3{
+font-family:var(--display-font);
+font-size:28px;
+margin-bottom:8px;
+}
+
+.admin-dialog-panel p{
+color:var(--text-soft);
+font-size:14px;
+line-height:1.6;
+margin-bottom:12px;
+}
+
+.admin-dialog-actions{
+display:grid;
+grid-template-columns:1fr;
+gap:8px;
+margin:12px 0;
+}
+
+.admin-dialog-actions button{
+margin:0;
+padding:12px;
+border:1px solid var(--line);
+background:#fff;
+color:#171717;
+box-shadow:none;
+font-weight:700;
+cursor:pointer;
+}
+
+.admin-dialog-actions .danger{
+color:#b00020;
+border-color:#e0b5b5;
+}
+
+.admin-image-choice-grid{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:10px;
+margin-top:12px;
+}
+
+.admin-image-choice-grid button{
+margin:0;
+padding:0;
+border:1px solid var(--line);
+background:#fff;
+box-shadow:none;
+color:#171717;
+overflow:hidden;
+cursor:pointer;
+}
+
+.admin-image-choice-grid img{
+width:100%;
+aspect-ratio:4/3;
+object-fit:cover;
+display:block;
+}
+
+.admin-image-choice-grid span{
+display:block;
+padding:8px;
+font-size:12px;
+font-weight:700;
+}
+
+.admin-position-grid{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:8px;
+}
+
+.admin-preview-frame{
+position:relative;
+min-height:170px;
+margin:12px 0;
+overflow:hidden;
+background:#f7f7f4;
+border:1px solid var(--line);
+}
+
+.admin-preview-frame img{
+position:absolute;
+left:50%;
+top:50%;
+max-width:none;
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+.admin-logo-preview{
+min-height:96px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.admin-logo-preview img{
+position:relative;
+left:auto;
+top:auto;
+width:auto;
+height:72px;
+object-fit:contain;
+}
+
+@media(min-width:680px){
+.admin-dialog-actions{
+grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+.admin-image-choice-grid{
+grid-template-columns:repeat(4,minmax(0,1fr));
+}
+}
+
+[data-admin-edit].admin-edit-target{
+outline:2px solid #171717;
+outline-offset:-2px;
+}
+
+@media(min-width:768px){
+
+.hero{
+min-height:100vh;
+width:100%;
+max-width:none;
+margin-left:0;
+margin-right:0;
+border-radius:0;
+padding:112px 24px 54px;
+}
+
+.hero-overlay{
+justify-content:center;
+padding:20px;
+}
+
+.hero-overlay h1{
+font-size:68px;
+margin-bottom:18px;
+}
+
+.hero-overlay p{
+font-size:17px;
+}
+
+.home-gallery{
+padding:80px 0;
+}
+
+.gallery-card{
+
+min-width:320px;
+height:420px;
+
+}
+
+}
+
+@media(min-width:1100px){
+
+.hero-overlay h1{
+font-size:88px;
+}
+
+.gallery-card{
+
+min-width:360px;
+height:460px;
+
+}
+
+}
+
+@media(max-width:480px){
+
+header{
+padding:9px 12px;
+min-height:58px;
+grid-template-columns:42px minmax(0,1fr) 42px;
+column-gap:8px;
+}
+
+.logo-area{
+left:auto;
+}
+
+.menu-toggle{
+right:auto;
+}
+
+.brand{
+font-size:21px;
+letter-spacing:1px;
+min-height:42px;
+line-height:1;
+}
+
+.logo-area,
+.menu-toggle{
+width:42px;
+height:42px;
+}
+
+.logo-frame{
+width:36px;
+height:36px;
+border-width:1px;
+}
+
+.menu-toggle{
+border-radius:0;
+}
+
+.menu-toggle span{
+width:19px;
+}
+
+.floating-whatsapp,
+.floating-contact{
+right:14px;
+width:54px;
+height:54px;
+}
+
+.floating-whatsapp{
+bottom:14px;
+}
+
+.floating-contact{
+bottom:80px;
+}
+
+.hero{
+min-height:auto;
+height:auto;
+border-radius:0;
+padding:68px 0 34px;
+}
+
+.hero-slide{
+border-radius:0;
+box-shadow:none;
+}
+
+.hero-slider{
+width:100%;
+height:clamp(430px,64vh,560px);
+height:clamp(430px,64svh,560px);
+max-height:none;
+aspect-ratio:auto;
+}
+
+.hero-overlay h1{
+font-size:34px;
+margin-bottom:6px;
+}
+
+.hero-overlay p{
+font-size:12px;
+line-height:1.45;
+}
+
+.section-title h2,
+.about h2{
+font-size:28px;
+}
+
+
+.cta{
+margin:50px 14px;
+padding:42px 16px;
+border-radius:20px;
+}
+
+.cta h2{
+font-size:30px;
+}
+.gallery-link{
+text-decoration:none;
+color:inherit;
+display:block;
+}
+
+}
+
+
+</style>
+
+</head>
+
+<body>
+
+<header data-admin-edit="logo">
+
+<div class="logo-area">
+
+<div class="logo-frame">
+
+<img
+id="siteLogo"
+src="/uploads/logo.png">
+
+</div>
+
+</div>
+
+<div class="brand">
+PhotoRoast
+</div>
+
+<button
+type="button"
+class="menu-toggle"
+id="menuToggle"
+aria-label="Open menu"
+aria-expanded="false">
+<span></span>
+<span></span>
+<span></span>
+</button>
+
+<nav
+class="main-menu"
+id="mainMenu">
+<a href="#home">Home</a>
+<a href="client-gallery.html">Gallery</a>
+<a href="reels.html">Reels</a>
+<a href="#about">About</a>
+<a href="#client-reviews">Client Review/Testimonial</a>
+<a href="career.html">Career</a>
+<a href="booking.html">Contact</a>
+</nav>
+
+</header>
+
+<a
+href="https://wa.me/919489704906?text=Hi%20PhotoRoast%2C%20I%20would%20like%20to%20enquire%20about%20a%20shoot."
+class="floating-whatsapp"
+target="_blank"
+rel="noopener"
+aria-label="Chat on WhatsApp">
+<svg viewBox="0 0 32 32" aria-hidden="true">
+<path d="M16.04 3C9.44 3 4.08 8.35 4.08 14.93c0 2.1.55 4.15 1.6 5.95L4 29l8.33-1.62a11.9 11.9 0 0 0 5.71 1.45C24.64 28.83 30 23.48 30 16.9 30 10.33 24.64 3 16.04 3Zm0 23.73c-1.8 0-3.56-.48-5.1-1.38l-.37-.22-4.95.96.99-4.82-.25-.39a9.78 9.78 0 0 1-1.55-5.26c0-5.41 4.42-9.82 9.86-9.82 5.43 0 9.86 4.41 9.86 9.82 0 5.42-4.43 9.83-9.86 9.83Zm5.4-7.36c-.3-.15-1.76-.86-2.03-.96-.27-.1-.47-.15-.67.15-.2.29-.77.96-.94 1.15-.17.2-.35.22-.64.08-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.74-1.64-2.03-.17-.3-.02-.46.13-.6.13-.13.3-.35.44-.52.15-.17.2-.3.3-.49.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.29-1.03 1-1.03 2.45s1.06 2.85 1.2 3.05c.15.2 2.08 3.17 5.04 4.45.7.3 1.25.48 1.68.61.71.22 1.35.19 1.86.12.57-.08 1.76-.72 2-1.42.25-.7.25-1.3.18-1.42-.08-.13-.27-.2-.57-.35Z"/>
+</svg>
+</a>
+
+<a
+href="tel:+919489704906"
+class="floating-contact"
+aria-label="Call PhotoRoast">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.61 21 3 13.39 3 4c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2Z"/>
+</svg>
+</a>
+
+<section
+class="hero"
+id="home"
+data-admin-edit="hero">
+
+<div
+class="hero-slider"
+id="heroSlider">
+</div>
+
+<div class="hero-overlay">
+
+<h1 id="heroHeading">
+Loading...
+</h1>
+
+<p id="heroDescription">
+Loading...
+</p>
+
+</div>
+
+</section>
+
+<section
+class="about"
+id="about"
+data-admin-edit="about">
+
+<h2 id="aboutTitle">
+Capturing Timeless Wedding Moments
+</h2>
+
+<p id="aboutText">
+
+PhotoRoast creates heartfelt wedding stories, cinematic portraits, and elegant visual memories with a calm, premium editing style. Every frame is shaped to feel natural, emotional, and easy to relive.
+
+</p>
+
+</section>
+
+<section class="home-gallery" data-admin-edit="featured">
+
+<div class="section-title">
+
+<h2>
+Featured Gallery
+</h2>
+
+<p>
+Luxury cinematic moments captured beautifully
+</p>
+
+</div>
+
+<div class="gallery-slider-box">
+
+<div
+class="gallery-slider-track"
+id="galleryTrack">
+</div>
+
+</div>
+
+</section>
+
+<section
+class="reviews"
+id="client-reviews"
+data-admin-edit="reviews">
+
+<div class="section-title">
+
+<h2>
+Client Reviews
+</h2>
+
+<p>
+What our happy clients say
+</p>
+
+</div>
+
+<div
+class="reviews-grid"
+id="reviewsGrid">
+
+Loading...
+
+</div>
+
+</section>
+
+<section class="cta" data-admin-edit="cta">
+
+<h2>
+Book Your Shoot Today
+</h2>
+
+<p>
+Professional photography for weddings, portraits and cinematic reels.
+</p>
+
+<a href="booking.html">
+Book Now
+</a>
+
+</section>
+
+<footer>
+
+<div class="footer-links">
+<a
+class="social-icon"
+href="https://www.instagram.com/photoroast2020?igsh=MTc0ampqYmZmcG1ieQ%3D%3D"
+target="_blank"
+rel="noopener"
+aria-label="Open Instagram">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<path d="M7.8 2h8.4A5.8 5.8 0 0 1 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8A5.8 5.8 0 0 1 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2Zm0 2A3.8 3.8 0 0 0 4 7.8v8.4A3.8 3.8 0 0 0 7.8 20h8.4a3.8 3.8 0 0 0 3.8-3.8V7.8A3.8 3.8 0 0 0 16.2 4H7.8Zm8.95 1.55a1.35 1.35 0 1 1 0 2.7 1.35 1.35 0 0 1 0-2.7ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/>
+</svg>
+</a>
+<a
+class="social-icon"
+href="#"
+aria-label="Open Facebook">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<path d="M14 8.2V6.7c0-.72.48-.89.82-.89H17V2h-3.02C10.63 2 9.9 4.51 9.9 6.12V8.2H7v3.93h2.9V22H14v-9.87h2.78l.44-3.93H14Z"/>
+</svg>
+</a>
+<a
+class="social-icon"
+href="https://www.youtube.com/@photoroast"
+target="_blank"
+rel="noopener"
+aria-label="Open YouTube">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.91C18 4.83 12 4.83 12 4.83s-6 0-7.68.45a2.7 2.7 0 0 0-1.9 1.91A28.1 28.1 0 0 0 2 12a28.1 28.1 0 0 0 .42 4.81 2.7 2.7 0 0 0 1.9 1.91c1.68.45 7.68.45 7.68.45s6 0 7.68-.45a2.7 2.7 0 0 0 1.9-1.91A28.1 28.1 0 0 0 22 12a28.1 28.1 0 0 0-.42-4.81ZM10 15.17V8.83L15.2 12 10 15.17Z"/>
+</svg>
+</a>
+</div>
+
+<p>© 2026 PhotoRoast Studio</p>
+
+</footer>
+
+<script>
+
+/* HAMBURGER MENU FIXED */
+
+(function(){
+
+const btn =
+document.getElementById("menuToggle");
+
+const menu =
+document.getElementById("mainMenu");
+
+const header =
+document.querySelector("header");
+
+if(!btn || !menu){
+return;
+}
+
+function updateHeader(){
+if(window.scrollY > 20 || menu.classList.contains("open")){
+header.classList.add("scrolled");
+}else{
+header.classList.remove("scrolled");
+}
+}
+
+btn.onclick = function(e){
+
+e.preventDefault();
+e.stopPropagation();
+
+menu.classList.toggle("open");
+btn.classList.toggle("active");
+
+btn.setAttribute(
+"aria-expanded",
+menu.classList.contains("open")
+? "true"
+: "false"
+);
+
+updateHeader();
+
+};
+
+menu.querySelectorAll("a").forEach(link=>{
+
+link.onclick = function(){
+
+menu.classList.remove("open");
+btn.classList.remove("active");
+
+btn.setAttribute(
+"aria-expanded",
+"false"
+);
+
+updateHeader();
+
+};
+
+});
+
+document.addEventListener("click",function(e){
+
+if(
+!menu.contains(e.target)
+&&
+!btn.contains(e.target)
+){
+
+menu.classList.remove("open");
+btn.classList.remove("active");
+
+btn.setAttribute(
+"aria-expanded",
+"false"
+);
+
+updateHeader();
+
+}
+
+});
+
+window.addEventListener(
+"scroll",
+updateHeader,
+{passive:true}
+);
+
+updateHeader();
+
+})();
+/* LOAD LOGO */
+
+async function loadLogo(){
+
+try{
+
+const res =
+await fetch(
+"/logo"
+);
+
+const data =
+await res.json();
+
+const logo =
+document.getElementById(
+"siteLogo"
+);
+
+logo.src =
+"/uploads/logo.png?t="
++
+new Date().getTime();
+
+const posX =
+Number(data.posX) || 0;
+
+const posY =
+Number(data.posY) || 0;
+
+const scale =
+Number(data.scale) || 1;
+
+logo.style.transform =
+
+`translate(-50%,-50%)
+translate(${posX}px, ${posY}px)
+scale(${scale})`;
+
+}catch(err){
+
+console.log(err);
+
+}
+
+}
+
+loadLogo();
+
+function getSiteFontFamily(fontStyle){
+const fonts = {
+Poppins:"'Montserrat','Poppins','Segoe UI',Arial,sans-serif",
+Calibri:"Calibri,'Segoe UI',Arial,sans-serif",
+Cambria:"Cambria,Georgia,serif",
+Garamond:"Garamond,Georgia,serif",
+Verdana:"Verdana,Geneva,sans-serif",
+Tahoma:"Tahoma,Geneva,sans-serif",
+"Times New Roman":"'Times New Roman',Times,serif",
+"Trebuchet MS":"'Trebuchet MS',Arial,sans-serif",
+Cinzel:"'Cinzel',Georgia,serif",
+Syne:"'Syne','Poppins',Arial,sans-serif",
+Georgia:"Georgia,'Times New Roman',serif",
+Arial:"Arial,'Segoe UI',sans-serif",
+"Playfair Display":"'Playfair Display',Georgia,serif",
+Montserrat:"'Montserrat','Poppins',Arial,sans-serif",
+Oswald:"'Oswald','Arial Narrow',Arial,sans-serif",
+Lora:"'Lora',Georgia,serif",
+"Great Vibes":"'Great Vibes',cursive",
+"Cormorant Garamond":"'Cormorant Garamond',Georgia,serif",
+Merriweather:"'Merriweather',Georgia,serif",
+Raleway:"'Raleway','Poppins',Arial,sans-serif",
+"Roboto Slab":"'Roboto Slab',Georgia,serif",
+"Dancing Script":"'Dancing Script',cursive"
+};
+
+return fonts[fontStyle] || fonts.Poppins;
+}
+
+function applySiteFont(fontStyle){
+const family =
+getSiteFontFamily(fontStyle || "Montserrat");
+
+document.documentElement.style.setProperty("--site-font",family);
+document.body.style.fontFamily = family;
+document.body.classList.add("site-font-applied");
+localStorage.setItem("photoRoastFontStyle",fontStyle || "Montserrat");
+}
+
+async function loadSiteFontStyle(){
+try{
+const res =
+await fetch("/logo");
+
+const data =
+await res.json();
+
+document.body.style.fontFamily =
+getSiteFontFamily(data.fontStyle || localStorage.getItem("photoRoastFontStyle") || "Montserrat");
+
+applySiteFont(data.fontStyle || localStorage.getItem("photoRoastFontStyle") || "Montserrat");
+
+}catch(err){
+console.log(err);
+}
+}
+
+loadSiteFontStyle();
+
+/* LOAD HERO */
+
+let heroSliderTimer = null;
+let currentHeroIndex = 0;
+const defaultHeroHeading = "PhotoRoast";
+const defaultHeroDescription =
+"Where every frame feels like a memory worth keeping";
+
+function getHeroViewport(){
+return window.matchMedia("(max-width: 767px)").matches ? "mobile" : "desktop";
+}
+
+function getHeroPosition(item){
+const viewport = getHeroViewport();
+
+if(viewport === "mobile"){
+return {
+posX:Number(item.mobilePosX) || 0,
+posY:Number(item.mobilePosY) || 0,
+scale:Number(item.mobileScale) || 1
+};
+}
+
+return {
+posX:Number(item.desktopPosX ?? item.posX) || 0,
+posY:Number(item.desktopPosY ?? item.posY) || 0,
+scale:Number(item.desktopScale ?? item.scale) || 1
+};
+}
+
+async function loadHero(){
+
+try{
+
+const res =
+await fetch(
+"/hero?t=" + new Date().getTime()
+);
+
+const data =
+await res.json();
+
+const slider =
+document.getElementById(
+"heroSlider"
+);
+
+slider.innerHTML = "";
+
+if(!data || data.length===0){
+
+slider.innerHTML = `
+
+<div
+class="hero-slide active"
+style="background:var(--section-bg);">
+</div>
+
+`;
+
+document.getElementById(
+"heroHeading"
+).innerText =
+defaultHeroHeading;
+
+document.getElementById(
+"heroDescription"
+).innerText =
+defaultHeroDescription;
+
+return;
+
+}
+
+document.getElementById(
+"heroHeading"
+).innerText =
+data[0].heading || defaultHeroHeading;
+
+document.getElementById(
+"heroDescription"
+).innerText =
+data[0].description || defaultHeroDescription;
+
+data.forEach((item,index)=>{
+
+const heroPosition =
+getHeroPosition(item);
+
+const posX =
+heroPosition.posX;
+
+const posY =
+heroPosition.posY;
+
+const scale =
+heroPosition.scale;
+
+slider.innerHTML += `
+
+<div
+class="hero-slide">
+
+<img
+src="/uploads/${item.image}"
+style="
+transform:
+translate(-50%,-50%)
+translate(${posX}px, ${posY}px)
+scale(${scale});
+">
+
+</div>
+
+`;
+
+});
+
+window.currentHeroSlides =
+data;
+
+currentHeroIndex = 0;
+setHeroSlideClasses();
+setupHeroClickNavigation();
+
+}catch(err){
+
+console.log(err);
+
+}
+
+}
+
+function setHeroSlideClasses(){
+const slides =
+document.querySelectorAll(
+".hero-slide"
+);
+
+const count =
+slides.length;
+
+if(count===0){
+return;
+}
+
+slides.forEach((slide,index)=>{
+slide.classList.remove(
+"active",
+"prev",
+"next"
+);
+
+if(index === currentHeroIndex){
+slide.classList.add("active");
+return;
+}
+});
+}
+
+function updateHeroText(){
+const heroSlidesData =
+window.currentHeroSlides || [];
+
+if(heroSlidesData[currentHeroIndex]){
+document.getElementById("heroHeading").innerText =
+heroSlidesData[currentHeroIndex].heading || defaultHeroHeading;
+
+document.getElementById("heroDescription").innerText =
+heroSlidesData[currentHeroIndex].description || defaultHeroDescription;
+}
+}
+
+function showNextHeroSlide(){
+const slides =
+document.querySelectorAll(
+".hero-slide"
+);
+
+if(slides.length <= 1){
+return;
+}
+
+if(heroSliderTimer){
+clearInterval(heroSliderTimer);
+heroSliderTimer = null;
+}
+
+currentHeroIndex =
+(currentHeroIndex + 1) % slides.length;
+
+setHeroSlideClasses();
+updateHeroText();
+}
+
+function setupHeroClickNavigation(){
+const slides =
+document.querySelectorAll(
+".hero-slide"
+);
+
+const slider =
+document.getElementById("heroSlider");
+
+if(!slider || slides.length===0){
+return;
+}
+
+slider.onclick = showNextHeroSlide;
+slider.setAttribute("role","button");
+slider.setAttribute("tabindex","0");
+slider.setAttribute("aria-label","Show next hero image");
+slider.onkeydown = function(e){
+if(e.key === "Enter" || e.key === " "){
+e.preventDefault();
+showNextHeroSlide();
+}
+};
+
+}	
+
+loadHero();
+
+let heroViewport = getHeroViewport();
+
+window.addEventListener("resize",()=>{
+const viewport = getHeroViewport();
+
+if(viewport === heroViewport){
+return;
+}
+
+heroViewport = viewport;
+loadHero();
+});
+
+/* LOAD GALLERY */
+
+async function loadGallery(){
+
+try{
+
+const res =
+await fetch(
+"/featured-images?t=" + new Date().getTime()
+);
+
+const data =
+await res.json();
+
+const track =
+document.getElementById(
+"galleryTrack"
+);
+
+let html = "";
+
+data.forEach(photo=>{
+
+if(
+photo.filename
+&&
+(
+photo.type==="photo"
+||
+photo.type==="image"
+)
+){
+
+html += `
+
+<a href="client-gallery.html" class="gallery-link">
+
+<div class="gallery-card">
+
+<img
+src="/uploads/${photo.filename}">
+
+<div class="gallery-overlay">
+
+<h3>
+${photo.title || "PhotoRoast"}
+</h3>
+
+<p>
+${photo.description || ""}
+</p>
+
+</div>
+
+</div>
+
+</a>
+
+`;
+
+}
+
+});
+
+if(!html){
+track.innerHTML =
+`<div class="section-empty">Featured gallery images will appear here after the admin selects them from the gallery.</div>`;
+return;
+}
+
+track.innerHTML = html + html;
+
+}catch(err){
+
+console.log(err);
+
+}
+
+}
+
+loadGallery();
+
+/* LOAD REVIEWS */
+
+async function loadReviews(){
+
+try{
+
+const res =
+await fetch(
+"/reviews"
+);
+
+const data =
+await res.json();
+
+const grid =
+document.getElementById(
+"reviewsGrid"
+);
+
+grid.innerHTML = "";
+
+if(!data || data.length===0){
+
+grid.innerHTML =
+`<div class="section-empty">Client review videos will appear here after they are uploaded.</div>`;
+
+return;
+
+}
+
+data.forEach(review=>{
+
+grid.innerHTML += `
+
+<div class="review-card">
+
+<video
+controls
+muted
+playsinline
+preload="metadata"
+class="review-video">
+
+<source
+src="/uploads/${review.video}"
+type="video/mp4">
+
+</video>
+
+<div class="review-content">
+
+<h3>
+${review.name || "Client"}
+</h3>
+
+<p>
+${review.text || ""}
+</p>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+setupReviewAutoplay();
+
+}catch(err){
+
+console.log(err);
+
+}
+
+}
+
+function setupReviewAutoplay(){
+
+const reviewVideos =
+document.querySelectorAll(".review-video");
+
+if(reviewVideos.length===0){
+return;
+}
+
+if(!("IntersectionObserver" in window)){
+reviewVideos.forEach(video=>{
+video.muted = true;
+video.play().catch(()=>{});
+});
+return;
+}
+
+const observer =
+new IntersectionObserver(
+entries=>{
+entries.forEach(entry=>{
+
+const video =
+entry.target;
+
+if(entry.isIntersecting){
+video.muted = true;
+video.play().catch(()=>{});
+}else{
+video.pause();
+}
+
+});
+},
+{
+threshold:.45
+}
+);
+
+reviewVideos.forEach(video=>{
+observer.observe(video);
+});
+
+}
+
+loadReviews();
+
+async function loadSiteContent(){
+try{
+const res = await fetch("/site-content?t=" + new Date().getTime());
+const data = await res.json();
+
+document.getElementById("aboutTitle").innerText =
+data.aboutTitle || "Capturing Timeless Wedding Moments";
+
+document.getElementById("aboutText").innerText =
+data.aboutText || "";
+}catch(err){
+console.log(err);
+}
+}
+
+loadSiteContent();
+
+function isAdminEditMode(){
+return (
+localStorage.getItem("auth") === "true"
+&&
+new URLSearchParams(window.location.search).get("adminEdit") === "1"
+);
+}
+
+function setupAdminHomepageEditor(){
+if(!isAdminEditMode()){
+return;
+}
+
+const banner = document.createElement("div");
+banner.className = "admin-edit-banner";
+banner.innerText = "Admin edit mode: right-click a home page section to manage it.";
+document.body.appendChild(banner);
+
+const menu = document.createElement("div");
+menu.className = "admin-edit-menu";
+document.body.appendChild(menu);
+
+const dialog = document.createElement("div");
+dialog.className = "admin-edit-dialog";
+document.body.appendChild(dialog);
+
+let activeArea = null;
+
+function closeAdminMenu(){
+menu.classList.remove("show");
+document
+.querySelectorAll(".admin-edit-target")
+.forEach(item=>item.classList.remove("admin-edit-target"));
+}
+
+function closeDialog(){
+dialog.classList.remove("show");
+dialog.innerHTML = "";
+}
+
+function showDialog(title,content){
+dialog.innerHTML = `
+<div class="admin-dialog-panel">
+<h3>${title}</h3>
+${content}
+<div class="admin-dialog-actions">
+<button type="button" data-dialog-close>Close</button>
+</div>
+</div>
+`;
+dialog.classList.add("show");
+}
+
+async function readJsonResponse(res){
+const data = await res.json().catch(()=>({}));
+
+if(!res.ok){
+throw new Error(data.message || "Update failed");
+}
+
+return data;
+}
+
+function getLogoTransform(posX,posY,scale){
+return `translate(-50%,-50%) translate(${posX}px, ${posY}px) scale(${scale})`;
+}
+
+async function openLogoUploadDialog(){
+showDialog(
+"Update Logo",
+`
+<p>Choose the new logo, preview it, then save.</p>
+<input id="adminLogoFile" type="file" accept="image/*">
+<div class="admin-preview-frame admin-logo-preview">
+<img id="adminLogoPreview" src="/uploads/logo.png?t=${Date.now()}" alt="Logo preview">
+</div>
+<div class="admin-dialog-actions">
+<button type="button" data-action="save-logo-upload">Save logo</button>
+</div>
+`
+);
+
+const input = dialog.querySelector("#adminLogoFile");
+const preview = dialog.querySelector("#adminLogoPreview");
+
+input.addEventListener("change",function(){
+const file = input.files && input.files[0];
+
+if(file){
+preview.src = URL.createObjectURL(file);
+}
+});
+}
+
+async function openLogoPositionDialog(){
+const res = await fetch("/logo");
+const data = await readJsonResponse(res);
+let posX = Number(data.posX) || 0;
+let posY = Number(data.posY) || 0;
+let scale = Number(data.scale) || 1;
+
+showDialog(
+"Edit Logo Position",
+`
+<p>Adjust the logo inside the homepage logo area, then save.</p>
+<div class="admin-preview-frame admin-logo-preview">
+<img id="adminLogoPositionPreview" src="/uploads/logo.png?t=${Date.now()}" alt="Logo preview">
+</div>
+<div class="admin-position-grid">
+<button type="button" data-logo-move="up">Up</button>
+<button type="button" data-logo-move="down">Down</button>
+<button type="button" data-logo-move="left">Left</button>
+<button type="button" data-logo-move="right">Right</button>
+<button type="button" data-logo-move="zoom-in">Zoom in</button>
+<button type="button" data-logo-move="zoom-out">Zoom out</button>
+</div>
+<div class="admin-dialog-actions">
+<button type="button" data-action="save-logo-position">Save position</button>
+</div>
+`
+);
+
+function applyLogoPosition(){
+const transform = getLogoTransform(posX,posY,scale);
+const siteLogo = document.getElementById("siteLogo");
+const previewLogo = dialog.querySelector("#adminLogoPositionPreview");
+
+if(siteLogo){
+siteLogo.style.transform = transform;
+}
+
+if(previewLogo){
+previewLogo.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+}
+}
+
+dialog.logoPositionState = {
+get:()=>({posX,posY,scale}),
+move:type=>{
+if(type === "up"){
+posY -= 5;
+}
+
+if(type === "down"){
+posY += 5;
+}
+
+if(type === "left"){
+posX -= 5;
+}
+
+if(type === "right"){
+posX += 5;
+}
+
+if(type === "zoom-in"){
+scale = Math.min(3,Number((scale + .05).toFixed(2)));
+}
+
+if(type === "zoom-out"){
+scale = Math.max(.4,Number((scale - .05).toFixed(2)));
+}
+
+applyLogoPosition();
+}
+};
+
+applyLogoPosition();
+}
+
+async function deleteLogo(){
+if(!confirm("Delete the current logo from the homepage?")){
+return;
+}
+
+const res = await fetch("/delete-logo",{method:"DELETE"});
+const data = await readJsonResponse(res);
+alert(data.message || "Logo deleted");
+loadLogo();
+closeAdminMenu();
+}
+
+function heroLimitReached(){
+const count = (window.currentHeroSlides || []).length;
+return count >= 5;
+}
+
+function showHeroLimitMessage(){
+showDialog(
+"Hero Images Full",
+`
+<p>The homepage already has 5 hero images. Please delete one image before adding another.</p>
+`
+);
+}
+
+function getCurrentHeroText(){
+return {
+heading:document.getElementById("heroHeading").innerText || defaultHeroHeading,
+description:document.getElementById("heroDescription").innerText || defaultHeroDescription
+};
+}
+
+async function openHeroUpdateDialog(){
+if(heroLimitReached()){
+showHeroLimitMessage();
+return;
+}
+
+showDialog(
+"Add Hero Image",
+`
+<p>Upload a new image or choose one from the gallery.</p>
+<input id="adminHeroFile" type="file" accept="image/*" multiple hidden>
+<div class="admin-dialog-actions">
+<button type="button" data-action="choose-hero-upload">Upload from computer</button>
+<button type="button" data-action="choose-hero-gallery">Choose from gallery</button>
+</div>
+<div id="adminHeroUpdateBody"></div>
+`
+);
+}
+
+async function showGalleryHeroChoices(){
+if(heroLimitReached()){
+showHeroLimitMessage();
+return;
+}
+
+const body = dialog.querySelector("#adminHeroUpdateBody");
+body.innerHTML = "<p>Loading gallery images...</p>";
+
+const res = await fetch("/photos");
+const photos = await readJsonResponse(res);
+const imagePhotos = photos.filter(photo=>
+photo.filename && (photo.type === "photo" || photo.type === "image")
+);
+
+if(imagePhotos.length===0){
+body.innerHTML = "<p>No gallery images found. Upload one first, then choose it here.</p>";
+return;
+}
+
+body.innerHTML = `
+<div class="admin-image-choice-grid">
+${imagePhotos.map(photo=>`
+<button type="button" data-gallery-hero-id="${photo.id}">
+<img src="/uploads/${photo.filename}" alt="">
+<span>${photo.title || "Gallery image"}</span>
+</button>
+`).join("")}
+</div>
+`;
+}
+
+async function getFeaturedImages(){
+const res = await fetch("/featured-images?t=" + Date.now());
+return readJsonResponse(res);
+}
+
+async function featuredLimitReached(addCount){
+const featured = await getFeaturedImages();
+return featured.length + (Number(addCount) || 1) > 5;
+}
+
+function showFeaturedLimitMessage(){
+showDialog(
+"Featured Gallery Full",
+`
+<p>Featured gallery already has 5 images. Please delete one image before adding another.</p>
+`
+);
+}
+
+async function openFeaturedUpdateDialog(){
+showDialog(
+"Update Featured Gallery",
+`
+<p>Add an image to the homepage Featured Gallery.</p>
+<input id="adminFeaturedFile" type="file" accept="image/*" multiple hidden>
+<div class="admin-dialog-actions">
+<button type="button" data-action="choose-featured-upload">Upload from device</button>
+<button type="button" data-action="choose-featured-gallery">Choose from gallery</button>
+</div>
+<div id="adminFeaturedUpdateBody"></div>
+`
+);
+}
+
+async function showFeaturedGalleryChoices(){
+const body = dialog.querySelector("#adminFeaturedUpdateBody");
+body.innerHTML = "<p>Loading gallery images...</p>";
+
+const res = await fetch("/photos");
+const photos = await readJsonResponse(res);
+const imagePhotos = photos.filter(photo=>
+photo.filename && (photo.type === "photo" || photo.type === "image")
+);
+
+if(imagePhotos.length===0){
+body.innerHTML = "<p>No gallery images found. Upload one first, then choose it here.</p>";
+return;
+}
+
+body.innerHTML = `
+<div class="admin-image-choice-grid">
+${imagePhotos.map(photo=>`
+<button type="button" data-featured-gallery-id="${photo.id}">
+<img src="/uploads/${photo.filename}" alt="">
+<span>${photo.title || photo.category || "Gallery image"}</span>
+</button>
+`).join("")}
+</div>
+`;
+}
+
+async function openFeaturedDeleteDialog(){
+const featured = await getFeaturedImages();
+
+if(featured.length===0){
+showDialog(
+"Delete Featured Image",
+"<p>No featured images are selected yet.</p>"
+);
+return;
+}
+
+showDialog(
+"Delete Featured Image",
+`
+<p>Select the featured image you want to remove from the homepage.</p>
+<div class="admin-image-choice-grid">
+${featured.map(photo=>`
+<button type="button" data-featured-delete-id="${photo.id}">
+<img src="/uploads/${photo.filename}" alt="">
+<span>${photo.title || "Featured image"}</span>
+</button>
+`).join("")}
+</div>
+`
+);
+}
+
+function showHeroSelector(mode){
+const slides = window.currentHeroSlides || [];
+const title = mode === "delete" ? "Delete Hero Image" : "Edit Hero Position";
+
+if(slides.length===0){
+showDialog(title,"<p>No hero images are available yet.</p>");
+return;
+}
+
+showDialog(
+title,
+`
+<p>Select the hero image you want to ${mode === "delete" ? "delete" : "edit"}.</p>
+<div class="admin-image-choice-grid">
+${slides.map(slide=>`
+<button type="button" data-hero-select="${slide.id}" data-hero-mode="${mode}">
+<img src="/uploads/${slide.image}" alt="">
+<span>${slide.heading || "Hero image"}</span>
+</button>
+`).join("")}
+</div>
+`
+);
+}
+
+function openHeroPositionDialog(heroId,viewport){
+const slides = window.currentHeroSlides || [];
+const slide = slides.find(item=>String(item.id) === String(heroId));
+
+if(!slide){
+alert("Hero image not found");
+return;
+}
+
+const selectedViewport = viewport || getHeroViewport();
+const isMobile = selectedViewport === "mobile";
+let posX = Number(isMobile ? slide.mobilePosX : (slide.desktopPosX ?? slide.posX)) || 0;
+let posY = Number(isMobile ? slide.mobilePosY : (slide.desktopPosY ?? slide.posY)) || 0;
+let scale = Number(isMobile ? slide.mobileScale : (slide.desktopScale ?? slide.scale)) || 1;
+
+showDialog(
+"Edit Hero Position",
+`
+<p>Adjust this hero image for ${isMobile ? "mobile" : "desktop"} view, then save.</p>
+<div class="admin-dialog-actions">
+<button type="button" data-action="hero-position-viewport" data-viewport="mobile">Mobile</button>
+<button type="button" data-action="hero-position-viewport" data-viewport="desktop">Desktop</button>
+</div>
+<div class="admin-preview-frame">
+<img id="adminHeroPositionPreview" src="/uploads/${slide.image}" alt="Hero preview">
+</div>
+<div class="admin-position-grid">
+<button type="button" data-hero-move="up">Up</button>
+<button type="button" data-hero-move="down">Down</button>
+<button type="button" data-hero-move="left">Left</button>
+<button type="button" data-hero-move="right">Right</button>
+<button type="button" data-hero-move="zoom-in">Zoom in</button>
+<button type="button" data-hero-move="zoom-out">Zoom out</button>
+</div>
+<div class="admin-dialog-actions">
+<button type="button" data-action="save-hero-position">Save position</button>
+</div>
+`
+);
+
+function applyHeroPosition(){
+const preview = dialog.querySelector("#adminHeroPositionPreview");
+
+if(preview){
+preview.style.transform =
+`translate(-50%,-50%) translate(${posX}px, ${posY}px) scale(${scale})`;
+}
+}
+
+dialog.heroPositionState = {
+id:slide.id,
+viewport:selectedViewport,
+get:()=>({posX,posY,scale,viewport:selectedViewport,id:slide.id}),
+move:type=>{
+if(type === "up"){
+posY -= 8;
+}
+
+if(type === "down"){
+posY += 8;
+}
+
+if(type === "left"){
+posX -= 8;
+}
+
+if(type === "right"){
+posX += 8;
+}
+
+if(type === "zoom-in"){
+scale = Math.min(3,Number((scale + .05).toFixed(2)));
+}
+
+if(type === "zoom-out"){
+scale = Math.max(.4,Number((scale - .05).toFixed(2)));
+}
+
+applyHeroPosition();
+}
+};
+
+applyHeroPosition();
+}
+
+function setMenuContent(area){
+const labels = {
+logo:"Logo Area",
+hero:"Hero Images",
+featured:"Featured Gallery",
+about:"About Section",
+reviews:"Client Reviews",
+cta:"Booking Section"
+};
+
+const uploadBase = "admin/upload.html?section=";
+
+let content = `<p>${labels[area] || "Section"}</p>`;
+
+if(area === "logo"){
+content += `<button type="button" data-action="logo-update">Update new logo</button>`;
+content += `<button type="button" data-action="logo-edit">Edit position</button>`;
+content += `<button type="button" data-action="logo-delete">Delete logo</button>`;
+}
+
+if(area === "hero"){
+content += `<button type="button" data-action="hero-update">Update image</button>`;
+content += `<button type="button" data-action="hero-edit">Edit image position</button>`;
+content += `<button type="button" data-action="hero-delete">Delete image</button>`;
+content += `<button type="button" data-action="edit-hero-text">Edit title/subtitle</button>`;
+}
+
+if(area === "featured"){
+content += `<button type="button" data-action="featured-update">Update featured gallery</button>`;
+content += `<button type="button" data-action="featured-delete">Delete featured image</button>`;
+content += `<a href="client-gallery.html?adminEdit=1">Edit gallery</a>`;
+}
+
+if(area === "about"){
+content += `<button type="button" data-action="edit-about">Edit about text here</button>`;
+}
+
+if(area === "reviews"){
+content += `<a href="${uploadBase}reviews">Upload client review video</a>`;
+}
+
+if(area === "cta"){
+content += `<a href="booking.html">View booking page</a>`;
+}
+
+menu.innerHTML = content;
+}
+
+document.addEventListener("contextmenu",function(e){
+const target = e.target.closest("[data-admin-edit]");
+
+if(!target){
+return;
+}
+
+e.preventDefault();
+closeAdminMenu();
+
+activeArea = target.dataset.adminEdit;
+target.classList.add("admin-edit-target");
+setMenuContent(activeArea);
+
+menu.style.left =
+Math.min(e.clientX,window.innerWidth - 250) + "px";
+
+menu.style.top =
+Math.min(e.clientY,window.innerHeight - 220) + "px";
+
+menu.classList.add("show");
+});
+
+menu.addEventListener("click",async function(e){
+const action = e.target.dataset.action;
+
+try{
+if(action === "logo-update"){
+closeAdminMenu();
+await openLogoUploadDialog();
+return;
+}
+
+if(action === "logo-edit"){
+closeAdminMenu();
+await openLogoPositionDialog();
+return;
+}
+
+if(action === "logo-delete"){
+await deleteLogo();
+return;
+}
+
+if(action === "hero-update"){
+closeAdminMenu();
+await openHeroUpdateDialog();
+return;
+}
+
+if(action === "hero-edit"){
+closeAdminMenu();
+showHeroSelector("edit");
+return;
+}
+
+if(action === "hero-delete"){
+closeAdminMenu();
+showHeroSelector("delete");
+return;
+}
+
+if(action === "featured-update"){
+closeAdminMenu();
+await openFeaturedUpdateDialog();
+return;
+}
+
+if(action === "featured-delete"){
+closeAdminMenu();
+await openFeaturedDeleteDialog();
+return;
+}
+
+if(action === "edit-about"){
+const title =
+prompt("About title",document.getElementById("aboutTitle").innerText);
+
+if(title === null){
+return;
+}
+
+const text =
+prompt("About text",document.getElementById("aboutText").innerText);
+
+if(text === null){
+return;
+}
+
+const res = await fetch("/site-content",{
+method:"PUT",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+aboutTitle:title,
+aboutText:text
+})
+});
+
+const data = await res.json();
+
+if(!res.ok){
+alert(data.message || "About update failed");
+return;
+}
+
+document.getElementById("aboutTitle").innerText = title;
+document.getElementById("aboutText").innerText = text;
+alert(data.message || "About section updated");
+closeAdminMenu();
+return;
+}
+
+if(action === "edit-hero-text"){
+const heroSlidesData = window.currentHeroSlides || [];
+const currentSlide = heroSlidesData[currentHeroIndex];
+
+if(!currentSlide || !currentSlide.id){
+alert("Choose or upload a hero image first");
+return;
+}
+
+const heading =
+prompt("Hero title",document.getElementById("heroHeading").innerText);
+
+if(heading === null){
+return;
+}
+
+const description =
+prompt("Hero subtitle",document.getElementById("heroDescription").innerText);
+
+if(description === null){
+return;
+}
+
+const res = await fetch("/hero-text/" + currentSlide.id,{
+method:"PUT",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+heading,
+description
+})
+});
+
+const data = await res.json();
+
+if(!res.ok){
+alert(data.message || "Hero text update failed");
+return;
+}
+
+document.getElementById("heroHeading").innerText = heading;
+document.getElementById("heroDescription").innerText = description;
+currentSlide.heading = heading;
+currentSlide.description = description;
+alert(data.message || "Hero text updated");
+closeAdminMenu();
+}
+}catch(err){
+alert(err.message || "Update failed");
+}
+});
+
+dialog.addEventListener("click",async function(e){
+if(e.target === dialog || e.target.hasAttribute("data-dialog-close")){
+closeDialog();
+return;
+}
+
+const action = e.target.dataset.action;
+
+try{
+if(action === "save-logo-upload"){
+const input = dialog.querySelector("#adminLogoFile");
+const file = input && input.files && input.files[0];
+
+if(!file){
+alert("Choose a logo first");
+return;
+}
+
+const formData = new FormData();
+formData.append("logo",file);
+
+const res = await fetch("/upload-logo",{
+method:"POST",
+body:formData
+});
+
+const data = await readJsonResponse(res);
+alert(data.message || "Logo saved");
+await loadLogo();
+closeDialog();
+return;
+}
+
+if(action === "save-logo-position"){
+const state = dialog.logoPositionState && dialog.logoPositionState.get();
+
+if(!state){
+return;
+}
+
+const res = await fetch("/logo-position",{
+method:"PUT",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(state)
+});
+
+const data = await readJsonResponse(res);
+alert(data.message || "Logo position saved");
+closeDialog();
+return;
+}
+
+if(action === "choose-hero-upload"){
+const input = dialog.querySelector("#adminHeroFile");
+
+if(input){
+input.click();
+}
+
+return;
+}
+
+if(action === "choose-hero-gallery"){
+await showGalleryHeroChoices();
+return;
+}
+
+if(action === "choose-featured-upload"){
+const input = dialog.querySelector("#adminFeaturedFile");
+
+if(input){
+input.click();
+}
+
+return;
+}
+
+if(action === "choose-featured-gallery"){
+await showFeaturedGalleryChoices();
+return;
+}
+
+if(action === "hero-position-viewport"){
+const state = dialog.heroPositionState;
+
+if(state){
+openHeroPositionDialog(state.id,e.target.dataset.viewport);
+}
+
+return;
+}
+
+if(action === "save-hero-position"){
+const state = dialog.heroPositionState && dialog.heroPositionState.get();
+
+if(!state){
+return;
+}
+
+const res = await fetch("/hero-position",{
+method:"PUT",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(state)
+});
+
+const data = await readJsonResponse(res);
+alert(data.message || "Hero position saved");
+await loadHero();
+closeDialog();
+return;
+}
+
+const logoMove = e.target.dataset.logoMove;
+
+if(logoMove && dialog.logoPositionState){
+dialog.logoPositionState.move(logoMove);
+return;
+}
+
+const heroMove = e.target.dataset.heroMove;
+
+if(heroMove && dialog.heroPositionState){
+dialog.heroPositionState.move(heroMove);
+return;
+}
+
+const galleryHeroId = e.target.closest("[data-gallery-hero-id]")?.dataset.galleryHeroId;
+
+if(galleryHeroId){
+const text = getCurrentHeroText();
+const res = await fetch("/hero-from-gallery",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+photoId:galleryHeroId,
+heading:text.heading,
+description:text.description
+})
+});
+
+const data = await readJsonResponse(res);
+alert(data.message || "Hero image added");
+await loadHero();
+closeDialog();
+return;
+}
+
+const featuredGalleryId = e.target.closest("[data-featured-gallery-id]")?.dataset.featuredGalleryId;
+
+if(featuredGalleryId){
+if(await featuredLimitReached(1)){
+showFeaturedLimitMessage();
+return;
+}
+
+const res = await fetch("/featured-image/" + featuredGalleryId,{
+method:"POST"
+});
+
+const data = await readJsonResponse(res);
+alert(data.message || "Image added to featured gallery");
+await loadGallery();
+closeDialog();
+return;
+}
+
+const featuredDeleteId = e.target.closest("[data-featured-delete-id]")?.dataset.featuredDeleteId;
+
+if(featuredDeleteId){
+if(!confirm("Remove this image from Featured Gallery?")){
+return;
+}
+
+const res = await fetch("/featured-image/" + featuredDeleteId,{
+method:"DELETE"
+});
+
+const data = await readJsonResponse(res);
+alert(data.message || "Featured image removed");
+await loadGallery();
+closeDialog();
+return;
+}
+
+const heroChoice = e.target.closest("[data-hero-select]");
+
+if(heroChoice){
+const heroId = heroChoice.dataset.heroSelect;
+const mode = heroChoice.dataset.heroMode;
+
+if(mode === "delete"){
+if(!confirm("Delete this hero image?")){
+return;
+}
+
+const res = await fetch("/delete-hero/" + heroId,{method:"DELETE"});
+const data = await readJsonResponse(res);
+alert(data.message || "Hero image deleted");
+await loadHero();
+closeDialog();
+return;
+}
+
+openHeroPositionDialog(heroId,getHeroViewport());
+}
+}catch(err){
+alert(err.message || "Update failed");
+}
+});
+
+dialog.addEventListener("change",async function(e){
+if(e.target.id !== "adminHeroFile" && e.target.id !== "adminFeaturedFile"){
+return;
+}
+
+try{
+const files = Array.from(e.target.files || []);
+
+if(files.length===0){
+return;
+}
+
+if(e.target.id === "adminFeaturedFile"){
+if(await featuredLimitReached(files.length)){
+showFeaturedLimitMessage();
+e.target.value = "";
+return;
+}
+
+const body = dialog.querySelector("#adminFeaturedUpdateBody");
+
+body.innerHTML = `
+<p>${files.length} image${files.length > 1 ? "s" : ""} selected. Save to add to Featured Gallery.</p>
+<div class="admin-image-choice-grid">
+${files.map(file=>`
+<button type="button">
+<img src="${URL.createObjectURL(file)}" alt="">
+<span>${file.name}</span>
+</button>
+`).join("")}
+</div>
+<div class="admin-dialog-actions">
+<button type="button" id="adminSaveFeaturedUpload">Save featured image</button>
+</div>
+`;
+
+body.querySelector("#adminSaveFeaturedUpload").addEventListener("click",async function(){
+const formData = new FormData();
+files.forEach(file=>formData.append("galleryImages",file));
+formData.append("category","Featured Gallery");
+formData.append("title","Featured Gallery");
+formData.append("description","");
+
+const res = await fetch("/upload-gallery",{
+method:"POST",
+body:formData
+});
+
+const data = await readJsonResponse(res);
+const ids = Array.isArray(data.ids) ? data.ids : [];
+
+for(const id of ids){
+const featuredRes = await fetch("/featured-image/" + id,{method:"POST"});
+await readJsonResponse(featuredRes);
+}
+
+alert("Featured gallery updated");
+await loadGallery();
+closeDialog();
+});
+
+return;
+}
+
+const currentCount = (window.currentHeroSlides || []).length;
+
+if(currentCount + files.length > 5){
+alert("The homepage already has " + currentCount + " hero images. Please delete one image before adding another.");
+e.target.value = "";
+return;
+}
+
+const body = dialog.querySelector("#adminHeroUpdateBody");
+
+body.innerHTML = `
+<p>${files.length} image${files.length > 1 ? "s" : ""} selected. Save to add to homepage hero.</p>
+<div class="admin-image-choice-grid">
+${files.map(file=>`
+<button type="button">
+<img src="${URL.createObjectURL(file)}" alt="">
+<span>${file.name}</span>
+</button>
+`).join("")}
+</div>
+<div class="admin-dialog-actions">
+<button type="button" id="adminSaveHeroUpload">Save hero image</button>
+</div>
+`;
+
+body.querySelector("#adminSaveHeroUpload").addEventListener("click",async function(){
+const text = getCurrentHeroText();
+const formData = new FormData();
+
+files.forEach(file=>formData.append("heroImages",file));
+formData.append("heading",text.heading);
+formData.append("description",text.description);
+formData.append("viewport",getHeroViewport());
+
+const res = await fetch("/upload-hero",{
+method:"POST",
+body:formData
+});
+
+const data = await readJsonResponse(res);
+alert(data.message || "Hero image added");
+await loadHero();
+closeDialog();
+});
+}catch(err){
+alert(err.message || "Upload failed");
+}
+});
+
+document.addEventListener("click",function(e){
+if(!menu.contains(e.target) && !dialog.contains(e.target)){
+closeAdminMenu();
+}
+});
+}
+
+setupAdminHomepageEditor();
+
+</script>
+
+
+</body>
+
+</html>

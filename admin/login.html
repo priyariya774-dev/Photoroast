@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet"
+href="../style.css">
+
+<title>Admin Login</title>
+<script src="../error-handler.js"></script>
+
+</head>
+
+<body>
+
+<div class="login-container">
+
+<h1>Admin Login</h1>
+
+<form id="loginForm">
+
+<input
+type="text"
+id="username"
+placeholder="Username"
+required>
+
+<input
+type="password"
+id="password"
+placeholder="Password"
+required>
+
+<button type="submit">
+
+Login
+
+</button>
+
+</form>
+
+<button
+type="button"
+class="forgot-toggle"
+onclick="showForgotPassword()">
+Forgot Password?
+</button>
+
+<div id="forgotBox" class="forgot-box">
+<h2>Reset Password</h2>
+
+<div id="mobileStep">
+<input
+type="tel"
+id="resetMobile"
+placeholder="Registered Mobile Number">
+<button type="button" onclick="sendResetOtp()">Send OTP</button>
+</div>
+
+<div id="otpStep" style="display:none;">
+<input
+type="text"
+id="resetOtp"
+placeholder="Enter OTP">
+<button type="button" onclick="verifyResetOtp()">Verify OTP</button>
+</div>
+
+<div id="passwordStep" style="display:none;">
+<input
+type="password"
+id="newPassword"
+placeholder="New Password">
+<button type="button" onclick="resetPassword()">Change Password</button>
+</div>
+
+<button type="button" onclick="hideForgotPassword()">Back to Login</button>
+</div>
+
+</div>
+
+
+<script>
+
+localStorage.removeItem("auth");
+
+function showForgotPassword(){
+document.getElementById("forgotBox").style.display = "block";
+}
+
+function hideForgotPassword(){
+document.getElementById("forgotBox").style.display = "none";
+}
+
+async function sendResetOtp(){
+const mobile =
+document.getElementById("resetMobile").value;
+
+const res =
+await fetch("/forgot-password/send-otp",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+mobile
+})
+});
+
+const data =
+await res.json();
+
+alert(data.message);
+
+if(res.ok){
+document.getElementById("otpStep").style.display = "block";
+}
+}
+
+async function verifyResetOtp(){
+const mobile =
+document.getElementById("resetMobile").value;
+
+const otp =
+document.getElementById("resetOtp").value;
+
+const res =
+await fetch("/forgot-password/verify-otp",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+mobile,
+otp
+})
+});
+
+const data =
+await res.json();
+
+alert(data.message);
+
+if(res.ok){
+document.getElementById("passwordStep").style.display = "block";
+}
+}
+
+async function resetPassword(){
+const mobile =
+document.getElementById("resetMobile").value;
+
+const newPassword =
+document.getElementById("newPassword").value;
+
+const res =
+await fetch("/forgot-password/reset",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+mobile,
+newPassword
+})
+});
+
+const data =
+await res.json();
+
+alert(data.message);
+
+if(res.ok){
+hideForgotPassword();
+document.getElementById("password").value = newPassword;
+}
+}
+
+document
+.getElementById("loginForm")
+
+.addEventListener(
+
+"submit",
+
+async function(e){
+
+e.preventDefault();
+
+const username =
+document.getElementById(
+"username"
+).value;
+
+
+const password =
+document.getElementById(
+"password"
+).value;
+
+
+const response =
+await fetch(
+
+"/login",
+
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":
+"application/json"
+},
+
+body:
+
+JSON.stringify({
+
+username,
+password
+
+})
+
+}
+
+);
+
+
+const data =
+await response.json();
+
+alert(
+data.message
+);
+
+
+// successful login
+
+if(
+data.message ===
+"Login success"
+){
+
+localStorage.setItem(
+"auth",
+"true"
+);
+
+
+window.location.href =
+"dashboard.html";
+
+}
+
+}
+
+);
+
+</script>
+
+</body>
+
+</html>

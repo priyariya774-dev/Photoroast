@@ -1,0 +1,2558 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>
+Dashboard
+</title>
+<script src="../error-handler.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+background:#f5f5f5;
+color:#111;
+min-height:100vh;
+}
+
+.dashboard-shell{
+width:100%;
+max-width:1180px;
+margin:0 auto;
+padding:14px;
+}
+
+/* TOP BAR */
+
+.topbar{
+position:sticky;
+top:0;
+z-index:100;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+padding:12px 0;
+background:#f5f5f5;
+}
+
+h1{
+font-size:24px;
+line-height:1.1;
+}
+
+.menu-wrap{
+position:relative;
+margin-left:auto;
+}
+
+.menu-btn{
+width:44px;
+height:44px;
+display:flex;
+align-items:center;
+justify-content:center;
+border:none;
+border-radius:10px;
+background:#111;
+color:white;
+font-size:26px;
+line-height:1;
+cursor:pointer;
+}
+
+.nav-menu{
+display:none;
+position:absolute;
+top:52px;
+right:0;
+min-width:220px;
+background:white;
+border-radius:12px;
+box-shadow:0 12px 30px rgba(0,0,0,.18);
+overflow:hidden;
+border:1px solid #e8e8e8;
+}
+
+.nav-menu.show{
+display:block;
+}
+
+.nav-menu a,
+.nav-menu button{
+display:block;
+width:100%;
+padding:14px 16px;
+border:none;
+background:white;
+color:#111;
+text-align:left;
+text-decoration:none;
+font-size:15px;
+cursor:pointer;
+border-bottom:1px solid #eee;
+}
+
+.nav-menu a:hover,
+.nav-menu button:hover{
+background:#f7f7f7;
+}
+
+.nav-menu button{
+color:#b00020;
+font-weight:bold;
+}
+
+.section-title{
+margin-top:32px;
+margin-bottom:14px;
+font-size:20px;
+}
+
+.quick-actions{
+display:grid;
+grid-template-columns:1fr;
+gap:12px;
+margin:16px 0 22px;
+}
+
+.quick-action{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+padding:16px;
+background:white;
+border:1px solid #e4e4e4;
+border-radius:14px;
+text-decoration:none;
+color:#111;
+box-shadow:0 8px 22px rgba(0,0,0,.06);
+}
+
+.quick-action strong{
+display:block;
+font-size:16px;
+margin-bottom:4px;
+}
+
+.quick-action span{
+display:block;
+font-size:13px;
+color:#666;
+line-height:1.4;
+}
+
+.quick-action b{
+font-size:20px;
+}
+
+.dashboard-frames,
+.content-panel,
+#editModal,
+.context-menu{
+display:none !important;
+}
+
+.dashboard-frames{
+display:grid;
+grid-template-columns:1fr;
+gap:14px;
+margin:22px 0;
+}
+
+.dashboard-frame{
+min-height:150px;
+padding:18px;
+border:none;
+border-radius:18px;
+overflow:hidden;
+position:relative;
+display:flex;
+flex-direction:column;
+justify-content:flex-end;
+align-items:flex-start;
+text-align:left;
+color:white;
+background:#111;
+box-shadow:0 16px 38px rgba(0,0,0,.18);
+cursor:pointer;
+isolation:isolate;
+}
+
+.dashboard-frame::before{
+content:"";
+position:absolute;
+inset:0;
+background:
+linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.78)),
+var(--frame-image,linear-gradient(135deg,#111,#444));
+background-size:cover;
+background-position:center;
+z-index:-2;
+}
+
+.dashboard-frame::after{
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(135deg,rgba(255,213,107,.2),transparent 45%);
+z-index:-1;
+}
+
+.dashboard-frame.active{
+outline:3px solid #ffd56b;
+box-shadow:0 0 0 5px rgba(255,213,107,.18),0 22px 48px rgba(0,0,0,.25);
+}
+
+.dashboard-frame span{
+font-size:13px;
+font-weight:bold;
+letter-spacing:.4px;
+text-transform:uppercase;
+color:#ffd56b;
+}
+
+.dashboard-frame strong{
+display:block;
+margin-top:6px;
+font-size:22px;
+line-height:1.15;
+}
+
+.dashboard-frame small{
+display:block;
+margin-top:8px;
+font-size:13px;
+line-height:1.4;
+color:#f5f5f5;
+}
+
+.content-panel{
+display:none;
+margin-top:18px;
+}
+
+.content-panel.active{
+display:block;
+}
+
+.dashboard-category-tabs{
+display:grid;
+grid-template-columns:1fr;
+gap:14px;
+margin-top:16px;
+}
+
+.dashboard-category-card{
+width:100%;
+aspect-ratio:16/10;
+border:none;
+border-radius:18px;
+overflow:hidden;
+position:relative;
+display:flex;
+align-items:flex-end;
+padding:16px;
+text-align:left;
+color:white;
+background:#181818;
+box-shadow:0 12px 28px rgba(0,0,0,.16);
+cursor:pointer;
+}
+
+.dashboard-category-card img{
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+.dashboard-category-card::after{
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.78));
+}
+
+.dashboard-category-card span{
+position:relative;
+z-index:2;
+font-size:22px;
+font-weight:bold;
+line-height:1.2;
+}
+
+.dashboard-category-card small{
+display:block;
+margin-top:6px;
+color:#ffd56b;
+font-size:13px;
+}
+
+.category-detail-bar{
+display:none;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+margin:18px 0;
+}
+
+.category-detail-bar.show{
+display:flex;
+}
+
+.category-detail-bar h3{
+font-size:20px;
+}
+
+.back-category-btn{
+padding:10px 14px;
+border:none;
+border-radius:10px;
+background:#111;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+.logout-btn{
+
+padding:10px 14px;
+
+background:black;
+color:white;
+
+border:none;
+border-radius:8px;
+
+cursor:pointer;
+
+}
+
+/* GRID */
+
+.images{
+
+display:grid;
+grid-template-columns:1fr;
+gap:14px;
+
+}
+
+/* CARD */
+
+.card{
+
+background:white;
+padding:12px;
+
+border-radius:12px;
+
+box-shadow:
+0 2px 10px rgba(0,0,0,.1);
+
+width:100%;
+overflow:hidden;
+position:relative;
+
+}
+
+.card.selected{
+outline:3px solid #ffd56b;
+box-shadow:0 0 0 4px rgba(255,213,107,.18),0 18px 40px rgba(0,0,0,.22);
+}
+
+.select-card{
+position:absolute;
+top:12px;
+right:12px;
+z-index:4;
+width:auto;
+min-width:42px;
+padding:8px 10px !important;
+border-radius:999px !important;
+background:#111 !important;
+color:#ffd56b !important;
+border:1px solid rgba(255,213,107,.35) !important;
+font-weight:bold;
+}
+
+/* MEDIA BOX */
+
+.media-box{
+
+width:100%;
+height:220px;
+
+overflow:hidden;
+border-radius:10px;
+position:relative;
+background:#ddd;
+
+}
+
+/* DRAG MEDIA */
+
+.draggable-media{
+
+width:100%;
+height:100%;
+
+object-fit:cover;
+
+position:absolute;
+
+top:0;
+left:0;
+
+transform:
+translate(0px,0px)
+scale(1);
+
+transition:.2s;
+
+}
+
+.card.editing-position .media-box{
+height:auto;
+min-height:220px;
+padding:12px;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#f0f0f0;
+}
+
+.card.editing-position .draggable-media{
+position:relative;
+top:auto;
+left:auto;
+width:auto;
+height:auto;
+max-width:100%;
+max-height:none;
+object-fit:contain;
+}
+
+.position-panel{
+display:none;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:8px;
+margin-top:12px;
+padding:10px;
+background:#f7f7f7;
+border-radius:10px;
+}
+
+.card.editing-position .position-panel{
+display:grid;
+}
+
+/* YOUTUBE */
+
+.card iframe{
+
+width:100%;
+height:220px;
+border:none;
+border-radius:10px;
+
+}
+
+.card h3{
+
+margin-top:10px;
+font-size:17px;
+word-break:break-word;
+
+}
+
+.hero-media-box{
+height:180px;
+}
+
+.card p{
+
+margin-top:8px;
+color:gray;
+line-height:1.5;
+word-break:break-word;
+
+}
+
+/* BUTTONS */
+
+.card-actions{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:8px;
+margin-top:12px;
+}
+
+.card button{
+
+margin-top:0;
+padding:10px 8px;
+
+border:none;
+border-radius:8px;
+
+cursor:pointer;
+
+font-size:13px;
+
+}
+
+.delete{
+
+background:red;
+color:white;
+
+}
+
+.edit{
+
+background:green;
+color:white;
+
+}
+
+.move{
+
+background:#111;
+color:white;
+
+}
+
+.zoom{
+
+background:#444;
+color:white;
+
+}
+
+/* EDIT MODAL */
+
+#editModal{
+
+display:none;
+
+position:fixed;
+top:0;
+left:0;
+
+width:100%;
+height:100%;
+
+background:
+rgba(0,0,0,.6);
+
+justify-content:center;
+align-items:center;
+
+z-index:9999;
+
+}
+
+.modal{
+
+background:white;
+
+padding:20px;
+
+width:90%;
+max-width:400px;
+
+border-radius:12px;
+
+}
+
+.position-toggle{
+background:#ffd56b;
+color:#111;
+font-weight:bold;
+}
+
+.modal input{
+
+width:100%;
+padding:12px;
+
+margin-top:10px;
+
+border:1px solid #ccc;
+border-radius:8px;
+
+}
+
+.modal select{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:1px solid #ffd56b;
+border-radius:8px;
+background:#111;
+color:#fff;
+font-size:15px;
+}
+
+.modal select option{
+background:#111;
+color:#fff;
+}
+
+.modal-label{
+display:block;
+margin-top:10px;
+color:#ffd56b;
+font-weight:bold;
+font-size:14px;
+}
+
+.modal.category-only #editTitle,
+.modal.category-only #editDesc{
+display:none;
+}
+
+.context-menu{
+display:none;
+position:fixed;
+z-index:10000;
+min-width:210px;
+padding:8px;
+border-radius:14px;
+background:#111;
+border:1px solid rgba(255,213,107,.25);
+box-shadow:0 18px 45px rgba(0,0,0,.35);
+}
+
+.context-menu.show{
+display:block;
+}
+
+.context-menu button{
+width:100%;
+margin:0;
+padding:12px 14px;
+border:none;
+border-radius:10px;
+background:transparent;
+color:white;
+text-align:left;
+font-weight:bold;
+cursor:pointer;
+}
+
+.context-menu button:hover{
+background:rgba(255,213,107,.12);
+color:#ffd56b;
+}
+
+.modal button{
+
+margin-top:10px;
+
+}
+
+/* RESPONSIVE TABLE/CARD LAYOUT */
+
+@media(min-width:768px){
+.quick-actions{
+grid-template-columns:repeat(2,minmax(0,1fr));
+}
+}
+
+@media(min-width:1024px){
+.quick-actions{
+grid-template-columns:repeat(4,minmax(0,1fr));
+}
+}
+
+@media(max-width:640px){
+.dashboard-shell{
+padding:10px;
+}
+
+.topbar{
+padding:10px 0;
+align-items:center;
+}
+
+h1{
+font-size:22px;
+}
+
+.menu-btn{
+width:40px;
+height:40px;
+border-radius:0;
+font-size:22px;
+}
+
+.nav-menu{
+position:fixed;
+top:58px;
+left:10px;
+right:10px;
+min-width:0;
+border-radius:0;
+}
+
+.nav-menu a,
+.nav-menu button{
+padding:15px;
+font-size:14px;
+}
+
+.quick-actions{
+gap:10px;
+margin:12px 0 18px;
+}
+
+.quick-action{
+padding:15px;
+border-radius:0;
+box-shadow:none;
+align-items:flex-start;
+}
+
+.quick-action strong{
+font-size:16px;
+}
+
+.quick-action span{
+font-size:12px;
+}
+
+.quick-action b{
+font-size:13px;
+padding:6px 8px;
+border:1px solid #e4e4e4;
+white-space:nowrap;
+}
+}
+
+@media(min-width:768px){
+
+.dashboard-shell{
+padding:18px;
+}
+
+.images{
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:18px;
+}
+
+.dashboard-frames{
+grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+.dashboard-category-tabs{
+grid-template-columns:1fr;
+max-width:720px;
+}
+
+.media-box,
+.card iframe{
+height:250px;
+}
+
+.card.editing-position .media-box{
+height:auto;
+min-height:250px;
+}
+
+.card-actions{
+grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+}
+
+@media(min-width:1000px){
+
+.topbar{
+align-items:center;
+}
+
+.menu-btn{
+display:none;
+}
+
+.nav-menu{
+display:flex;
+position:static;
+min-width:0;
+background:transparent;
+box-shadow:none;
+border:none;
+border-radius:0;
+overflow:visible;
+gap:8px;
+}
+
+.nav-menu a,
+.nav-menu button{
+width:auto;
+border:none;
+border-radius:8px;
+padding:10px 12px;
+background:white;
+box-shadow:0 1px 6px rgba(0,0,0,.08);
+}
+
+.nav-menu button{
+background:#111;
+color:white;
+}
+
+.images{
+grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+.dashboard-frame{
+min-height:190px;
+}
+
+.dashboard-category-tabs{
+max-width:760px;
+}
+
+.dashboard-category-card{
+aspect-ratio:16/7;
+}
+
+.card-actions{
+grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+}
+
+</style>
+
+<link rel="stylesheet" href="../style.css">
+
+</head>
+
+<body>
+
+<script>
+
+if(
+localStorage.getItem("auth")
+!=="true"
+){
+
+window.location.href=
+"login.html";
+
+}
+
+</script>
+
+<div class="dashboard-shell">
+
+<div class="topbar">
+
+<h1>
+Dashboard
+</h1>
+
+<div class="menu-wrap">
+
+<button
+class="menu-btn"
+type="button"
+onclick="toggleMenu()"
+aria-label="Open menu">
+☰
+</button>
+
+<nav
+class="nav-menu"
+id="navMenu">
+
+<a href="upload.html">
+Upload
+</a>
+
+<a href="../client-gallery.html">
+Gallery
+</a>
+
+<a href="../index.html">
+Public Homepage
+</a>
+
+<a href="catagories.html">
+Categories
+</a>
+
+<button
+type="button"
+onclick="logout()">
+Logout
+</button>
+
+</nav>
+
+</div>
+
+</div>
+
+<div class="quick-actions">
+<a class="quick-action" href="../index.html?adminEdit=1">
+<span><strong>Manage Homepage</strong>Open the real home page and right-click sections</span>
+<b>Open</b>
+</a>
+<a class="quick-action" href="upload.html">
+<span><strong>Add Content</strong>Home images, gallery photos, videos, reviews</span>
+<b>Open</b>
+</a>
+<a class="quick-action" href="../client-gallery.html?featured=1">
+<span><strong>Featured Gallery</strong>Choose photos for the home page</span>
+<b>Open</b>
+</a>
+<a class="quick-action" href="../index.html" target="_blank" rel="noopener">
+<span><strong>View Website</strong>Preview what visitors see</span>
+<b>View</b>
+</a>
+</div>
+
+<!-- EDIT MODAL -->
+
+<div id="editModal">
+
+<div class="modal" id="editModalBox">
+
+<input
+id="editTitle"
+placeholder="Title">
+
+<input
+id="editDesc"
+placeholder="Description">
+
+<label class="modal-label" for="editCategory">
+Choose Category
+</label>
+
+<select
+id="editCategory"
+>
+<option>General</option>
+</select>
+
+<br><br>
+
+<button
+class="edit"
+onclick="saveEdit()">
+
+Save
+
+</button>
+
+
+<button
+class="delete"
+onclick="closeModal()">
+
+Cancel
+
+</button>
+
+</div>
+
+</div>
+
+<div class="context-menu" id="mediaContextMenu">
+<button type="button" onclick="contextEditPosition()">Edit Positions</button>
+<button type="button" onclick="contextDeleteSelected()">Delete</button>
+<button type="button" onclick="contextChangeCategory()">Change Category</button>
+<button type="button" onclick="contextEditDetails()">Edit Details</button>
+</div>
+
+
+
+<script>
+
+
+// =====================
+// MENU
+// =====================
+
+function toggleMenu(){
+document
+.getElementById("navMenu")
+.classList
+.toggle("show");
+}
+
+document.addEventListener("click",function(e){
+const menu =
+document.getElementById("navMenu");
+
+const menuButton =
+document.querySelector(".menu-btn");
+
+if(
+menu.contains(e.target)
+||
+menuButton.contains(e.target)
+){
+return;
+}
+
+menu.classList.remove("show");
+});
+
+
+// =====================
+// LOGOUT
+// =====================
+
+async function logout(){
+try{
+await fetch("/logout",{method:"POST"});
+}catch(err){}
+localStorage.removeItem("auth");
+window.location.href="login.html";
+}
+
+
+
+// =====================
+// YOUTUBE CONVERTER
+// =====================
+
+function convertYoutube(url){
+
+if(!url){
+return "";
+}
+
+let videoId = "";
+
+if(url.includes("youtu.be/")){
+
+videoId =
+
+url
+.split("youtu.be/")[1]
+.split("?")[0];
+
+}
+
+else if(url.includes("watch?v=")){
+
+videoId =
+
+url
+.split("watch?v=")[1]
+.split("&")[0];
+
+}
+
+else if(url.includes("/shorts/")){
+
+videoId =
+
+url
+.split("/shorts/")[1]
+.split("?")[0];
+
+}
+
+else if(url.includes("/embed/")){
+
+return url;
+
+}
+
+return `https://www.youtube-nocookie.com/embed/${videoId}?rel=0`;
+
+}
+
+
+
+// =====================
+// MOVE FUNCTIONS
+// =====================
+
+const mediaSettings = {};
+let dashboardCategories = ["General"];
+let selectedMediaIds = [];
+let dashboardPhotoMap = {};
+let currentEditIds = [];
+let categoryOnlyEdit = false;
+let uploadedVideoItemCount = 0;
+let reviewVideoItemCount = 0;
+let dashboardGalleryPhotos = [];
+let activeDashboardCategory = "";
+
+function normalizeDashboardCategory(category){
+return String(category || "General").trim().toLowerCase();
+}
+
+function getDashboardCategories(){
+const categoryMap = new Map();
+
+dashboardGalleryPhotos.forEach(photo=>{
+const label =
+photo.category || "General";
+
+const key =
+normalizeDashboardCategory(label);
+
+if(!categoryMap.has(key)){
+categoryMap.set(key,label);
+}
+});
+
+return Array.from(categoryMap.values());
+}
+
+function getDashboardCategoryPhotos(category){
+const key =
+normalizeDashboardCategory(category);
+
+return dashboardGalleryPhotos.filter(photo=>
+normalizeDashboardCategory(photo.category || "General") === key
+);
+}
+
+function getDashboardCategoryCover(category){
+const photo =
+getDashboardCategoryPhotos(category).find(item=>item.filename);
+
+return photo ? "/uploads/" + photo.filename : "";
+}
+
+function showDashboardPanel(panelName){
+["hero","gallery","videos"].forEach(name=>{
+const panel =
+document.getElementById(
+"panel" + name.charAt(0).toUpperCase() + name.slice(1)
+);
+
+const frame =
+document.getElementById(
+"frame" + name.charAt(0).toUpperCase() + name.slice(1)
+);
+
+if(panel){
+panel.classList.toggle("active",name === panelName);
+}
+
+if(frame){
+frame.classList.toggle("active",name === panelName);
+}
+});
+}
+
+function updateFrameCover(frameId,imageUrl){
+const frame =
+document.getElementById(frameId);
+
+if(!frame || !imageUrl){
+return;
+}
+
+frame.style.setProperty("--frame-image",`url('${imageUrl}')`);
+}
+
+function renderDashboardCategoryTabs(){
+const tabs =
+document.getElementById("dashboardCategoryTabs");
+
+const gallery =
+document.getElementById("gallery");
+
+tabs.innerHTML = "";
+gallery.innerHTML = "";
+
+const categories =
+getDashboardCategories();
+
+if(categories.length===0){
+tabs.innerHTML = `
+<div class="card">
+<p>No gallery images uploaded</p>
+</div>
+`;
+return;
+}
+
+categories.forEach(category=>{
+const cover =
+getDashboardCategoryCover(category);
+
+const count =
+getDashboardCategoryPhotos(category).length;
+
+tabs.innerHTML += `
+<button
+type="button"
+class="dashboard-category-card"
+onclick="showDashboardCategory('${escapeQuotes(category)}')">
+${cover ? `<img src="${cover}" alt="${category}">` : ""}
+<span>
+${category}
+<small>${count} image${count === 1 ? "" : "s"}</small>
+</span>
+</button>
+`;
+});
+}
+
+function showDashboardCategories(){
+activeDashboardCategory = "";
+document.getElementById("dashboardCategoryTabs").style.display = "grid";
+document.getElementById("dashboardCategoryDetail").classList.remove("show");
+document.getElementById("gallery").innerHTML = "";
+}
+
+function showDashboardCategory(category){
+activeDashboardCategory = category;
+document.getElementById("dashboardCategoryTabs").style.display = "none";
+document.getElementById("dashboardCategoryDetail").classList.add("show");
+document.getElementById("dashboardCategoryTitle").innerText = category;
+renderDashboardGalleryCategory();
+document.getElementById("gallery").scrollIntoView({
+behavior:"smooth",
+block:"start"
+});
+}
+
+async function loadDashboardCategories(){
+try{
+const res =
+await fetch("/categories");
+
+const data =
+await res.json();
+
+dashboardCategories =
+data && data.length ? data.map(item=>item.name) : ["General"];
+
+const select =
+document.getElementById("editCategory");
+
+select.innerHTML = "";
+
+dashboardCategories.forEach(category=>{
+select.innerHTML += `<option>${category}</option>`;
+});
+
+renderSelectedMedia();
+
+}catch(err){
+console.log(err);
+}
+}
+
+function updateTransform(id){
+
+const media =
+document.getElementById(id);
+
+if(!media) return;
+
+const settings =
+mediaSettings[id];
+
+media.style.transform =
+
+`translate(${settings.x}px, ${settings.y}px) scale(${settings.scale})`;
+
+}
+
+
+
+async function savePosition(photoId,id){
+
+const settings =
+mediaSettings[id];
+
+await fetch(
+
+`/move-media/${photoId}`,
+
+{
+
+method:"PUT",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+posX:settings.x,
+posY:settings.y,
+scale:settings.scale
+
+})
+
+}
+
+);
+
+}
+
+
+
+function moveLeft(photoId,id){
+
+mediaSettings[id].x -= 20;
+
+updateTransform(id);
+
+savePosition(photoId,id);
+
+}
+
+
+
+function moveRight(photoId,id){
+
+mediaSettings[id].x += 20;
+
+updateTransform(id);
+
+savePosition(photoId,id);
+
+}
+
+
+
+function moveUp(photoId,id){
+
+mediaSettings[id].y -= 20;
+
+updateTransform(id);
+
+savePosition(photoId,id);
+
+}
+
+
+
+function moveDown(photoId,id){
+
+mediaSettings[id].y += 20;
+
+updateTransform(id);
+
+savePosition(photoId,id);
+
+}
+
+
+
+function zoomIn(photoId,id){
+
+mediaSettings[id].scale += 0.1;
+
+updateTransform(id);
+
+savePosition(photoId,id);
+
+}
+
+
+
+function zoomOut(photoId,id){
+
+mediaSettings[id].scale -= 0.1;
+
+if(mediaSettings[id].scale < 0.5){
+
+mediaSettings[id].scale = 0.5;
+
+}
+
+updateTransform(id);
+
+savePosition(photoId,id);
+
+}
+
+function toggleMediaSelection(id){
+if(selectedMediaIds.includes(id)){
+selectedMediaIds =
+selectedMediaIds.filter(item=>item !== id);
+}else{
+selectedMediaIds.push(id);
+}
+
+renderSelectedMedia();
+}
+
+function renderSelectedMedia(){
+document.querySelectorAll(".card[data-media-id]").forEach(card=>{
+const id = Number(card.dataset.mediaId);
+card.classList.toggle("selected",selectedMediaIds.includes(id));
+});
+}
+
+function showMediaContextMenu(e,id){
+e.preventDefault();
+
+if(!selectedMediaIds.includes(id)){
+selectedMediaIds = [id];
+renderSelectedMedia();
+}
+
+const menu =
+document.getElementById("mediaContextMenu");
+
+menu.style.left = Math.min(e.clientX,window.innerWidth - 230) + "px";
+menu.style.top = Math.min(e.clientY,window.innerHeight - 210) + "px";
+menu.classList.add("show");
+}
+
+function hideMediaContextMenu(){
+document
+.getElementById("mediaContextMenu")
+.classList
+.remove("show");
+}
+
+document.addEventListener("click",function(e){
+const menu =
+document.getElementById("mediaContextMenu");
+
+if(menu && !menu.contains(e.target)){
+hideMediaContextMenu();
+}
+});
+
+function togglePositionPanel(cardId){
+const card =
+document.getElementById(cardId);
+
+if(!card){
+return;
+}
+
+card.classList.toggle("editing-position");
+}
+
+
+
+// =====================
+// LOAD HERO SLIDES
+// =====================
+
+async function loadHeroSlides(){
+
+try{
+
+const response =
+await fetch(
+"/hero?t=" + new Date().getTime()
+);
+
+const slides =
+await response.json();
+
+const container =
+document.getElementById(
+"heroContainer"
+);
+
+container.innerHTML = "";
+
+if(!slides || slides.length===0){
+document.getElementById("heroFrameCount").textContent =
+"0 hero images uploaded";
+
+container.innerHTML = `
+<div class="card">
+<p>No hero slideshow images uploaded</p>
+</div>
+`;
+return;
+}
+
+document.getElementById("heroFrameCount").textContent =
+`${slides.length} hero image${slides.length === 1 ? "" : "s"} uploaded`;
+
+updateFrameCover("frameHero","/uploads/" + slides[0].image);
+
+slides.forEach((slide,index)=>{
+
+container.innerHTML += `
+
+<div class="card">
+
+<div class="media-box hero-media-box">
+
+<img
+class="draggable-media"
+src="/uploads/${slide.image}"
+style="
+transform:
+translate(${slide.desktopPosX || slide.posX || 0}px,
+${slide.desktopPosY || slide.posY || 0}px)
+scale(${slide.desktopScale || slide.scale || 1});
+"
+>
+
+</div>
+
+<h3>Hero Image ${index + 1}</h3>
+
+<p>${slide.heading || ""}</p>
+
+<div class="card-actions">
+
+<button
+class="delete"
+onclick="deleteHeroSlide(${slide.id})">
+Delete Hero Image
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+}catch(err){
+
+console.log(err);
+alert("Hero slideshow images could not load");
+
+}
+
+}
+
+
+
+// =====================
+// DELETE HERO SLIDE
+// =====================
+
+async function deleteHeroSlide(id){
+
+const confirmDelete =
+confirm("Delete this hero image?");
+
+if(!confirmDelete){
+return;
+}
+
+try{
+
+await fetch(
+`/delete-hero/${id}`,
+{
+method:"DELETE"
+}
+);
+
+loadHeroSlides();
+
+}catch(err){
+
+console.log(err);
+alert("Hero image delete failed");
+
+}
+
+}
+
+
+
+// =====================
+// LOAD MEDIA
+// =====================
+
+function buildDashboardMediaCard(photo){
+
+let media="";
+
+const mediaId =
+`media-${photo.id}`;
+
+mediaSettings[mediaId]={
+x:photo.posX || 0,
+y:photo.posY || 0,
+scale:photo.scale || 1
+};
+
+if(photo.youtube || photo.type==="youtube"){
+const embedUrl =
+convertYoutube(photo.youtube);
+
+media=`
+<iframe
+src="${embedUrl}"
+allowfullscreen>
+</iframe>
+`;
+
+}else if(photo.type==="video"){
+media=`
+<div class="media-box">
+<video
+controls
+class="draggable-media"
+id="${mediaId}"
+style="
+transform:
+translate(${photo.posX || 0}px,
+${photo.posY || 0}px)
+scale(${photo.scale || 1});
+">
+<source
+src="/uploads/${photo.filename}"
+type="video/mp4">
+</video>
+</div>
+`;
+
+}else{
+media=`
+<div class="media-box">
+<img
+class="draggable-media"
+id="${mediaId}"
+style="
+transform:
+translate(${photo.posX || 0}px,
+${photo.posY || 0}px)
+scale(${photo.scale || 1});
+"
+src="/uploads/${photo.filename}">
+</div>
+`;
+}
+
+const cardId =
+`card-${photo.id}`;
+
+return `
+<div
+class="card"
+id="${cardId}"
+data-media-id="${photo.id}"
+oncontextmenu="showMediaContextMenu(event,${photo.id})">
+<button
+type="button"
+class="select-card"
+onclick="toggleMediaSelection(${photo.id})">
+Select
+</button>
+${media}
+<h3>${photo.title || ""}</h3>
+<p>${photo.description || ""}</p>
+<p>Category: ${photo.category || "General"}</p>
+<div class="card-actions">
+<button
+class="position-toggle"
+onclick="togglePositionPanel('${cardId}')">
+Edit Position
+</button>
+<button
+class="delete"
+onclick="deleteImage(${photo.id})">
+Delete
+</button>
+<button
+class="edit"
+onclick=
+"editPhoto(
+${photo.id},
+'${escapeQuotes(photo.title)}',
+'${escapeQuotes(photo.description)}',
+'${escapeQuotes(photo.category)}'
+)">
+Edit Details
+</button>
+<button
+class="edit"
+onclick=
+"changeCategory(
+${photo.id},
+'${escapeQuotes(photo.title)}',
+'${escapeQuotes(photo.description)}',
+'${escapeQuotes(photo.category)}'
+)">
+Change Category
+</button>
+</div>
+<div class="position-panel">
+<button class="move" onclick="moveLeft(${photo.id},'${mediaId}')">Left</button>
+<button class="move" onclick="moveRight(${photo.id},'${mediaId}')">Right</button>
+<button class="move" onclick="moveUp(${photo.id},'${mediaId}')">Up</button>
+<button class="move" onclick="moveDown(${photo.id},'${mediaId}')">Down</button>
+<button class="zoom" onclick="zoomIn(${photo.id},'${mediaId}')">Zoom In</button>
+<button class="zoom" onclick="zoomOut(${photo.id},'${mediaId}')">Zoom Out</button>
+<button class="zoom" onclick="togglePositionPanel('${cardId}')">Done</button>
+</div>
+</div>
+`;
+}
+
+function renderDashboardGalleryCategory(){
+const gallery =
+document.getElementById("gallery");
+
+gallery.innerHTML = "";
+
+if(!activeDashboardCategory){
+return;
+}
+
+const photos =
+getDashboardCategoryPhotos(activeDashboardCategory);
+
+if(photos.length===0){
+gallery.innerHTML = `
+<div class="card">
+<p>No ${activeDashboardCategory} images uploaded</p>
+</div>
+`;
+return;
+}
+
+photos.forEach(photo=>{
+gallery.innerHTML += buildDashboardMediaCard(photo);
+});
+
+renderSelectedMedia();
+}
+
+async function loadImages(){
+
+try{
+
+const response =
+
+await fetch(
+"/photos"
+);
+
+const photos =
+await response.json();
+
+dashboardPhotoMap = {};
+photos.forEach(photo=>{
+dashboardPhotoMap[Number(photo.id)] = photo;
+});
+
+selectedMediaIds =
+selectedMediaIds.filter(id=>dashboardPhotoMap[id]);
+
+
+const gallery =
+
+document.getElementById(
+"gallery"
+);
+
+const videoContainer =
+document.getElementById(
+"videoContainer"
+);
+
+gallery.innerHTML="";
+videoContainer.innerHTML="";
+
+const galleryPhotos =
+photos.filter(photo=>photo.type !== "video" && photo.type !== "youtube" && !photo.youtube);
+
+const videoPhotos =
+photos.filter(photo=>photo.type === "video" || photo.type === "youtube" || photo.youtube);
+
+uploadedVideoItemCount =
+videoPhotos.length;
+
+document.getElementById("galleryFrameCount").textContent =
+`${galleryPhotos.length} gallery image${galleryPhotos.length === 1 ? "" : "s"} uploaded`;
+
+document.getElementById("videoFrameCount").textContent =
+`${uploadedVideoItemCount + reviewVideoItemCount} video/link item${uploadedVideoItemCount + reviewVideoItemCount === 1 ? "" : "s"} uploaded`;
+
+if(galleryPhotos[0] && galleryPhotos[0].filename){
+updateFrameCover("frameGallery","/uploads/" + galleryPhotos[0].filename);
+}
+
+if(videoPhotos[0] && videoPhotos[0].type !== "youtube" && videoPhotos[0].filename){
+updateFrameCover("frameVideos","/uploads/" + videoPhotos[0].filename);
+}
+
+if(videoPhotos.length===0){
+videoContainer.innerHTML = `
+<div class="card">
+<p>No uploaded videos or YouTube links</p>
+</div>
+`;
+}
+
+function buildDashboardMediaCard(photo){
+
+let media="";
+
+const mediaId =
+`media-${photo.id}`;
+
+mediaSettings[mediaId]={
+
+x:photo.posX || 0,
+y:photo.posY || 0,
+scale:photo.scale || 1
+
+};
+
+
+if(
+photo.youtube
+||
+photo.type==="youtube"
+){
+
+const embedUrl =
+
+convertYoutube(
+photo.youtube
+);
+
+media=`
+
+<iframe
+
+src="${embedUrl}"
+
+allowfullscreen>
+
+</iframe>
+
+`;
+
+}
+
+else if(
+photo.type==="video"
+){
+
+media=`
+
+<div class="media-box">
+
+<video
+controls
+class="draggable-media"
+id="${mediaId}"
+
+style="
+transform:
+translate(${photo.posX || 0}px,
+${photo.posY || 0}px)
+scale(${photo.scale || 1});
+">
+
+<source
+
+src=
+"/uploads/${photo.filename}"
+
+type="video/mp4"
+
+>
+
+</video>
+
+</div>
+
+`;
+
+}
+
+else{
+
+media=`
+
+<div class="media-box">
+
+<img
+
+class="draggable-media"
+
+id="${mediaId}"
+
+style="
+transform:
+translate(${photo.posX || 0}px,
+${photo.posY || 0}px)
+scale(${photo.scale || 1});
+"
+
+src=
+"/uploads/${photo.filename}"
+
+>
+
+</div>
+
+`;
+
+}
+
+
+
+const cardId =
+`card-${photo.id}`;
+
+return `
+
+<div
+class="card"
+id="${cardId}"
+data-media-id="${photo.id}"
+oncontextmenu="showMediaContextMenu(event,${photo.id})">
+
+<button
+type="button"
+class="select-card"
+onclick="toggleMediaSelection(${photo.id})">
+Select
+</button>
+
+${media}
+
+<h3>
+
+${photo.title || ""}
+
+</h3>
+
+<p>
+
+${photo.description || ""}
+
+</p>
+
+<p>
+Category: ${photo.category || "General"}
+</p>
+
+<div class="card-actions">
+
+<button
+class="position-toggle"
+onclick="togglePositionPanel('${cardId}')">
+Edit Position
+</button>
+
+<button
+class="delete"
+onclick="deleteImage(${photo.id})"
+>
+Delete
+</button>
+
+<button
+class="edit"
+onclick=
+"editPhoto(
+${photo.id},
+'${escapeQuotes(photo.title)}',
+'${escapeQuotes(photo.description)}',
+'${escapeQuotes(photo.category)}'
+)"
+>
+Edit Details
+</button>
+
+<button
+class="edit"
+onclick=
+"changeCategory(
+${photo.id},
+'${escapeQuotes(photo.title)}',
+'${escapeQuotes(photo.description)}',
+'${escapeQuotes(photo.category)}'
+)">
+Change Category
+</button>
+
+</div>
+
+<div class="position-panel">
+
+<button
+class="move"
+onclick="moveLeft(${photo.id},'${mediaId}')">
+
+⬅ Left
+
+</button>
+
+<button
+class="move"
+onclick="moveRight(${photo.id},'${mediaId}')">
+
+➡ Right
+
+</button>
+
+<button
+class="move"
+onclick="moveUp(${photo.id},'${mediaId}')">
+
+⬆ Up
+
+</button>
+
+<button
+class="move"
+onclick="moveDown(${photo.id},'${mediaId}')">
+
+⬇ Down
+
+</button>
+
+<button
+class="zoom"
+onclick="zoomIn(${photo.id},'${mediaId}')">
+
+＋ Zoom
+
+</button>
+
+<button
+class="zoom"
+onclick="zoomOut(${photo.id},'${mediaId}')">
+
+－ Zoom
+
+</button>
+
+<button
+
+class="zoom"
+onclick="togglePositionPanel('${cardId}')">
+Done
+</button>
+
+</div>
+
+</div>
+
+`;
+
+}
+
+function renderDashboardGalleryCategory(){
+const gallery =
+document.getElementById("gallery");
+
+gallery.innerHTML = "";
+
+if(!activeDashboardCategory){
+return;
+}
+
+const photos =
+getDashboardCategoryPhotos(activeDashboardCategory);
+
+if(photos.length===0){
+gallery.innerHTML = `
+<div class="card">
+<p>No ${activeDashboardCategory} images uploaded</p>
+</div>
+`;
+return;
+}
+
+photos.forEach(photo=>{
+gallery.innerHTML += buildDashboardMediaCard(photo);
+});
+
+renderSelectedMedia();
+}
+
+videoPhotos.forEach(photo=>{
+videoContainer.innerHTML += buildDashboardMediaCard(photo);
+});
+
+dashboardGalleryPhotos =
+galleryPhotos;
+
+renderDashboardCategoryTabs();
+showDashboardCategories();
+renderSelectedMedia();
+
+}catch(err){
+
+console.error(
+"LOAD MEDIA ERROR:",
+err
+);
+
+}
+
+}
+
+
+
+
+// =====================
+// LOAD REVIEWS
+// =====================
+
+async function loadReviews(){
+
+try{
+
+const response =
+
+await fetch(
+"/reviews"
+);
+
+const reviews =
+await response.json();
+
+const reviewList =
+Array.isArray(reviews) ? reviews : [];
+
+reviewVideoItemCount =
+reviewList.length;
+
+const totalVideoItems =
+uploadedVideoItemCount + reviewList.length;
+
+document.getElementById("videoFrameCount").textContent =
+`${totalVideoItems} video/link item${totalVideoItems === 1 ? "" : "s"} uploaded`;
+
+const container =
+
+document.getElementById(
+"reviewsContainer"
+);
+
+container.innerHTML = "";
+
+if(reviewList.length===0){
+container.innerHTML = `
+<div class="card">
+<p>No client review videos uploaded</p>
+</div>
+`;
+return;
+}
+
+reviewList.forEach(review=>{
+
+container.innerHTML += `
+
+<div class="card">
+
+<div class="media-box">
+
+<video
+controls
+class="draggable-media">
+
+<source
+src=
+"/uploads/${review.video}"
+type="video/mp4">
+
+</video>
+
+</div>
+
+<h3>
+
+${review.name || "Client"}
+
+</h3>
+
+<p>
+
+${review.text || ""}
+
+</p>
+
+<div class="card-actions">
+
+<button
+class="delete"
+onclick="deleteReview(${review.id})">
+
+Delete Review
+
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+}catch(err){
+
+console.log(err);
+
+}
+
+}
+
+
+
+
+// =====================
+// DELETE MEDIA
+// =====================
+
+async function deleteImage(id){
+
+try{
+
+await fetch(
+
+`/delete/${id}`,
+
+{
+method:"DELETE"
+}
+
+);
+
+loadImages();
+
+}catch(err){
+
+console.error(
+"DELETE ERROR:",
+err
+);
+
+}
+
+}
+
+function getFirstSelectedPhoto(){
+const id =
+selectedMediaIds[0];
+
+return dashboardPhotoMap[id];
+}
+
+function contextEditPosition(){
+hideMediaContextMenu();
+const photo =
+getFirstSelectedPhoto();
+
+if(!photo){
+alert("Please select media first");
+return;
+}
+
+togglePositionPanel(`card-${photo.id}`);
+}
+
+async function contextDeleteSelected(){
+hideMediaContextMenu();
+
+if(selectedMediaIds.length===0){
+alert("Please select media first");
+return;
+}
+
+const confirmDelete =
+confirm("Delete selected media?");
+
+if(!confirmDelete){
+return;
+}
+
+for(const id of selectedMediaIds){
+await fetch(`/delete/${id}`,{
+method:"DELETE"
+});
+}
+
+selectedMediaIds = [];
+loadImages();
+}
+
+function contextChangeCategory(){
+hideMediaContextMenu();
+
+if(selectedMediaIds.length===0){
+alert("Please select media first");
+return;
+}
+
+const firstPhoto =
+getFirstSelectedPhoto();
+
+changeCategory(
+firstPhoto.id,
+firstPhoto.title,
+firstPhoto.description,
+firstPhoto.category,
+selectedMediaIds
+);
+}
+
+function contextEditDetails(){
+hideMediaContextMenu();
+const photo =
+getFirstSelectedPhoto();
+
+if(!photo){
+alert("Please select media first");
+return;
+}
+
+editPhoto(
+photo.id,
+photo.title,
+photo.description,
+photo.category
+);
+}
+
+
+
+
+// =====================
+// DELETE REVIEW
+// =====================
+
+async function deleteReview(id){
+
+const confirmDelete = confirm(
+"Delete this review?"
+);
+
+if(!confirmDelete){
+return;
+}
+
+try{
+
+await fetch(
+
+`/delete-review/${id}`,
+
+{
+method:"DELETE"
+}
+
+);
+
+loadReviews();
+
+}catch(err){
+
+console.log(err);
+
+}
+
+}
+
+
+
+
+// =====================
+// EDIT
+// =====================
+
+let currentId=null;
+
+
+function editPhoto(
+id,
+title,
+desc,
+category
+){
+
+currentId=id;
+currentEditIds = [id];
+categoryOnlyEdit = false;
+editModalBox.classList.remove("category-only");
+
+editTitle.value=
+title;
+
+editDesc.value=
+desc;
+
+if(category && !dashboardCategories.includes(category)){
+dashboardCategories.push(category);
+editCategory.innerHTML += `<option>${category}</option>`;
+}
+
+editCategory.value=
+category || "General";
+
+
+editModal.style.display=
+"flex";
+
+}
+
+function changeCategory(
+id,
+title,
+desc,
+category,
+ids
+){
+currentEditIds =
+Array.isArray(ids) && ids.length ? [...ids] : [id];
+
+editPhoto(
+id,
+title,
+desc,
+category
+);
+
+currentEditIds =
+Array.isArray(ids) && ids.length ? [...ids] : [id];
+categoryOnlyEdit = true;
+editModalBox.classList.add("category-only");
+}
+
+
+
+async function saveEdit(){
+
+try{
+
+const idsToSave =
+currentEditIds.length ? currentEditIds : [currentId];
+
+for(const id of idsToSave){
+const existingPhoto =
+dashboardPhotoMap[id] || {};
+
+await fetch(
+
+`/edit-photo/${id}`,
+
+{
+
+method:"PUT",
+
+headers:{
+"Content-Type":
+"application/json"
+},
+
+body:
+
+JSON.stringify({
+
+title:
+categoryOnlyEdit ? (existingPhoto.title || "") : editTitle.value,
+
+description:
+categoryOnlyEdit ? (existingPhoto.description || "") : editDesc.value,
+
+category:
+editCategory.value
+
+})
+
+}
+
+);
+}
+
+closeModal();
+
+loadImages();
+
+}catch(err){
+
+console.error(
+"EDIT ERROR:",
+err
+);
+
+}
+
+}
+
+
+
+function closeModal(){
+
+editModal.style.display=
+"none";
+editModalBox.classList.remove("category-only");
+categoryOnlyEdit = false;
+currentEditIds = [];
+
+}
+
+
+
+// =====================
+// ESCAPE QUOTES
+// =====================
+
+function escapeQuotes(str){
+
+return String(
+str || ""
+)
+
+.replace(/'/g,"\\\\'")
+.replace(/"/g,'\\\\\\"');
+
+}
+
+
+
+// =====================
+// INITIAL LOAD
+// =====================
+
+async function initialLoad(){
+await loadDashboardCategories();
+loadImages();
+loadHeroSlides();
+loadReviews();
+}
+
+// Dashboard intentionally shows only the four main actions.
+// Uploaded files are managed from the content editor.
+
+</script>
+
+</div>
+
+</body>
+
+</html>
