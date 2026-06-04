@@ -10,7 +10,7 @@ const session = require("express-session");
 const bcrypt = require("bcryptjs");
 
 const app = express();
-const DEFAULT_ADMIN_MOBILE = "8270003472";
+const DEFAULT_ADMIN_MOBILE = "9043103301";
 const PORT = process.env.PORT || 3000;
 const MAX_UPLOAD_SIZE = Number(process.env.MAX_UPLOAD_MB || 100) * 1024 * 1024;
 
@@ -174,6 +174,18 @@ ensureColumn("hero_slides","desktopScale","FLOAT DEFAULT NULL");
 ensureColumn("photos","featured","INT DEFAULT 0");
 ensureColumn("photos","featuredOrder","INT DEFAULT 0");
 ensureColumn("users","mobile","VARCHAR(20) DEFAULT NULL");
+
+db.query(`
+CREATE TABLE IF NOT EXISTS reviews (
+id INT AUTO_INCREMENT PRIMARY KEY,
+name VARCHAR(255) DEFAULT NULL,
+text TEXT DEFAULT NULL,
+video VARCHAR(255) DEFAULT NULL,
+rating INT DEFAULT 5
+)
+`,()=>{});
+
+ensureColumn("reviews","rating","INT DEFAULT 5");
 
 db.query(
 `
@@ -653,6 +665,10 @@ message:"Logged out"
 });
 
 app.use((req,res,next)=>{
+
+if(req.method === "POST" && req.path === "/reviews"){
+return next();
+}
 
 if(["POST","PUT","DELETE"].includes(req.method)){
 return requireAdmin(req,res,next);
@@ -2415,18 +2431,21 @@ message:"Moved"
 
 });
 
-// ======================
-// UPLOAD REVIEW
-// ======================
+app.post("/reviews",(req,res)=>{
+const name =
+String(req.body.name || "").trim();
 
-app.post("/upload-review",upload.single("reviewVideo"),(req,res)=>{
+const text =
+String(req.body.text || req.body.review || "").trim();
 
-const video = req.file ? req.file.filename : null;
+const rating =
+Math.max(1,Math.min(5,Number(req.body.rating) || 5));
 
-const {
-name,
-review
-} = req.body;
+if(!name || !text){
+return res.status(400).json({
+message:"Enter your name and review"
+});
+}
 
 db.query(
 `
@@ -2434,33 +2453,32 @@ INSERT INTO reviews
 (
 name,
 text,
+rating,
 video
 )
 VALUES
 (
 ?,
 ?,
-?
+?,
+NULL
 )
 `,
 [
 name,
-review,
-video
+text,
+rating
 ],
-(err)=>{
-
+err=>{
 if(err){
 return res.status(500).json(err);
 }
 
 res.json({
-message:"Review uploaded"
+message:"Thank you. Your review has been added."
 });
-
 }
 );
-
 });
 
 // ======================
@@ -2492,20 +2510,26 @@ app.put("/edit-review/:id",(req,res)=>{
 const id = req.params.id;
 const {
 name,
-text
+text,
+rating
 } = req.body;
+
+const safeRating =
+Math.max(1,Math.min(5,Number(rating) || 5));
 
 db.query(
 `
 UPDATE reviews
 SET
 name=?,
-text=?
+text=?,
+rating=?
 WHERE id=?
 `,
 [
 String(name || "").trim(),
 String(text || "").trim(),
+safeRating,
 id
 ],
 err=>{

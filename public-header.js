@@ -113,7 +113,7 @@ document.createElement("a");
 
 link.id = "floatingWhatsApp";
 link.className = "floating-whatsapp";
-link.href = "https://wa.me/919489704906?text=Hi%20PhotoRoast%2C%20I%20would%20like%20to%20enquire%20about%20a%20shoot.";
+link.href = "https://wa.me/919043103301?text=Hi%20PhotoRoast%2C%20I%20would%20like%20to%20enquire%20about%20a%20shoot.";
 link.target = "_blank";
 link.rel = "noopener";
 link.setAttribute("aria-label","Chat on WhatsApp");
@@ -136,7 +136,7 @@ document.createElement("a");
 
 contactLink.id = "floatingContact";
 contactLink.className = "floating-contact";
-contactLink.href = "tel:+919489704906";
+contactLink.href = "tel:+919043103301";
 contactLink.setAttribute("aria-label","Call PhotoRoast");
 
 contactLink.innerHTML = `

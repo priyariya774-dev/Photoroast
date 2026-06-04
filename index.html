@@ -908,25 +908,8 @@ box-shadow:
 
 }
 
-.review-card video{
-
-width:100%;
-
-aspect-ratio:16/9;
-
-object-fit:cover;
-
-background:#f1f1ed;
-
-display:block;
-
-border-bottom:
-1px solid var(--line);
-
-}
-
 .review-content{
-padding:18px;
+padding:22px;
 }
 
 .review-content h3{
@@ -951,6 +934,62 @@ line-height:1.8;
 
 color:var(--text-soft);
 
+}
+
+.review-stars{
+color:#d99a00;
+font-size:18px;
+letter-spacing:2px;
+margin-bottom:12px;
+}
+
+.review-form{
+max-width:720px;
+margin:34px auto 0;
+padding:18px;
+background:#fff;
+border:1px solid var(--line);
+border-radius:10px;
+display:grid;
+gap:10px;
+}
+
+.review-form h3{
+font-family:var(--display-font);
+font-size:28px;
+color:var(--text-main);
+}
+
+.review-form input,
+.review-form textarea,
+.review-form select{
+width:100%;
+padding:12px;
+border:1px solid var(--line);
+background:#fff;
+color:var(--text-main);
+font-family:var(--site-font);
+font-size:14px;
+}
+
+.review-form textarea{
+min-height:110px;
+resize:vertical;
+}
+
+.review-form button{
+padding:12px 16px;
+border:1px solid var(--line);
+background:#171717;
+color:#fff;
+font-weight:700;
+cursor:pointer;
+}
+
+.review-message{
+font-size:13px;
+color:var(--text-soft);
+line-height:1.5;
 }
 
 /* CTA */
@@ -1518,7 +1557,7 @@ id="mainMenu">
 </header>
 
 <a
-href="https://wa.me/919489704906?text=Hi%20PhotoRoast%2C%20I%20would%20like%20to%20enquire%20about%20a%20shoot."
+href="https://wa.me/919043103301?text=Hi%20PhotoRoast%2C%20I%20would%20like%20to%20enquire%20about%20a%20shoot."
 class="floating-whatsapp"
 target="_blank"
 rel="noopener"
@@ -1529,7 +1568,7 @@ aria-label="Chat on WhatsApp">
 </a>
 
 <a
-href="tel:+919489704906"
+href="tel:+919043103301"
 class="floating-contact"
 aria-label="Call PhotoRoast">
 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -1627,6 +1666,21 @@ id="reviewsGrid">
 Loading...
 
 </div>
+
+<form class="review-form" id="reviewForm">
+<h3>Add Your Review</h3>
+<input id="reviewName" placeholder="Your name" required>
+<select id="reviewRating" required>
+<option value="5">5 stars</option>
+<option value="4">4 stars</option>
+<option value="3">3 stars</option>
+<option value="2">2 stars</option>
+<option value="1">1 star</option>
+</select>
+<textarea id="reviewText" placeholder="Write your review" required></textarea>
+<button type="submit">Submit Review</button>
+<p class="review-message" id="reviewMessage"></p>
+</form>
 
 </section>
 
@@ -2249,10 +2303,26 @@ grid.innerHTML = "";
 if(!data || data.length===0){
 
 grid.innerHTML =
-`<div class="section-empty">Client review videos will appear here after they are uploaded.</div>`;
+`<div class="section-empty">Client reviews will appear here after people add them.</div>`;
 
 return;
 
+}
+
+function getStars(rating){
+const count =
+Math.max(1,Math.min(5,Number(rating) || 5));
+
+return "★★★★★".slice(0,count) + "☆☆☆☆☆".slice(0,5 - count);
+}
+
+function escapeReviewText(value){
+return String(value || "")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
 }
 
 data.forEach(review=>{
@@ -2261,27 +2331,16 @@ grid.innerHTML += `
 
 <div class="review-card">
 
-<video
-controls
-muted
-playsinline
-preload="metadata"
-class="review-video">
-
-<source
-src="/uploads/${review.video}"
-type="video/mp4">
-
-</video>
-
 <div class="review-content">
 
+<div class="review-stars">${getStars(review.rating)}</div>
+
 <h3>
-${review.name || "Client"}
+${escapeReviewText(review.name || "Client")}
 </h3>
 
 <p>
-${review.text || ""}
+${escapeReviewText(review.text || "")}
 </p>
 
 </div>
@@ -2292,8 +2351,6 @@ ${review.text || ""}
 
 });
 
-setupReviewAutoplay();
-
 }catch(err){
 
 console.log(err);
@@ -2302,52 +2359,43 @@ console.log(err);
 
 }
 
-function setupReviewAutoplay(){
-
-const reviewVideos =
-document.querySelectorAll(".review-video");
-
-if(reviewVideos.length===0){
-return;
-}
-
-if(!("IntersectionObserver" in window)){
-reviewVideos.forEach(video=>{
-video.muted = true;
-video.play().catch(()=>{});
-});
-return;
-}
-
-const observer =
-new IntersectionObserver(
-entries=>{
-entries.forEach(entry=>{
-
-const video =
-entry.target;
-
-if(entry.isIntersecting){
-video.muted = true;
-video.play().catch(()=>{});
-}else{
-video.pause();
-}
-
-});
-},
-{
-threshold:.45
-}
-);
-
-reviewVideos.forEach(video=>{
-observer.observe(video);
-});
-
-}
-
 loadReviews();
+
+document.getElementById("reviewForm").addEventListener("submit",async function(e){
+e.preventDefault();
+
+const message =
+document.getElementById("reviewMessage");
+
+try{
+const res =
+await fetch("/reviews",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+name:document.getElementById("reviewName").value,
+rating:document.getElementById("reviewRating").value,
+text:document.getElementById("reviewText").value
+})
+});
+
+const data =
+await res.json();
+
+if(!res.ok){
+message.innerText = data.message || "Review submit failed";
+return;
+}
+
+message.innerText = data.message || "Review added";
+this.reset();
+await loadReviews();
+}catch(err){
+message.innerText = "Review submit failed";
+}
+});
 
 async function loadSiteContent(){
 try{
@@ -2873,7 +2921,7 @@ content += `<button type="button" data-action="edit-about">Edit about text here<
 }
 
 if(area === "reviews"){
-content += `<a href="admin/media.html?mode=reviews">Manage client reviews</a>`;
+content += `<a href="#client-reviews">Use review form on this page</a>`;
 }
 
 if(area === "cta"){
