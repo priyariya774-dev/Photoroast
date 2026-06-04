@@ -680,29 +680,34 @@ overflow:hidden;
 overflow:visible;
 
 width:100%;
-max-width:1180px;
-margin:0 auto;
-padding:0 16px;
+max-width:none;
+margin:0;
+padding:0;
 
 }
 
 .gallery-slider-track{
 
-display:grid;
+display:flex;
 
-grid-template-columns:1fr;
+gap:18px;
 
-gap:16px;
+width:max-content;
 
-width:100%;
+padding-left:18px;
+animation:autoScroll 35s linear infinite;
+will-change:transform;
 
-padding:0;
+}
 
+.gallery-slider-track.loading{
+animation:none;
 }
 
 .gallery-card{
 
-width:100%;
+width:250px;
+min-width:250px;
 
 aspect-ratio:4 / 5;
 
@@ -713,6 +718,7 @@ overflow:hidden;
 background:color-mix(in srgb,var(--page-bg) 82%,white 6%);
 
 position:relative;
+flex-shrink:0;
 
 border:
 1px solid var(--line);
@@ -749,6 +755,7 @@ transform:scale(1.05);
 text-decoration:none;
 color:inherit;
 display:block;
+flex-shrink:0;
 }
 
 .gallery-overlay{
@@ -800,6 +807,16 @@ background:#ffffff;
 color:var(--text-soft);
 font-size:14px;
 line-height:1.7;
+}
+
+@keyframes autoScroll{
+0%{
+transform:translateX(0);
+}
+
+100%{
+transform:translateX(-50%);
+}
 }
 
 /* ABOUT */
@@ -1331,8 +1348,9 @@ font-size:17px;
 padding:80px 0;
 }
 
-.gallery-slider-track{
-grid-template-columns:repeat(2,minmax(0,1fr));
+.gallery-card{
+width:320px;
+min-width:320px;
 }
 
 }
@@ -1343,8 +1361,9 @@ grid-template-columns:repeat(2,minmax(0,1fr));
 font-size:88px;
 }
 
-.gallery-slider-track{
-grid-template-columns:repeat(3,minmax(0,1fr));
+.gallery-card{
+width:360px;
+min-width:360px;
 }
 
 }
@@ -2131,6 +2150,7 @@ document.getElementById(
 
 track.innerHTML =
 `<div class="section-empty">Loading featured gallery...</div>`;
+track.classList.add("loading");
 
 const featuredPhotos =
 data.filter(photo=>
@@ -2146,12 +2166,18 @@ photo.type==="image"
 if(featuredPhotos.length===0){
 track.innerHTML =
 `<div class="section-empty">Featured gallery images will appear here after the admin selects them from the gallery.</div>`;
+track.classList.remove("loading");
 return;
 }
 
 track.innerHTML = "";
 
-featuredPhotos.forEach(photo=>{
+const scrollingPhotos =
+featuredPhotos.length > 0
+? [...featuredPhotos,...featuredPhotos]
+: [];
+
+scrollingPhotos.forEach(photo=>{
 const link =
 document.createElement("a");
 link.href = "client-gallery.html";
@@ -2200,9 +2226,22 @@ link.appendChild(card);
 track.appendChild(link);
 });
 
+const firstImage =
+track.querySelector("img");
+
+if(firstImage){
+if(firstImage.complete){
+track.classList.remove("loading");
+}else{
+firstImage.addEventListener("load",()=>track.classList.remove("loading"),{once:true});
+firstImage.addEventListener("error",()=>track.classList.remove("loading"),{once:true});
+}
+}
+
 }catch(err){
 
 console.log(err);
+track.classList.remove("loading");
 
 }
 
