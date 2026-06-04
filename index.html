@@ -2537,6 +2537,11 @@ async function readJsonResponse(res){
 const data = await res.json().catch(()=>({}));
 
 if(!res.ok){
+if(res.status === 401){
+localStorage.removeItem("auth");
+throw new Error("Admin login expired. Please login again, then open Manage Homepage.");
+}
+
 throw new Error(data.message || "Update failed");
 }
 
@@ -3681,6 +3686,11 @@ credentials:"same-origin"
 if(!res.ok){
 const errorData =
 await res.json().catch(()=>({}));
+
+if(res.status === 401){
+localStorage.removeItem("auth");
+throw new Error("Admin login expired. Please login again, then open Manage Homepage.");
+}
 
 throw new Error(
 errorData.message ||
