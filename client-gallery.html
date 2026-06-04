@@ -373,6 +373,60 @@ font-size:12px;
 font-weight:bold;
 }
 
+.photo-viewer{
+position:fixed;
+inset:0;
+z-index:32000;
+display:none;
+align-items:center;
+justify-content:center;
+padding:16px;
+background:rgba(0,0,0,.86);
+}
+
+.photo-viewer.show{
+display:flex;
+}
+
+.photo-viewer-panel{
+width:min(1000px,100%);
+max-height:92vh;
+display:grid;
+grid-template-columns:1fr;
+gap:10px;
+color:#fff;
+}
+
+.photo-viewer img{
+max-width:100%;
+max-height:78vh;
+object-fit:contain;
+display:block;
+margin:auto;
+background:#111;
+}
+
+.photo-viewer button{
+justify-self:end;
+padding:10px 14px;
+border:1px solid rgba(255,255,255,.3);
+background:#fff;
+color:#171717;
+font-weight:bold;
+cursor:pointer;
+}
+
+.photo-viewer h2{
+font-size:20px;
+line-height:1.2;
+}
+
+.photo-viewer p{
+font-size:14px;
+line-height:1.5;
+color:#eee;
+}
+
 /* MEDIA BOX */
 
 .media-box{
@@ -616,6 +670,14 @@ id="gallery">
 
 <div class="gallery-admin-menu" id="galleryAdminMenu"></div>
 <div class="gallery-admin-dialog" id="galleryAdminDialog"></div>
+<div class="photo-viewer" id="photoViewer">
+<div class="photo-viewer-panel">
+<button type="button" onclick="closePhotoViewer()">Close</button>
+<img id="photoViewerImage" alt="">
+<h2 id="photoViewerTitle"></h2>
+<p id="photoViewerText"></p>
+</div>
+</div>
 
 <script>
 
@@ -712,6 +774,32 @@ dialog.innerHTML = "";
 
 function closeAdminMenu(){
 document.getElementById("galleryAdminMenu").classList.remove("show");
+}
+
+function openPhotoViewer(photoId){
+if(isFeaturedMode){
+return;
+}
+
+const photo =
+allMedia.find(item=>Number(item.id) === Number(photoId));
+
+if(!photo || !photo.filename){
+return;
+}
+
+document.getElementById("photoViewerImage").src =
+"/uploads/" + photo.filename;
+document.getElementById("photoViewerTitle").innerText =
+photo.title || photo.category || "Gallery image";
+document.getElementById("photoViewerText").innerText =
+photo.description || "";
+document.getElementById("photoViewer").classList.add("show");
+}
+
+function closePhotoViewer(){
+document.getElementById("photoViewer").classList.remove("show");
+document.getElementById("photoViewerImage").src = "";
 }
 
 async function readJsonResponse(res){
@@ -1421,7 +1509,7 @@ g.innerHTML += `
 class="card ${selectedFeaturedIds.includes(Number(p.id)) ? 'selected' : ''}"
 data-photo-id="${p.id}"
 ${isGalleryAdminMode ? `oncontextmenu="openPhotoAdminMenu(event,${p.id})"` : ""}
-${isFeaturedMode ? `onclick="toggleFeaturedImage(${p.id})"` : ""}>
+${isFeaturedMode ? `onclick="toggleFeaturedImage(${p.id})"` : `onclick="openPhotoViewer(${p.id})"`}>
 
 <div class="select-badge">
 ${selectedFeaturedIds.includes(Number(p.id)) ? "Selected" : "Select"}
@@ -1631,6 +1719,12 @@ await reloadGallery();
 closeAdminDialog();
 }catch(err){
 alert(err.message || "Upload failed");
+}
+});
+
+document.getElementById("photoViewer").addEventListener("click",function(event){
+if(event.target === this){
+closePhotoViewer();
 }
 });
 

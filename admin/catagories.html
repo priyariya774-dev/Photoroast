@@ -229,59 +229,6 @@ cursor:pointer;
 
 }
 
-.cover-btn{
-background:#ffd56b;
-color:#111;
-border:none;
-padding:8px 12px;
-border-radius:8px;
-cursor:pointer;
-font-weight:bold;
-width:100%;
-}
-
-.cover-picker{
-display:none;
-margin-top:18px;
-padding:16px;
-border-radius:14px;
-background:rgba(255,255,255,.06);
-border:1px solid rgba(255,215,120,.18);
-}
-
-.cover-picker.show{
-display:block;
-}
-
-.cover-grid{
-display:grid;
-grid-template-columns:1fr;
-gap:12px;
-margin-top:12px;
-}
-
-.cover-option{
-padding:0;
-overflow:hidden;
-border-radius:12px;
-background:#111;
-border:2px solid transparent;
-cursor:pointer;
-}
-
-.cover-option.active{
-border-color:#ffd56b;
-}
-
-.cover-option img{
-width:100%;
-aspect-ratio:16/10;
-object-fit:cover;
-display:block;
-}
-
-
-
 /* Tablet */
 
 @media(min-width:768px){
@@ -312,7 +259,6 @@ align-items:center;
 justify-content:flex-end;
 }
 
-.cover-btn,
 .delete{
 white-space:nowrap;
 }
@@ -419,22 +365,12 @@ Add
 
 </div>
 
-<div class="cover-picker" id="coverPicker">
-<h2 id="coverPickerTitle">Choose Frame Picture</h2>
-<div class="cover-grid" id="coverGrid"></div>
-</div>
-
-
 </div>
 
 
 
 
 <script>
-
-let allPhotos = [];
-let coverMap = {};
-let activeCoverCategory = "";
 
 function normalizeCategory(value){
 return String(value || "")
@@ -455,8 +391,6 @@ window.location.href="login.html";
 
 
 async function loadCategories(){
-
-await loadPhotosAndCovers();
 
 const response =
 await fetch(
@@ -493,15 +427,6 @@ ${cat.name}
 <div class="category-actions">
 
 <button
-class="cover-btn"
-onclick=
-"openCoverPicker('${cat.name.replace(/'/g,"\\'")}')">
-
-Choose Frame Picture
-
-</button>
-
-<button
 
 class="delete"
 
@@ -521,102 +446,6 @@ Delete
 });
 
 }
-
-async function loadPhotosAndCovers(){
-const photosRes =
-await fetch("/photos");
-
-const photos =
-await photosRes.json();
-
-allPhotos =
-photos.filter(item=>
-item.filename &&
-(item.type === "photo" || item.type === "image")
-);
-
-const coversRes =
-await fetch("/category-covers");
-
-const covers =
-await coversRes.json();
-
-coverMap = {};
-
-covers.forEach(item=>{
-coverMap[normalizeCategory(item.category)] = Number(item.photoId);
-});
-}
-
-function openCoverPicker(category){
-activeCoverCategory = category;
-
-document
-.getElementById("coverPicker")
-.classList
-.add("show");
-
-document
-.getElementById("coverPicker")
-.scrollIntoView({
-behavior:"smooth",
-block:"start"
-});
-
-document.getElementById("coverPickerTitle").innerText =
-"Choose Frame Picture for " + category;
-
-const grid =
-document.getElementById("coverGrid");
-
-const categoryPhotos =
-allPhotos.filter(item=>
-normalizeCategory(item.category) === normalizeCategory(category)
-);
-
-if(categoryPhotos.length===0){
-grid.innerHTML =
-`<p>No images uploaded in ${category} yet</p>`;
-return;
-}
-
-grid.innerHTML = "";
-
-categoryPhotos.forEach(photo=>{
-grid.innerHTML += `
-<button
-type="button"
-class="cover-option ${coverMap[normalizeCategory(category)] === Number(photo.id) ? 'active' : ''}"
-onclick="saveCategoryCover(${photo.id})">
-<img src="/uploads/${photo.filename}">
-</button>
-`;
-});
-}
-
-async function saveCategoryCover(photoId){
-const res =
-await fetch("/category-covers",{
-method:"PUT",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-category:activeCoverCategory,
-photoId
-})
-});
-
-const data =
-await res.json();
-
-alert(data.message || "Category cover updated");
-
-await loadPhotosAndCovers();
-openCoverPicker(activeCoverCategory);
-}
-
-
 
 async function addCategory(){
 

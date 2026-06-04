@@ -37,8 +37,6 @@ button{min-height:40px;padding:10px 12px;border:1px solid #d8d1c6;background:#ff
 .shell{padding:0 22px 36px}
 .admin-nav{margin:0 -22px 20px;padding:14px 22px}
 h1{font-size:30px}
-.button-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-.actions{grid-template-columns:repeat(2,minmax(0,1fr))}
 .list{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(min-width:1100px){
@@ -65,12 +63,11 @@ h1{font-size:30px}
 <h2>Upload Video</h2>
 <p class="hint">Upload a normal video or video file for the website.</p>
 <form id="videoForm">
-<input type="file" id="videoFile" accept="video/*" hidden>
+<input type="file" id="videoFile" accept="video/*">
 <input id="videoTitle" placeholder="Video title">
 <textarea id="videoDesc" placeholder="Video description"></textarea>
 <select id="videoCategory"></select>
 <div class="actions">
-<button type="button" onclick="document.getElementById('videoFile').click()">Choose Video</button>
 <button type="submit">Upload Video</button>
 </div>
 </form>
@@ -92,11 +89,10 @@ h1{font-size:30px}
 <h2>Upload Reels</h2>
 <p class="hint">Upload a reel video or paste a YouTube reel link.</p>
 <form id="reelVideoForm">
-<input type="file" id="reelFile" accept="video/*" hidden>
+<input type="file" id="reelFile" accept="video/*">
 <input id="reelTitle" placeholder="Reel title">
 <textarea id="reelDesc" placeholder="Reel description"></textarea>
 <div class="actions">
-<button type="button" onclick="document.getElementById('reelFile').click()">Choose Reel Video</button>
 <button type="submit">Upload Reel Video</button>
 </div>
 </form>
@@ -111,12 +107,13 @@ h1{font-size:30px}
 <section class="panel" id="uploadsPanel">
 <h2>Uploads</h2>
 <p class="hint">View and manage uploaded videos, YouTube links, and reels separately.</p>
-<h2 class="section-title">Uploaded Videos</h2>
-<div class="list" id="videoList"></div>
-<h2 class="section-title">YouTube Links</h2>
-<div class="list" id="youtubeList"></div>
-<h2 class="section-title">Reels</h2>
-<div class="list" id="reelList"></div>
+<div class="button-grid">
+<button class="big-btn" type="button" onclick="showUploadList('videos')">Videos</button>
+<button class="big-btn" type="button" onclick="showUploadList('youtube')">YouTube Videos</button>
+<button class="big-btn" type="button" onclick="showUploadList('reels')">Reels</button>
+</div>
+<h2 class="section-title" id="uploadsTitle">Choose upload type</h2>
+<div class="list" id="uploadList"></div>
 </section>
 </main>
 
@@ -132,6 +129,8 @@ panel.classList.toggle("show",panel.id === id);
 
 if(id === "uploadsPanel"){
 loadUploads();
+document.getElementById("uploadsTitle").innerText = "Choose upload type";
+document.getElementById("uploadList").innerHTML = "";
 }
 }
 
@@ -175,8 +174,13 @@ fallback.map(item=>`<option>${item}</option>`).join("");
 }
 }
 
-function renderList(targetId,items,emptyText){
-const target = document.getElementById(targetId);
+let cachedVideos = [];
+let cachedYoutube = [];
+let cachedReels = [];
+let activeUploadList = "";
+
+function renderList(items,emptyText){
+const target = document.getElementById("uploadList");
 
 if(items.length===0){
 target.innerHTML = `<div class="empty">${emptyText}</div>`;
@@ -213,17 +217,35 @@ async function loadUploads(){
 try{
 const res = await fetch("/videos?t=" + Date.now());
 const items = await readJson(res);
-const videos = items.filter(item=>item.type === "video" && normalize(item.category) !== "reels");
-const youtube = items.filter(item=>(item.youtube || item.type === "youtube") && normalize(item.category) !== "reels");
-const reels = items.filter(item=>normalize(item.category) === "reels");
-renderList("videoList",videos,"No uploaded videos yet");
-renderList("youtubeList",youtube,"No YouTube links yet");
-renderList("reelList",reels,"No reels uploaded yet");
-}catch(err){
-document.getElementById("videoList").innerHTML = `<div class="empty">${err.message || "Load failed"}</div>`;
-document.getElementById("youtubeList").innerHTML = "";
-document.getElementById("reelList").innerHTML = "";
+cachedVideos = items.filter(item=>item.type === "video" && normalize(item.category) !== "reels");
+cachedYoutube = items.filter(item=>(item.youtube || item.type === "youtube") && normalize(item.category) !== "reels");
+cachedReels = items.filter(item=>normalize(item.category) === "reels");
+
+if(activeUploadList){
+showUploadList(activeUploadList);
 }
+}catch(err){
+document.getElementById("uploadList").innerHTML = `<div class="empty">${err.message || "Load failed"}</div>`;
+}
+}
+
+function showUploadList(type){
+activeUploadList = type;
+
+if(type === "videos"){
+document.getElementById("uploadsTitle").innerText = "Uploaded Videos";
+renderList(cachedVideos,"No uploaded videos yet");
+return;
+}
+
+if(type === "youtube"){
+document.getElementById("uploadsTitle").innerText = "YouTube Videos";
+renderList(cachedYoutube,"No YouTube links yet");
+return;
+}
+
+document.getElementById("uploadsTitle").innerText = "Reels";
+renderList(cachedReels,"No reels uploaded yet");
 }
 
 async function saveMedia(id){
