@@ -1326,8 +1326,10 @@ overflow:hidden;
 }
 
 .admin-preview-frame.hero-upload-preview.mobile{
-aspect-ratio:4 / 5;
-max-width:360px;
+aspect-ratio:auto;
+width:min(360px,100%);
+height:clamp(430px,64vh,560px);
+height:clamp(430px,64svh,560px);
 margin-left:auto;
 margin-right:auto;
 }
@@ -1353,7 +1355,7 @@ object-fit:cover;
 object-fit:contain;
 }
 
-.admin-preview-frame.hero-upload-preview.editing img{
+.admin-preview-frame.hero-upload-preview.editing.cropped img{
 object-fit:cover;
 }
 
@@ -3488,7 +3490,8 @@ viewport:getHeroViewport(),
 posX:0,
 posY:0,
 scale:1,
-editing:false
+editing:false,
+cropped:false
 };
 
 function applyHeroUploadPreview(){
@@ -3503,6 +3506,7 @@ return;
 
 if(previewFrame){
 previewFrame.classList.toggle("editing",heroUploadState.editing);
+previewFrame.classList.toggle("cropped",heroUploadState.cropped);
 previewFrame.classList.toggle("mobile",heroUploadState.viewport === "mobile");
 previewFrame.classList.toggle("desktop",heroUploadState.viewport === "desktop");
 }
@@ -3514,6 +3518,7 @@ preview.style.transform = heroUploadState.editing
 
 body.querySelector("#adminEditHeroUploadPosition").addEventListener("click",function(){
 heroUploadState.editing = true;
+heroUploadState.cropped = false;
 applyHeroUploadPreview();
 
 const tools =
@@ -3542,6 +3547,7 @@ event.target.dataset.uploadHeroViewport;
 
 if(viewport){
 heroUploadState.editing = true;
+heroUploadState.cropped = false;
 heroUploadState.viewport = viewport;
 applyHeroUploadPreview();
 const tools =
@@ -3563,6 +3569,7 @@ return;
 }
 
 heroUploadState.editing = true;
+heroUploadState.cropped = true;
 
 if(move === "up"){
 heroUploadState.posY -= 8;
