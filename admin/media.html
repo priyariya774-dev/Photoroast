@@ -87,7 +87,7 @@ h1{font-size:30px}
 
 <section class="panel" id="reelPanel">
 <h2>Upload Reels</h2>
-<p class="hint">Upload a reel video or paste a YouTube reel link.</p>
+<p class="hint">Upload a reel video, paste an Instagram reel link, or paste a YouTube reel link.</p>
 <form id="reelVideoForm">
 <input type="file" id="reelFile" accept="video/*">
 <input id="reelTitle" placeholder="Reel title">
@@ -97,10 +97,10 @@ h1{font-size:30px}
 </div>
 </form>
 <form id="reelYoutubeForm">
-<input id="reelYoutubeLink" placeholder="YouTube reel link">
+<input id="reelYoutubeLink" placeholder="Instagram or YouTube reel link">
 <input id="reelYoutubeTitle" placeholder="Reel title">
 <textarea id="reelYoutubeDesc" placeholder="Reel description"></textarea>
-<button type="submit">Save YouTube Reel</button>
+<button type="submit">Save Reel Link</button>
 </form>
 </section>
 
@@ -134,8 +134,13 @@ document.getElementById("uploadList").innerHTML = "";
 }
 }
 
-function convertYoutube(url){
+function convertEmbed(url){
 if(!url){ return ""; }
+if(url.includes("instagram.com/")){
+const cleanUrl = url.split("?")[0].replace(/\/?$/,"/");
+return cleanUrl.endsWith("/embed/") ? cleanUrl : cleanUrl + "embed/";
+}
+
 let videoId = "";
 if(url.includes("youtu.be/")){
 videoId = url.split("youtu.be/")[1].split("?")[0];
@@ -190,7 +195,7 @@ return;
 target.innerHTML = items.map(item=>{
 const isYoutube = item.youtube || item.type === "youtube";
 const media = isYoutube
-? `<iframe src="${convertYoutube(item.youtube)}" title="YouTube video" allowfullscreen></iframe>`
+? `<iframe src="${convertEmbed(item.youtube)}" title="Reel or video link" allowfullscreen></iframe>`
 : `<video controls><source src="/uploads/${item.filename}"></video>`;
 
 return `

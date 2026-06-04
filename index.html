@@ -3414,7 +3414,10 @@ return;
 const body = dialog.querySelector("#adminHeroUpdateBody");
 
 body.innerHTML = `
-<p>${files.length} image${files.length > 1 ? "s" : ""} selected. Save to add to homepage hero.</p>
+<p>${files.length} image${files.length > 1 ? "s" : ""} selected. Edit position if needed, then save to add to homepage hero.</p>
+<div class="admin-preview-frame">
+<img id="adminHeroUploadPreview" src="${URL.createObjectURL(files[0])}" alt="Hero upload preview">
+</div>
 <div class="admin-image-choice-grid">
 ${files.map(file=>`
 <button type="button">
@@ -3424,9 +3427,97 @@ ${files.map(file=>`
 `).join("")}
 </div>
 <div class="admin-dialog-actions">
+<button type="button" id="adminEditHeroUploadPosition">Edit position</button>
 <button type="button" id="adminSaveHeroUpload">Save hero image</button>
 </div>
+<div id="adminHeroUploadPositionTools"></div>
 `;
+
+const heroUploadState = {
+viewport:getHeroViewport(),
+posX:0,
+posY:0,
+scale:1
+};
+
+function applyHeroUploadPreview(){
+const preview =
+body.querySelector("#adminHeroUploadPreview");
+
+if(!preview){
+return;
+}
+
+preview.style.transform =
+`translate(-50%,-50%) translate(${heroUploadState.posX}px, ${heroUploadState.posY}px) scale(${heroUploadState.scale})`;
+}
+
+body.querySelector("#adminEditHeroUploadPosition").addEventListener("click",function(){
+const tools =
+body.querySelector("#adminHeroUploadPositionTools");
+
+tools.innerHTML = `
+<p>Choose which layout you want to adjust.</p>
+<div class="admin-dialog-actions">
+<button type="button" data-upload-hero-viewport="mobile">Mobile</button>
+<button type="button" data-upload-hero-viewport="desktop">Desktop</button>
+</div>
+<div class="admin-position-grid">
+<button type="button" data-upload-hero-move="up">Up</button>
+<button type="button" data-upload-hero-move="down">Down</button>
+<button type="button" data-upload-hero-move="left">Left</button>
+<button type="button" data-upload-hero-move="right">Right</button>
+<button type="button" data-upload-hero-move="zoom-in">Zoom in</button>
+<button type="button" data-upload-hero-move="zoom-out">Zoom out</button>
+</div>
+`;
+});
+
+body.addEventListener("click",function(event){
+const viewport =
+event.target.dataset.uploadHeroViewport;
+
+if(viewport){
+heroUploadState.viewport = viewport;
+alert("Editing " + viewport + " position");
+return;
+}
+
+const move =
+event.target.dataset.uploadHeroMove;
+
+if(!move){
+return;
+}
+
+if(move === "up"){
+heroUploadState.posY -= 8;
+}
+
+if(move === "down"){
+heroUploadState.posY += 8;
+}
+
+if(move === "left"){
+heroUploadState.posX -= 8;
+}
+
+if(move === "right"){
+heroUploadState.posX += 8;
+}
+
+if(move === "zoom-in"){
+heroUploadState.scale = Math.min(3,Number((heroUploadState.scale + .05).toFixed(2)));
+}
+
+if(move === "zoom-out"){
+heroUploadState.scale = Math.max(.4,Number((heroUploadState.scale - .05).toFixed(2)));
+}
+
+applyHeroUploadPreview();
+});
+
+applyHeroUploadPreview();
 
 body.querySelector("#adminSaveHeroUpload").addEventListener("click",async function(){
 const text = getCurrentHeroText();
@@ -3435,7 +3526,10 @@ const formData = new FormData();
 files.forEach(file=>formData.append("heroImages",file));
 formData.append("heading",text.heading);
 formData.append("description",text.description);
-formData.append("viewport",getHeroViewport());
+formData.append("viewport",heroUploadState.viewport);
+formData.append("posX",heroUploadState.posX);
+formData.append("posY",heroUploadState.posY);
+formData.append("scale",heroUploadState.scale);
 
 const res = await fetch("/upload-hero",{
 method:"POST",
