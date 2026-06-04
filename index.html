@@ -3521,9 +3521,8 @@ preview.naturalWidth;
 const imageHeight =
 preview.naturalHeight;
 
-const fitScale = heroUploadState.cropped
-? Math.max(frameWidth / imageWidth,frameHeight / imageHeight)
-: Math.min(frameWidth / imageWidth,frameHeight / imageHeight);
+const fitScale =
+Math.min(frameWidth / imageWidth,frameHeight / imageHeight);
 
 preview.style.width = imageWidth * fitScale + "px";
 preview.style.height = imageHeight * fitScale + "px";
@@ -3588,7 +3587,6 @@ return;
 }
 
 heroUploadState.editing = true;
-heroUploadState.cropped = true;
 
 if(move === "up"){
 heroUploadState.posY += 8;
