@@ -1317,12 +1317,12 @@ border:1px solid var(--line);
 width:100%;
 aspect-ratio:16 / 9;
 min-height:0;
-overflow:visible;
+overflow:hidden;
 background:#f7f7f4;
 }
 
-.admin-preview-frame.hero-upload-preview.editing{
-overflow:hidden;
+.admin-preview-frame.hero-upload-preview.full-image{
+overflow:visible;
 }
 
 .admin-preview-frame.hero-upload-preview.mobile{
@@ -1351,12 +1351,8 @@ height:100%;
 object-fit:cover;
 }
 
-.admin-preview-frame.hero-upload-preview:not(.editing) img{
-object-fit:contain;
-}
-
-.admin-preview-frame.hero-upload-preview.editing.cropped img{
-object-fit:cover;
+.admin-preview-frame.hero-upload-preview img{
+object-fit:fill;
 }
 
 .admin-logo-preview{
@@ -3507,8 +3503,31 @@ return;
 if(previewFrame){
 previewFrame.classList.toggle("editing",heroUploadState.editing);
 previewFrame.classList.toggle("cropped",heroUploadState.cropped);
+previewFrame.classList.toggle("full-image",!heroUploadState.cropped);
 previewFrame.classList.toggle("mobile",heroUploadState.viewport === "mobile");
 previewFrame.classList.toggle("desktop",heroUploadState.viewport === "desktop");
+}
+
+if(previewFrame && preview.naturalWidth && preview.naturalHeight){
+const frameWidth =
+previewFrame.clientWidth || 1;
+
+const frameHeight =
+previewFrame.clientHeight || 1;
+
+const imageWidth =
+preview.naturalWidth;
+
+const imageHeight =
+preview.naturalHeight;
+
+const fitScale = heroUploadState.cropped
+? Math.max(frameWidth / imageWidth,frameHeight / imageHeight)
+: Math.min(frameWidth / imageWidth,frameHeight / imageHeight);
+
+preview.style.width = imageWidth * fitScale + "px";
+preview.style.height = imageHeight * fitScale + "px";
+preview.style.objectFit = "fill";
 }
 
 preview.style.transform = heroUploadState.editing
@@ -3572,19 +3591,19 @@ heroUploadState.editing = true;
 heroUploadState.cropped = true;
 
 if(move === "up"){
-heroUploadState.posY -= 8;
-}
-
-if(move === "down"){
 heroUploadState.posY += 8;
 }
 
+if(move === "down"){
+heroUploadState.posY -= 8;
+}
+
 if(move === "left"){
-heroUploadState.posX -= 8;
+heroUploadState.posX += 8;
 }
 
 if(move === "right"){
-heroUploadState.posX += 8;
+heroUploadState.posX -= 8;
 }
 
 if(move === "zoom-in"){
@@ -3599,6 +3618,13 @@ applyHeroUploadPreview();
 });
 
 applyHeroUploadPreview();
+
+const uploadPreviewImage =
+body.querySelector("#adminHeroUploadPreview");
+
+if(uploadPreviewImage){
+uploadPreviewImage.addEventListener("load",applyHeroUploadPreview,{once:true});
+}
 
 body.querySelector("#adminSaveHeroUpload").addEventListener("click",async function(){
 try{
