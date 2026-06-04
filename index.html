@@ -708,8 +708,7 @@ animation:none;
 
 width:250px;
 min-width:250px;
-
-aspect-ratio:4 / 5;
+height:340px;
 
 border-radius:10px;
 
@@ -725,14 +724,6 @@ border:
 
 transition:.35s;
 
-}
-
-.gallery-card.landscape{
-aspect-ratio:16 / 10;
-}
-
-.gallery-card.portrait{
-aspect-ratio:4 / 5;
 }
 
 .gallery-card img{
@@ -1351,6 +1342,7 @@ padding:80px 0;
 .gallery-card{
 width:320px;
 min-width:320px;
+height:420px;
 }
 
 }
@@ -1364,6 +1356,7 @@ font-size:88px;
 .gallery-card{
 width:360px;
 min-width:360px;
+height:460px;
 }
 
 }
@@ -2192,24 +2185,7 @@ document.createElement("img");
 img.alt = photo.title || "PhotoRoast gallery image";
 img.loading = "eager";
 img.decoding = "async";
-
-function applyFeaturedImageShape(){
-const isPortrait =
-(img.naturalHeight || 0) > (img.naturalWidth || 0);
-
-card.classList.toggle("portrait",isPortrait);
-card.classList.toggle("landscape",!isPortrait);
-}
-
-img.onload = applyFeaturedImageShape;
-img.onerror = function(){
-card.classList.add("landscape");
-};
 img.src = "/uploads/" + photo.filename;
-
-if(img.complete){
-applyFeaturedImageShape();
-}
 
 const overlay =
 document.createElement("div");
