@@ -2178,6 +2178,17 @@ loadHero();
 
 /* LOAD GALLERY */
 
+async function getJsonOrThrow(res,fallbackMessage){
+const data =
+await res.json().catch(()=>({}));
+
+if(!res.ok){
+throw new Error(data.message || fallbackMessage || "Request failed");
+}
+
+return data;
+}
+
 async function loadGallery(){
 
 try{
@@ -2188,7 +2199,7 @@ await fetch(
 );
 
 const data =
-await res.json();
+await getJsonOrThrow(res,"Featured gallery load failed");
 
 const track =
 document.getElementById(
@@ -2272,6 +2283,8 @@ firstImage.addEventListener("error",()=>track.classList.remove("loading"),{once:
 
 console.log(err);
 track.classList.remove("loading");
+track.innerHTML =
+`<div class="section-empty">${err.message || "Featured gallery load failed"}</div>`;
 
 }
 
@@ -2291,7 +2304,7 @@ await fetch(
 );
 
 const data =
-await res.json();
+await getJsonOrThrow(res,"Reviews load failed");
 
 const grid =
 document.getElementById(
@@ -2354,6 +2367,8 @@ ${escapeReviewText(review.text || "")}
 }catch(err){
 
 console.log(err);
+document.getElementById("reviewsGrid").innerHTML =
+`<div class="section-empty">${err.message || "Reviews load failed"}</div>`;
 
 }
 
@@ -2382,12 +2397,7 @@ text:document.getElementById("reviewText").value
 });
 
 const data =
-await res.json();
-
-if(!res.ok){
-message.innerText = data.message || "Review submit failed";
-return;
-}
+await getJsonOrThrow(res,"Review submit failed");
 
 message.innerText = data.message || "Review added";
 this.reset();

@@ -1304,7 +1304,7 @@ ids:selectedFeaturedIds
 });
 
 const data =
-await res.json();
+await readJsonResponse(res);
 
 alert(data.message || "Featured images updated");
 
@@ -1324,7 +1324,7 @@ const res =
 await fetch("/featured-images?t=" + new Date().getTime());
 
 const data =
-await res.json();
+await readJsonResponse(res);
 
 selectedFeaturedIds =
 data.map(item=>Number(item.id));

@@ -280,6 +280,7 @@ alert(err.message || "Delete failed");
 }
 
 async function uploadVideo(form,fileId,titleId,descId,category){
+try{
 const file = document.getElementById(fileId).files[0];
 if(!file){ alert("Choose a video first"); return; }
 const formData = new FormData();
@@ -292,9 +293,13 @@ const data = await readJson(res);
 alert(data.message || "Uploaded");
 form.reset();
 await loadUploads();
+}catch(err){
+alert(err.message || "Upload failed");
+}
 }
 
 async function uploadYoutube(form,linkId,titleId,descId,category){
+try{
 const link = document.getElementById(linkId).value;
 if(!link){ alert("Paste a YouTube link first"); return; }
 const res = await fetch("/upload",{
@@ -311,6 +316,9 @@ const data = await readJson(res);
 alert(data.message || "Saved");
 form.reset();
 await loadUploads();
+}catch(err){
+alert(err.message || "Save failed");
+}
 }
 
 document.getElementById("videoForm").addEventListener("submit",event=>{

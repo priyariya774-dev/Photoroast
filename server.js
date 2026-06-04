@@ -2754,6 +2754,23 @@ message:"Category cover updated"
 
 });
 
+app.use((err,req,res,next)=>{
+console.error("Unhandled server error:",err);
+
+if(res.headersSent){
+return next(err);
+}
+
+const isFileTooLarge =
+err && err.code === "LIMIT_FILE_SIZE";
+
+res.status(isFileTooLarge ? 413 : 500).json({
+message:isFileTooLarge
+? "File is too large. Please choose a smaller file."
+: "Something went wrong. Please try again."
+});
+});
+
 // ======================
 // START SERVER
 // ======================
