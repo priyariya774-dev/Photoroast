@@ -1088,6 +1088,19 @@ color:#fff;
 font-size:13px;
 text-align:center;
 box-shadow:0 12px 28px rgba(0,0,0,.18);
+display:flex;
+align-items:center;
+justify-content:center;
+gap:8px;
+flex-wrap:wrap;
+}
+
+.admin-edit-banner a{
+color:#171717;
+background:#fff;
+padding:8px 10px;
+text-decoration:none;
+font-weight:700;
 }
 
 .admin-edit-menu{
@@ -2343,7 +2356,11 @@ return;
 
 const banner = document.createElement("div");
 banner.className = "admin-edit-banner";
-banner.innerText = "Admin edit mode: right-click a home page section to manage it.";
+banner.innerHTML = `
+<span>Admin edit mode: right-click a home page section to manage it.</span>
+<a href="javascript:history.back()">Back</a>
+<a href="admin/dashboard.html">Dashboard</a>
+`;
 document.body.appendChild(banner);
 
 const menu = document.createElement("div");
@@ -2819,7 +2836,7 @@ content += `<button type="button" data-action="edit-about">Edit about text here<
 }
 
 if(area === "reviews"){
-content += `<a href="${uploadBase}reviews">Upload client review video</a>`;
+content += `<a href="admin/media.html?mode=reviews">Manage client reviews</a>`;
 }
 
 if(area === "cta"){

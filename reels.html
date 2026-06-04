@@ -163,15 +163,19 @@ return `https://www.youtube.com/embed/${videoId}?rel=0`;
 
 function renderReels(videos){
 const grid = document.getElementById("reelsGrid");
+const reels =
+(videos || []).filter(item=>
+String(item.category || "").trim().toLowerCase() === "reels"
+);
 
-if(!videos || videos.length===0){
+if(reels.length===0){
 grid.innerHTML = `<div class="empty">No reels uploaded yet</div>`;
 return;
 }
 
 grid.innerHTML = "";
 
-videos.forEach(item=>{
+reels.forEach(item=>{
 const media =
 item.type === "youtube"
 ? `

@@ -186,6 +186,13 @@ WHERE mobile IS NULL OR mobile=''
 );
 
 db.query(`
+CREATE TABLE IF NOT EXISTS categories (
+id INT AUTO_INCREMENT PRIMARY KEY,
+name VARCHAR(255) NOT NULL UNIQUE
+)
+`,()=>{});
+
+db.query(`
 CREATE TABLE IF NOT EXISTS category_covers (
 category VARCHAR(255) PRIMARY KEY,
 photoId INT NOT NULL
@@ -2481,6 +2488,38 @@ res.json(result);
 
 });
 
+app.put("/edit-review/:id",(req,res)=>{
+const id = req.params.id;
+const {
+name,
+text
+} = req.body;
+
+db.query(
+`
+UPDATE reviews
+SET
+name=?,
+text=?
+WHERE id=?
+`,
+[
+String(name || "").trim(),
+String(text || "").trim(),
+id
+],
+err=>{
+if(err){
+return res.status(500).json(err);
+}
+
+res.json({
+message:"Review updated"
+});
+}
+);
+});
+
 // ======================
 // DELETE REVIEW
 // ======================
@@ -2567,6 +2606,54 @@ res.json(result);
 }
 );
 
+});
+
+app.post("/categories",(req,res)=>{
+const name = String(req.body.name || "").trim();
+
+if(!name){
+return res.status(400).json({
+message:"Enter category"
+});
+}
+
+db.query(
+`
+INSERT INTO categories
+(name)
+VALUES
+(?)
+`,
+[name],
+err=>{
+if(err){
+return res.status(500).json(err);
+}
+
+res.json({
+message:"Category added"
+});
+}
+);
+});
+
+app.delete("/categories/:id",(req,res)=>{
+db.query(
+`
+DELETE FROM categories
+WHERE id=?
+`,
+[req.params.id],
+err=>{
+if(err){
+return res.status(500).json(err);
+}
+
+res.json({
+message:"Category deleted"
+});
+}
+);
 });
 
 // ======================

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Media</title>
+<script src="../error-handler.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+body{min-height:100vh;background:#f6f4ef;color:#171717}
+.shell{width:100%;max-width:1120px;margin:0 auto;padding:0 12px 28px}
+.admin-nav{position:sticky;top:0;z-index:50;margin:0 -12px 14px;padding:10px 12px;background:#f6f4ef;border-bottom:1px solid #e4dfd4;display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}
+.nav-btn{min-height:40px;display:flex;align-items:center;justify-content:center;padding:9px 12px;border:1px solid #d8d1c6;background:#fff;color:#171717;text-decoration:none;font-size:13px;font-weight:800;cursor:pointer}
+h1,h2{font-family:Georgia,'Times New Roman',serif;line-height:1.1}
+h1{font-size:22px;text-align:center}
+h2{font-size:24px;margin-bottom:8px}
+.hint{font-size:13px;color:#6f675e;line-height:1.55}
+.layout{display:grid;grid-template-columns:1fr;gap:12px}
+.box{background:#fff;border:1px solid #e4dfd4;padding:14px}
+input,textarea,select{width:100%;padding:12px;margin-top:10px;border:1px solid #d8d1c6;background:#fff;color:#171717;font-size:14px}
+textarea{min-height:90px;resize:vertical}
+.actions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}
+button{min-height:40px;padding:10px 12px;border:1px solid #d8d1c6;background:#fff;color:#171717;font-weight:800;cursor:pointer}
+.danger{color:#b00020;border-color:#e0b5b5}
+.list{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
+.card{background:#fff;border:1px solid #e4dfd4;overflow:hidden}
+.media-box{width:100%;aspect-ratio:16/10;background:#f1f1ed}
+.media-box video,.media-box iframe{width:100%;height:100%;display:block;border:0;object-fit:cover}
+.content{padding:12px}
+.content h3{font-size:17px;margin-bottom:6px}
+.content p{font-size:13px;line-height:1.5;color:#5f5850;margin-bottom:6px}
+.empty{padding:20px;text-align:center;color:#6f675e;background:#fff;border:1px solid #e4dfd4}
+@media(min-width:760px){
+.shell{padding:0 22px 36px}
+.admin-nav{margin:0 -22px 20px;padding:14px 22px}
+h1{font-size:30px}
+.layout{grid-template-columns:1fr 1fr;align-items:start}
+.actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+.list{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(min-width:1100px){
+.list{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+</style>
+</head>
+<body>
+<script>
+if(localStorage.getItem("auth") !== "true"){
+window.location.href = "login.html";
+}
+</script>
+
+<main class="shell">
+<div class="admin-nav">
+<a class="nav-btn" href="javascript:history.back()">‹ Back</a>
+<h1 id="pageTitle">Manage Media</h1>
+<a class="nav-btn" href="dashboard.html">Dashboard</a>
+</div>
+
+<section class="layout" id="videoTools">
+<div class="box">
+<h2 id="uploadTitle">Upload Video</h2>
+<p class="hint">Choose a video file, add details, then save.</p>
+<form id="videoForm">
+<input type="file" id="videoFile" accept="video/*" hidden>
+<input id="videoTitle" placeholder="Title">
+<textarea id="videoDesc" placeholder="Description"></textarea>
+<select id="videoCategory"></select>
+<div class="actions">
+<button type="button" onclick="document.getElementById('videoFile').click()">Choose Video</button>
+<button type="submit">Upload Video</button>
+</div>
+</form>
+</div>
+
+<div class="box">
+<h2 id="youtubeTitleHeading">Add YouTube Link</h2>
+<p class="hint">Paste a YouTube video, Shorts, or embed link.</p>
+<form id="youtubeForm">
+<input id="youtubeLink" placeholder="YouTube link">
+<input id="youtubeTitle" placeholder="Title">
+<textarea id="youtubeDesc" placeholder="Description"></textarea>
+<select id="youtubeCategory"></select>
+<button type="submit">Save YouTube Link</button>
+</form>
+</div>
+</section>
+
+<section class="box" id="reviewTools" hidden>
+<h2>Upload Client Review</h2>
+<p class="hint">Add a client name, review text, and review video.</p>
+<form id="reviewForm">
+<input type="file" id="reviewVideo" accept="video/*" hidden>
+<input id="reviewName" placeholder="Client name">
+<textarea id="reviewText" placeholder="Client review"></textarea>
+<div class="actions">
+<button type="button" onclick="document.getElementById('reviewVideo').click()">Choose Review Video</button>
+<button type="submit">Upload Review</button>
+</div>
+</form>
+</section>
+
+<section>
+<div class="list" id="mediaList">
+<div class="empty">Loading...</div>
+</div>
+</section>
+</main>
+
+<script>
+const params = new URLSearchParams(location.search);
+const mode = params.get("mode") || "videos";
+const isReels = mode === "reels";
+const isReviews = mode === "reviews";
+
+function normalize(value){
+return String(value || "").trim().toLowerCase();
+}
+
+function convertYoutube(url){
+if(!url){ return ""; }
+let videoId = "";
+if(url.includes("youtu.be/")){
+videoId = url.split("youtu.be/")[1].split("?")[0];
+}else if(url.includes("watch?v=")){
+videoId = url.split("watch?v=")[1].split("&")[0];
+}else if(url.includes("/shorts/")){
+videoId = url.split("/shorts/")[1].split("?")[0];
+}else if(url.includes("/embed/")){
+return url;
+}
+return `https://www.youtube.com/embed/${videoId}?rel=0`;
+}
+
+async function readJson(res){
+const data = await res.json().catch(()=>({}));
+if(!res.ok){ throw new Error(data.message || "Request failed"); }
+return data;
+}
+
+function configurePage(){
+document.getElementById("pageTitle").innerText =
+isReviews ? "Manage Reviews" : isReels ? "Manage Reels" : "Manage Videos / YouTube Links";
+
+document.getElementById("uploadTitle").innerText =
+isReels ? "Upload Reel Video" : "Upload Video";
+
+document.getElementById("youtubeTitleHeading").innerText =
+isReels ? "Add YouTube Reel" : "Add YouTube Link";
+
+document.getElementById("videoTools").hidden = isReviews;
+document.getElementById("reviewTools").hidden = !isReviews;
+}
+
+async function loadCategories(){
+const fallback = ["General","Reels"];
+try{
+const res = await fetch("/categories?t=" + Date.now());
+const raw = await readJson(res);
+const names = raw.map(item=>item.name || item).filter(Boolean);
+const options = Array.from(new Set([...fallback,...names]));
+["videoCategory","youtubeCategory"].forEach(id=>{
+const select = document.getElementById(id);
+select.innerHTML = options.map(item=>`<option${isReels && item === "Reels" ? " selected" : ""}>${item}</option>`).join("");
+select.disabled = isReels;
+});
+}catch(err){
+["videoCategory","youtubeCategory"].forEach(id=>{
+document.getElementById(id).innerHTML = fallback.map(item=>`<option${isReels && item === "Reels" ? " selected" : ""}>${item}</option>`).join("");
+});
+}
+}
+
+function mediaMatchesMode(item){
+const category = normalize(item.category);
+if(isReels){
+return category === "reels";
+}
+return category !== "reels";
+}
+
+function renderVideoList(items){
+const list = document.getElementById("mediaList");
+const videos = items.filter(mediaMatchesMode);
+
+if(videos.length===0){
+list.innerHTML = `<div class="empty">No ${isReels ? "reels" : "videos or YouTube links"} uploaded yet</div>`;
+return;
+}
+
+list.innerHTML = videos.map(item=>{
+const isYoutube = item.youtube || item.type === "youtube";
+const media = isYoutube
+? `<iframe src="${convertYoutube(item.youtube)}" title="YouTube video" allowfullscreen></iframe>`
+: `<video controls><source src="/uploads/${item.filename}"></video>`;
+
+return `
+<article class="card">
+<div class="media-box">${media}</div>
+<div class="content">
+<h3>${item.title || "Untitled"}</h3>
+<p>${item.description || ""}</p>
+<p>${item.category || ""}</p>
+<input id="title-${item.id}" value="${String(item.title || "").replace(/"/g,"&quot;")}" placeholder="Title">
+<textarea id="desc-${item.id}" placeholder="Description">${item.description || ""}</textarea>
+<input id="category-${item.id}" value="${item.category || "General"}" placeholder="Category">
+<div class="actions">
+<button type="button" onclick="saveMedia(${item.id})">Save</button>
+<button type="button" class="danger" onclick="deleteMedia(${item.id})">Delete</button>
+</div>
+</div>
+</article>
+`;
+}).join("");
+}
+
+function renderReviewList(items){
+const list = document.getElementById("mediaList");
+
+if(items.length===0){
+list.innerHTML = `<div class="empty">No reviews uploaded yet</div>`;
+return;
+}
+
+list.innerHTML = items.map(item=>`
+<article class="card">
+<div class="media-box">
+<video controls><source src="/uploads/${item.video}"></video>
+</div>
+<div class="content">
+<h3>${item.name || "Client"}</h3>
+<p>${item.text || ""}</p>
+<input id="review-name-${item.id}" value="${String(item.name || "").replace(/"/g,"&quot;")}" placeholder="Client name">
+<textarea id="review-text-${item.id}" placeholder="Review text">${item.text || ""}</textarea>
+<div class="actions">
+<button type="button" onclick="saveReview(${item.id})">Save</button>
+<button type="button" class="danger" onclick="deleteReview(${item.id})">Delete</button>
+</div>
+</div>
+</article>
+`).join("");
+}
+
+async function loadList(){
+try{
+if(isReviews){
+const res = await fetch("/reviews?t=" + Date.now());
+renderReviewList(await readJson(res));
+return;
+}
+
+const res = await fetch("/videos?t=" + Date.now());
+renderVideoList(await readJson(res));
+}catch(err){
+document.getElementById("mediaList").innerHTML = `<div class="empty">${err.message || "Load failed"}</div>`;
+}
+}
+
+async function saveMedia(id){
+try{
+const res = await fetch("/edit-photo/" + id,{
+method:"PUT",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+title:document.getElementById("title-" + id).value,
+description:document.getElementById("desc-" + id).value,
+category:document.getElementById("category-" + id).value
+})
+});
+const data = await readJson(res);
+alert(data.message || "Saved");
+await loadList();
+}catch(err){
+alert(err.message || "Save failed");
+}
+}
+
+async function deleteMedia(id){
+if(!confirm("Delete this item?")){ return; }
+try{
+const res = await fetch("/delete/" + id,{method:"DELETE"});
+const data = await readJson(res);
+alert(data.message || "Deleted");
+await loadList();
+}catch(err){
+alert(err.message || "Delete failed");
+}
+}
+
+async function saveReview(id){
+try{
+const res = await fetch("/edit-review/" + id,{
+method:"PUT",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+name:document.getElementById("review-name-" + id).value,
+text:document.getElementById("review-text-" + id).value
+})
+});
+const data = await readJson(res);
+alert(data.message || "Saved");
+await loadList();
+}catch(err){
+alert(err.message || "Save failed");
+}
+}
+
+async function deleteReview(id){
+if(!confirm("Delete this review?")){ return; }
+try{
+const res = await fetch("/delete-review/" + id,{method:"DELETE"});
+const data = await readJson(res);
+alert(data.message || "Deleted");
+await loadList();
+}catch(err){
+alert(err.message || "Delete failed");
+}
+}
+
+document.getElementById("videoForm").addEventListener("submit",async event=>{
+event.preventDefault();
+const file = document.getElementById("videoFile").files[0];
+if(!file){ alert("Choose a video first"); return; }
+const formData = new FormData();
+formData.append("media",file);
+formData.append("title",document.getElementById("videoTitle").value);
+formData.append("description",document.getElementById("videoDesc").value);
+formData.append("category",isReels ? "Reels" : document.getElementById("videoCategory").value);
+const res = await fetch("/upload",{method:"POST",body:formData});
+const data = await readJson(res);
+alert(data.message || "Uploaded");
+event.target.reset();
+await loadCategories();
+await loadList();
+});
+
+document.getElementById("youtubeForm").addEventListener("submit",async event=>{
+event.preventDefault();
+const res = await fetch("/upload",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+youtube:document.getElementById("youtubeLink").value,
+title:document.getElementById("youtubeTitle").value,
+description:document.getElementById("youtubeDesc").value,
+category:isReels ? "Reels" : document.getElementById("youtubeCategory").value
+})
+});
+const data = await readJson(res);
+alert(data.message || "Saved");
+event.target.reset();
+await loadCategories();
+await loadList();
+});
+
+document.getElementById("reviewForm").addEventListener("submit",async event=>{
+event.preventDefault();
+const file = document.getElementById("reviewVideo").files[0];
+if(!file){ alert("Choose a review video first"); return; }
+const formData = new FormData();
+formData.append("reviewVideo",file);
+formData.append("name",document.getElementById("reviewName").value);
+formData.append("review",document.getElementById("reviewText").value);
+const res = await fetch("/upload-review",{method:"POST",body:formData});
+const data = await readJson(res);
+alert(data.message || "Review uploaded");
+event.target.reset();
+await loadList();
+});
+
+configurePage();
+loadCategories();
+loadList();
+</script>
+</body>
+</html>

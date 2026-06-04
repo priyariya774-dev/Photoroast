@@ -27,6 +27,43 @@ padding:14px;
 background:#ffffff;
 }
 
+.gallery-admin-top{
+position:sticky;
+top:0;
+z-index:25000;
+display:none;
+grid-template-columns:auto 1fr auto;
+gap:8px;
+align-items:center;
+margin:-14px -14px 14px;
+padding:10px 14px;
+background:#fff;
+border-bottom:1px solid rgba(23,23,23,.12);
+}
+
+.gallery-admin-top.show{
+display:grid;
+}
+
+.gallery-admin-top a{
+min-height:40px;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:9px 12px;
+border:1px solid rgba(23,23,23,.14);
+background:#fff;
+color:#171717;
+text-decoration:none;
+font-size:13px;
+font-weight:bold;
+}
+
+.gallery-admin-top strong{
+text-align:center;
+font-size:14px;
+}
+
 h1{
 text-align:center;
 margin-bottom:18px;
@@ -531,6 +568,12 @@ aspect-ratio:4/5;
 
 <body>
 
+<div class="gallery-admin-top" id="galleryAdminTop">
+<a href="javascript:history.back()">‹ Back</a>
+<strong>Gallery Edit Mode</strong>
+<a href="admin/dashboard.html">Dashboard</a>
+</div>
+
 <h1>
 
 Client Gallery
@@ -619,6 +662,10 @@ let selectedFeaturedIds = [];
 
 if(isFeaturedMode){
 document.body.classList.add("featured-mode");
+}
+
+if(isGalleryAdminMode){
+document.getElementById("galleryAdminTop").classList.add("show");
 }
 
 function normalizeCategory(value){
