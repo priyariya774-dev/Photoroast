@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Manage Media</title>
+<title>Manage Uploads</title>
 <script src="../error-handler.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
@@ -15,14 +15,17 @@ h1,h2{font-family:Georgia,'Times New Roman',serif;line-height:1.1}
 h1{font-size:22px;text-align:center}
 h2{font-size:24px;margin-bottom:8px}
 .hint{font-size:13px;color:#6f675e;line-height:1.55}
-.layout{display:grid;grid-template-columns:1fr;gap:12px}
-.box{background:#fff;border:1px solid #e4dfd4;padding:14px}
+.button-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px}
+.big-btn{min-height:58px;padding:15px;background:#fff;border:1px solid #e2dbcf;color:#171717;font-size:16px;font-weight:800;text-align:left;cursor:pointer}
+.panel{display:none;background:#fff;border:1px solid #e4dfd4;padding:14px;margin-bottom:14px}
+.panel.show{display:block}
 input,textarea,select{width:100%;padding:12px;margin-top:10px;border:1px solid #d8d1c6;background:#fff;color:#171717;font-size:14px}
 textarea{min-height:90px;resize:vertical}
 .actions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}
 button{min-height:40px;padding:10px 12px;border:1px solid #d8d1c6;background:#fff;color:#171717;font-weight:800;cursor:pointer}
 .danger{color:#b00020;border-color:#e0b5b5}
-.list{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
+.section-title{margin:18px 0 10px;font-size:22px}
+.list{display:grid;grid-template-columns:1fr;gap:12px}
 .card{background:#fff;border:1px solid #e4dfd4;overflow:hidden}
 .media-box{width:100%;aspect-ratio:16/10;background:#f1f1ed}
 .media-box video,.media-box iframe{width:100%;height:100%;display:block;border:0;object-fit:cover}
@@ -34,7 +37,7 @@ button{min-height:40px;padding:10px 12px;border:1px solid #d8d1c6;background:#ff
 .shell{padding:0 22px 36px}
 .admin-nav{margin:0 -22px 20px;padding:14px 22px}
 h1{font-size:30px}
-.layout{grid-template-columns:1fr 1fr;align-items:start}
+.button-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 .actions{grid-template-columns:repeat(2,minmax(0,1fr))}
 .list{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
@@ -44,77 +47,92 @@ h1{font-size:30px}
 </style>
 </head>
 <body>
-<script>
-if(localStorage.getItem("auth") !== "true"){
-window.location.href = "login.html";
-}
-</script>
-
 <main class="shell">
 <div class="admin-nav">
-<a class="nav-btn" href="javascript:history.back()">‹ Back</a>
-<h1 id="pageTitle">Manage Media</h1>
+<a class="nav-btn" href="javascript:history.back()">Back</a>
+<h1>Manage Videos</h1>
 <a class="nav-btn" href="dashboard.html">Dashboard</a>
 </div>
 
-<section class="layout" id="videoTools">
-<div class="box">
-<h2 id="uploadTitle">Upload Video</h2>
-<p class="hint">Choose a video file, add details, then save.</p>
+<div class="button-grid">
+<button class="big-btn" type="button" onclick="showPanel('videoPanel')">Upload Video</button>
+<button class="big-btn" type="button" onclick="showPanel('youtubePanel')">Upload YouTube Link</button>
+<button class="big-btn" type="button" onclick="showPanel('reelPanel')">Upload Reels</button>
+<button class="big-btn" type="button" onclick="showPanel('uploadsPanel')">Uploads</button>
+</div>
+
+<section class="panel" id="videoPanel">
+<h2>Upload Video</h2>
+<p class="hint">Upload a normal video or video file for the website.</p>
 <form id="videoForm">
 <input type="file" id="videoFile" accept="video/*" hidden>
-<input id="videoTitle" placeholder="Title">
-<textarea id="videoDesc" placeholder="Description"></textarea>
+<input id="videoTitle" placeholder="Video title">
+<textarea id="videoDesc" placeholder="Video description"></textarea>
 <select id="videoCategory"></select>
 <div class="actions">
 <button type="button" onclick="document.getElementById('videoFile').click()">Choose Video</button>
 <button type="submit">Upload Video</button>
 </div>
 </form>
-</div>
+</section>
 
-<div class="box">
-<h2 id="youtubeTitleHeading">Add YouTube Link</h2>
+<section class="panel" id="youtubePanel">
+<h2>Upload YouTube Link</h2>
 <p class="hint">Paste a YouTube video, Shorts, or embed link.</p>
 <form id="youtubeForm">
 <input id="youtubeLink" placeholder="YouTube link">
-<input id="youtubeTitle" placeholder="Title">
+<input id="youtubeTitle" placeholder="Video title">
 <textarea id="youtubeDesc" placeholder="Description"></textarea>
 <select id="youtubeCategory"></select>
 <button type="submit">Save YouTube Link</button>
 </form>
-</div>
 </section>
 
-<section class="box" id="reviewTools" hidden>
-<h2>Upload Client Review</h2>
-<p class="hint">Add a client name, review text, and review video.</p>
-<form id="reviewForm">
-<input type="file" id="reviewVideo" accept="video/*" hidden>
-<input id="reviewName" placeholder="Client name">
-<textarea id="reviewText" placeholder="Client review"></textarea>
+<section class="panel" id="reelPanel">
+<h2>Upload Reels</h2>
+<p class="hint">Upload a reel video or paste a YouTube reel link.</p>
+<form id="reelVideoForm">
+<input type="file" id="reelFile" accept="video/*" hidden>
+<input id="reelTitle" placeholder="Reel title">
+<textarea id="reelDesc" placeholder="Reel description"></textarea>
 <div class="actions">
-<button type="button" onclick="document.getElementById('reviewVideo').click()">Choose Review Video</button>
-<button type="submit">Upload Review</button>
+<button type="button" onclick="document.getElementById('reelFile').click()">Choose Reel Video</button>
+<button type="submit">Upload Reel Video</button>
 </div>
+</form>
+<form id="reelYoutubeForm">
+<input id="reelYoutubeLink" placeholder="YouTube reel link">
+<input id="reelYoutubeTitle" placeholder="Reel title">
+<textarea id="reelYoutubeDesc" placeholder="Reel description"></textarea>
+<button type="submit">Save YouTube Reel</button>
 </form>
 </section>
 
-<section>
-<div class="list" id="mediaList">
-<div class="empty">Loading...</div>
-</div>
+<section class="panel" id="uploadsPanel">
+<h2>Uploads</h2>
+<p class="hint">View and manage uploaded videos, YouTube links, and reels separately.</p>
+<h2 class="section-title">Uploaded Videos</h2>
+<div class="list" id="videoList"></div>
+<h2 class="section-title">YouTube Links</h2>
+<div class="list" id="youtubeList"></div>
+<h2 class="section-title">Reels</h2>
+<div class="list" id="reelList"></div>
 </section>
 </main>
 
 <script>
-const params = new URLSearchParams(location.search);
-const mode = params.get("mode") || "videos";
-const isReels = mode === "reels";
-const isReviews = mode === "reviews";
-
 function normalize(value){
 return String(value || "").trim().toLowerCase();
+}
+
+function showPanel(id){
+document.querySelectorAll(".panel").forEach(panel=>{
+panel.classList.toggle("show",panel.id === id);
+});
+
+if(id === "uploadsPanel"){
+loadUploads();
+}
 }
 
 function convertYoutube(url){
@@ -138,20 +156,6 @@ if(!res.ok){ throw new Error(data.message || "Request failed"); }
 return data;
 }
 
-function configurePage(){
-document.getElementById("pageTitle").innerText =
-isReviews ? "Manage Reviews" : isReels ? "Manage Reels" : "Manage Videos / YouTube Links";
-
-document.getElementById("uploadTitle").innerText =
-isReels ? "Upload Reel Video" : "Upload Video";
-
-document.getElementById("youtubeTitleHeading").innerText =
-isReels ? "Add YouTube Reel" : "Add YouTube Link";
-
-document.getElementById("videoTools").hidden = isReviews;
-document.getElementById("reviewTools").hidden = !isReviews;
-}
-
 async function loadCategories(){
 const fallback = ["General","Reels"];
 try{
@@ -160,35 +164,26 @@ const raw = await readJson(res);
 const names = raw.map(item=>item.name || item).filter(Boolean);
 const options = Array.from(new Set([...fallback,...names]));
 ["videoCategory","youtubeCategory"].forEach(id=>{
-const select = document.getElementById(id);
-select.innerHTML = options.map(item=>`<option${isReels && item === "Reels" ? " selected" : ""}>${item}</option>`).join("");
-select.disabled = isReels;
+document.getElementById(id).innerHTML =
+options.map(item=>`<option>${item}</option>`).join("");
 });
 }catch(err){
 ["videoCategory","youtubeCategory"].forEach(id=>{
-document.getElementById(id).innerHTML = fallback.map(item=>`<option${isReels && item === "Reels" ? " selected" : ""}>${item}</option>`).join("");
+document.getElementById(id).innerHTML =
+fallback.map(item=>`<option>${item}</option>`).join("");
 });
 }
 }
 
-function mediaMatchesMode(item){
-const category = normalize(item.category);
-if(isReels){
-return category === "reels";
-}
-return category !== "reels";
-}
+function renderList(targetId,items,emptyText){
+const target = document.getElementById(targetId);
 
-function renderVideoList(items){
-const list = document.getElementById("mediaList");
-const videos = items.filter(mediaMatchesMode);
-
-if(videos.length===0){
-list.innerHTML = `<div class="empty">No ${isReels ? "reels" : "videos or YouTube links"} uploaded yet</div>`;
+if(items.length===0){
+target.innerHTML = `<div class="empty">${emptyText}</div>`;
 return;
 }
 
-list.innerHTML = videos.map(item=>{
+target.innerHTML = items.map(item=>{
 const isYoutube = item.youtube || item.type === "youtube";
 const media = isYoutube
 ? `<iframe src="${convertYoutube(item.youtube)}" title="YouTube video" allowfullscreen></iframe>`
@@ -214,45 +209,20 @@ return `
 }).join("");
 }
 
-function renderReviewList(items){
-const list = document.getElementById("mediaList");
-
-if(items.length===0){
-list.innerHTML = `<div class="empty">No reviews uploaded yet</div>`;
-return;
-}
-
-list.innerHTML = items.map(item=>`
-<article class="card">
-<div class="media-box">
-<video controls><source src="/uploads/${item.video}"></video>
-</div>
-<div class="content">
-<h3>${item.name || "Client"}</h3>
-<p>${item.text || ""}</p>
-<input id="review-name-${item.id}" value="${String(item.name || "").replace(/"/g,"&quot;")}" placeholder="Client name">
-<textarea id="review-text-${item.id}" placeholder="Review text">${item.text || ""}</textarea>
-<div class="actions">
-<button type="button" onclick="saveReview(${item.id})">Save</button>
-<button type="button" class="danger" onclick="deleteReview(${item.id})">Delete</button>
-</div>
-</div>
-</article>
-`).join("");
-}
-
-async function loadList(){
+async function loadUploads(){
 try{
-if(isReviews){
-const res = await fetch("/reviews?t=" + Date.now());
-renderReviewList(await readJson(res));
-return;
-}
-
 const res = await fetch("/videos?t=" + Date.now());
-renderVideoList(await readJson(res));
+const items = await readJson(res);
+const videos = items.filter(item=>item.type === "video" && normalize(item.category) !== "reels");
+const youtube = items.filter(item=>(item.youtube || item.type === "youtube") && normalize(item.category) !== "reels");
+const reels = items.filter(item=>normalize(item.category) === "reels");
+renderList("videoList",videos,"No uploaded videos yet");
+renderList("youtubeList",youtube,"No YouTube links yet");
+renderList("reelList",reels,"No reels uploaded yet");
 }catch(err){
-document.getElementById("mediaList").innerHTML = `<div class="empty">${err.message || "Load failed"}</div>`;
+document.getElementById("videoList").innerHTML = `<div class="empty">${err.message || "Load failed"}</div>`;
+document.getElementById("youtubeList").innerHTML = "";
+document.getElementById("reelList").innerHTML = "";
 }
 }
 
@@ -269,108 +239,80 @@ category:document.getElementById("category-" + id).value
 });
 const data = await readJson(res);
 alert(data.message || "Saved");
-await loadList();
+await loadUploads();
 }catch(err){
 alert(err.message || "Save failed");
 }
 }
 
 async function deleteMedia(id){
-if(!confirm("Delete this item?")){ return; }
+if(!confirm("Delete this upload?")){ return; }
 try{
 const res = await fetch("/delete/" + id,{method:"DELETE"});
 const data = await readJson(res);
 alert(data.message || "Deleted");
-await loadList();
+await loadUploads();
 }catch(err){
 alert(err.message || "Delete failed");
 }
 }
 
-async function saveReview(id){
-try{
-const res = await fetch("/edit-review/" + id,{
-method:"PUT",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-name:document.getElementById("review-name-" + id).value,
-text:document.getElementById("review-text-" + id).value
-})
-});
-const data = await readJson(res);
-alert(data.message || "Saved");
-await loadList();
-}catch(err){
-alert(err.message || "Save failed");
-}
-}
-
-async function deleteReview(id){
-if(!confirm("Delete this review?")){ return; }
-try{
-const res = await fetch("/delete-review/" + id,{method:"DELETE"});
-const data = await readJson(res);
-alert(data.message || "Deleted");
-await loadList();
-}catch(err){
-alert(err.message || "Delete failed");
-}
-}
-
-document.getElementById("videoForm").addEventListener("submit",async event=>{
-event.preventDefault();
-const file = document.getElementById("videoFile").files[0];
+async function uploadVideo(form,fileId,titleId,descId,category){
+const file = document.getElementById(fileId).files[0];
 if(!file){ alert("Choose a video first"); return; }
 const formData = new FormData();
 formData.append("media",file);
-formData.append("title",document.getElementById("videoTitle").value);
-formData.append("description",document.getElementById("videoDesc").value);
-formData.append("category",isReels ? "Reels" : document.getElementById("videoCategory").value);
+formData.append("title",document.getElementById(titleId).value);
+formData.append("description",document.getElementById(descId).value);
+formData.append("category",category);
 const res = await fetch("/upload",{method:"POST",body:formData});
 const data = await readJson(res);
 alert(data.message || "Uploaded");
-event.target.reset();
-await loadCategories();
-await loadList();
-});
+form.reset();
+await loadUploads();
+}
 
-document.getElementById("youtubeForm").addEventListener("submit",async event=>{
-event.preventDefault();
+async function uploadYoutube(form,linkId,titleId,descId,category){
+const link = document.getElementById(linkId).value;
+if(!link){ alert("Paste a YouTube link first"); return; }
 const res = await fetch("/upload",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
-youtube:document.getElementById("youtubeLink").value,
-title:document.getElementById("youtubeTitle").value,
-description:document.getElementById("youtubeDesc").value,
-category:isReels ? "Reels" : document.getElementById("youtubeCategory").value
+youtube:link,
+title:document.getElementById(titleId).value,
+description:document.getElementById(descId).value,
+category
 })
 });
 const data = await readJson(res);
 alert(data.message || "Saved");
-event.target.reset();
-await loadCategories();
-await loadList();
-});
+form.reset();
+await loadUploads();
+}
 
-document.getElementById("reviewForm").addEventListener("submit",async event=>{
+document.getElementById("videoForm").addEventListener("submit",event=>{
 event.preventDefault();
-const file = document.getElementById("reviewVideo").files[0];
-if(!file){ alert("Choose a review video first"); return; }
-const formData = new FormData();
-formData.append("reviewVideo",file);
-formData.append("name",document.getElementById("reviewName").value);
-formData.append("review",document.getElementById("reviewText").value);
-const res = await fetch("/upload-review",{method:"POST",body:formData});
-const data = await readJson(res);
-alert(data.message || "Review uploaded");
-event.target.reset();
-await loadList();
+uploadVideo(event.target,"videoFile","videoTitle","videoDesc",document.getElementById("videoCategory").value || "General");
 });
 
-configurePage();
+document.getElementById("youtubeForm").addEventListener("submit",event=>{
+event.preventDefault();
+uploadYoutube(event.target,"youtubeLink","youtubeTitle","youtubeDesc",document.getElementById("youtubeCategory").value || "General");
+});
+
+document.getElementById("reelVideoForm").addEventListener("submit",event=>{
+event.preventDefault();
+uploadVideo(event.target,"reelFile","reelTitle","reelDesc","Reels");
+});
+
+document.getElementById("reelYoutubeForm").addEventListener("submit",event=>{
+event.preventDefault();
+uploadYoutube(event.target,"reelYoutubeLink","reelYoutubeTitle","reelYoutubeDesc","Reels");
+});
+
 loadCategories();
-loadList();
+showPanel("uploadsPanel");
 </script>
 </body>
 </html>

@@ -2349,6 +2349,20 @@ new URLSearchParams(window.location.search).get("adminEdit") === "1"
 );
 }
 
+function setupHomepagePreviewBar(){
+if(new URLSearchParams(window.location.search).get("adminPreview") !== "1"){
+return;
+}
+
+const banner = document.createElement("div");
+banner.className = "admin-edit-banner";
+banner.innerHTML = `
+<span>Homepage preview</span>
+<a href="admin/dashboard.html">Back to Dashboard</a>
+`;
+document.body.appendChild(banner);
+}
+
 function setupAdminHomepageEditor(){
 if(!isAdminEditMode()){
 return;
@@ -2846,6 +2860,27 @@ content += `<a href="booking.html">View booking page</a>`;
 menu.innerHTML = content;
 }
 
+function openAdminMenuForArea(area){
+const target = document.querySelector(`[data-admin-edit="${area}"]`);
+
+if(!target){
+return;
+}
+
+closeAdminMenu();
+activeArea = area;
+target.classList.add("admin-edit-target");
+setMenuContent(area);
+target.scrollIntoView({
+behavior:"smooth",
+block:"center"
+});
+
+menu.style.left = "16px";
+menu.style.top = "96px";
+menu.classList.add("show");
+}
+
 document.addEventListener("contextmenu",function(e){
 const target = e.target.closest("[data-admin-edit]");
 
@@ -3341,8 +3376,16 @@ if(!menu.contains(e.target) && !dialog.contains(e.target)){
 closeAdminMenu();
 }
 });
+
+const requestedArea =
+new URLSearchParams(window.location.search).get("editArea");
+
+if(requestedArea){
+setTimeout(()=>openAdminMenuForArea(requestedArea),500);
+}
 }
 
+setupHomepagePreviewBar();
 setupAdminHomepageEditor();
 
 </script>

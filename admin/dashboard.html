@@ -27,10 +27,6 @@ h1{font-size:30px}
 </head>
 <body>
 <script>
-if(localStorage.getItem("auth") !== "true"){
-window.location.href = "login.html";
-}
-
 async function logout(){
 try{
 await fetch("/logout",{method:"POST"});
@@ -48,13 +44,12 @@ window.location.href = "login.html";
 </div>
 
 <nav class="button-grid" aria-label="Admin sections">
-<a class="dash-button" href="../index.html?adminEdit=1">Manage Homepage <span>›</span></a>
-<a class="dash-button" href="../client-gallery.html?adminEdit=1">Manage Gallery <span>›</span></a>
-<a class="dash-button" href="media.html?mode=videos">Manage Videos / YouTube Links <span>›</span></a>
-<a class="dash-button" href="media.html?mode=reels">Manage Reels <span>›</span></a>
-<a class="dash-button" href="catagories.html">Manage Category <span>›</span></a>
-<a class="dash-button" href="media.html?mode=reviews">Manage Reviews <span>›</span></a>
-<a class="dash-button" href="../index.html" target="_blank" rel="noopener">Homepage Preview <span>›</span></a>
+<a class="dash-button" href="../index.html?adminEdit=1">Manage Homepage <span>&gt;</span></a>
+<a class="dash-button" href="../client-gallery.html?adminEdit=1">Manage Gallery <span>&gt;</span></a>
+<a class="dash-button" href="media.html?mode=videos">Manage Videos / YouTube Links <span>&gt;</span></a>
+<a class="dash-button" href="catagories.html">Manage Category <span>&gt;</span></a>
+<a class="dash-button" href="../index.html?adminEdit=1&editArea=reviews#client-reviews">Manage Reviews <span>&gt;</span></a>
+<a class="dash-button" href="../index.html?adminPreview=1">Homepage Preview <span>&gt;</span></a>
 </nav>
 </main>
 </body>
