@@ -3376,6 +3376,11 @@ ${files.map(file=>`
 `;
 
 body.querySelector("#adminSaveFeaturedUpload").addEventListener("click",async function(){
+try{
+const saveButton = this;
+saveButton.disabled = true;
+saveButton.innerText = "Saving...";
+
 const formData = new FormData();
 files.forEach(file=>formData.append("galleryImages",file));
 formData.append("category","Featured Gallery");
@@ -3398,6 +3403,11 @@ await readJsonResponse(featuredRes);
 alert("Featured gallery updated");
 await loadGallery();
 closeDialog();
+}catch(err){
+alert(err.message || "Featured gallery update failed");
+this.disabled = false;
+this.innerText = "Save featured image";
+}
 });
 
 return;
@@ -3520,6 +3530,11 @@ applyHeroUploadPreview();
 applyHeroUploadPreview();
 
 body.querySelector("#adminSaveHeroUpload").addEventListener("click",async function(){
+try{
+const saveButton = this;
+saveButton.disabled = true;
+saveButton.innerText = "Saving...";
+
 const text = getCurrentHeroText();
 const formData = new FormData();
 
@@ -3540,6 +3555,11 @@ const data = await readJsonResponse(res);
 alert(data.message || "Hero image added");
 await loadHero();
 closeDialog();
+}catch(err){
+alert(err.message || "Hero image save failed");
+this.disabled = false;
+this.innerText = "Save hero image";
+}
 });
 }catch(err){
 alert(err.message || "Upload failed");
