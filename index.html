@@ -3521,8 +3521,9 @@ preview.naturalWidth;
 const imageHeight =
 preview.naturalHeight;
 
-const fitScale =
-Math.min(frameWidth / imageWidth,frameHeight / imageHeight);
+const fitScale = heroUploadState.editing
+? Math.max(frameWidth / imageWidth,frameHeight / imageHeight)
+: Math.min(frameWidth / imageWidth,frameHeight / imageHeight);
 
 preview.style.width = imageWidth * fitScale + "px";
 preview.style.height = imageHeight * fitScale + "px";
@@ -3556,23 +3557,15 @@ preview.naturalWidth;
 const imageHeight =
 preview.naturalHeight;
 
-const containScale =
-Math.min(frameWidth / imageWidth,frameHeight / imageHeight);
-
-const coverScale =
-Math.max(frameWidth / imageWidth,frameHeight / imageHeight);
-
-const minManualScale =
-coverScale / containScale;
-
-if(heroUploadState.scale < minManualScale){
-heroUploadState.scale = Number(minManualScale.toFixed(2));
+if(heroUploadState.scale < 1){
+heroUploadState.scale = 1;
 }
 }
 
 body.querySelector("#adminEditHeroUploadPosition").addEventListener("click",function(){
 heroUploadState.editing = true;
-heroUploadState.cropped = false;
+heroUploadState.cropped = true;
+heroUploadState.scale = Math.max(1,heroUploadState.scale);
 applyHeroUploadPreview();
 
 const tools =
@@ -3601,11 +3594,9 @@ event.target.dataset.uploadHeroViewport;
 
 if(viewport){
 heroUploadState.editing = true;
-heroUploadState.cropped = false;
+heroUploadState.cropped = true;
 heroUploadState.viewport = viewport;
-if(heroUploadState.scale > 1){
 clampHeroUploadScale();
-}
 applyHeroUploadPreview();
 const tools =
 body.querySelector("#adminHeroUploadPositionTools");
@@ -3648,7 +3639,7 @@ heroUploadState.scale = Math.min(3,Number((heroUploadState.scale + .05).toFixed(
 }
 
 if(move === "zoom-out"){
-heroUploadState.scale = Math.max(.4,Number((heroUploadState.scale - .05).toFixed(2)));
+heroUploadState.scale = Math.max(1,Number((heroUploadState.scale - .05).toFixed(2)));
 }
 
 clampHeroUploadScale();
@@ -3686,6 +3677,16 @@ method:"POST",
 body:formData,
 credentials:"same-origin"
 });
+
+if(!res.ok){
+const errorData =
+await res.json().catch(()=>({}));
+
+throw new Error(
+errorData.message ||
+("Hero image save failed. Server returned " + res.status)
+);
+}
 
 const data = await readJsonResponse(res);
 alert(data.message || "Hero image added");
