@@ -1317,6 +1317,12 @@ border:1px solid var(--line);
 width:100%;
 aspect-ratio:16 / 9;
 min-height:0;
+overflow:visible;
+background:#f7f7f4;
+}
+
+.admin-preview-frame.hero-upload-preview.editing{
+overflow:hidden;
 }
 
 .admin-preview-frame.hero-upload-preview.mobile{
@@ -1340,6 +1346,14 @@ top:50%;
 max-width:none;
 width:100%;
 height:100%;
+object-fit:cover;
+}
+
+.admin-preview-frame.hero-upload-preview:not(.editing) img{
+object-fit:contain;
+}
+
+.admin-preview-frame.hero-upload-preview.editing img{
 object-fit:cover;
 }
 
@@ -3473,7 +3487,8 @@ const heroUploadState = {
 viewport:getHeroViewport(),
 posX:0,
 posY:0,
-scale:1
+scale:1,
+editing:false
 };
 
 function applyHeroUploadPreview(){
@@ -3487,15 +3502,20 @@ return;
 }
 
 if(previewFrame){
+previewFrame.classList.toggle("editing",heroUploadState.editing);
 previewFrame.classList.toggle("mobile",heroUploadState.viewport === "mobile");
 previewFrame.classList.toggle("desktop",heroUploadState.viewport === "desktop");
 }
 
-preview.style.transform =
-`translate(-50%,-50%) translate(${heroUploadState.posX}px, ${heroUploadState.posY}px) scale(${heroUploadState.scale})`;
+preview.style.transform = heroUploadState.editing
+? `translate(-50%,-50%) translate(${heroUploadState.posX}px, ${heroUploadState.posY}px) scale(${heroUploadState.scale})`
+: "translate(-50%,-50%)";
 }
 
 body.querySelector("#adminEditHeroUploadPosition").addEventListener("click",function(){
+heroUploadState.editing = true;
+applyHeroUploadPreview();
+
 const tools =
 body.querySelector("#adminHeroUploadPositionTools");
 
@@ -3521,6 +3541,7 @@ const viewport =
 event.target.dataset.uploadHeroViewport;
 
 if(viewport){
+heroUploadState.editing = true;
 heroUploadState.viewport = viewport;
 applyHeroUploadPreview();
 const tools =
@@ -3540,6 +3561,8 @@ event.target.dataset.uploadHeroMove;
 if(!move){
 return;
 }
+
+heroUploadState.editing = true;
 
 if(move === "up"){
 heroUploadState.posY -= 8;
