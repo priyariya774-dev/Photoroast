@@ -1260,6 +1260,12 @@ color:#b00020;
 border-color:#e0b5b5;
 }
 
+.admin-dialog-actions button.active{
+background:#171717;
+color:#fff;
+border-color:#171717;
+}
+
 .admin-image-choice-grid{
 display:grid;
 grid-template-columns:repeat(2,minmax(0,1fr));
@@ -1305,6 +1311,26 @@ margin:12px 0;
 overflow:hidden;
 background:#f7f7f4;
 border:1px solid var(--line);
+}
+
+.admin-preview-frame.hero-upload-preview{
+width:100%;
+aspect-ratio:16 / 9;
+min-height:0;
+}
+
+.admin-preview-frame.hero-upload-preview.mobile{
+aspect-ratio:4 / 5;
+max-width:360px;
+margin-left:auto;
+margin-right:auto;
+}
+
+.admin-preview-frame.hero-upload-preview.desktop{
+aspect-ratio:16 / 9;
+max-width:680px;
+margin-left:auto;
+margin-right:auto;
 }
 
 .admin-preview-frame img{
@@ -3425,7 +3451,7 @@ const body = dialog.querySelector("#adminHeroUpdateBody");
 
 body.innerHTML = `
 <p>${files.length} image${files.length > 1 ? "s" : ""} selected. Edit position if needed, then save to add to homepage hero.</p>
-<div class="admin-preview-frame">
+<div class="admin-preview-frame hero-upload-preview ${getHeroViewport()}">
 <img id="adminHeroUploadPreview" src="${URL.createObjectURL(files[0])}" alt="Hero upload preview">
 </div>
 <div class="admin-image-choice-grid">
@@ -3453,9 +3479,16 @@ scale:1
 function applyHeroUploadPreview(){
 const preview =
 body.querySelector("#adminHeroUploadPreview");
+const previewFrame =
+body.querySelector(".hero-upload-preview");
 
 if(!preview){
 return;
+}
+
+if(previewFrame){
+previewFrame.classList.toggle("mobile",heroUploadState.viewport === "mobile");
+previewFrame.classList.toggle("desktop",heroUploadState.viewport === "desktop");
 }
 
 preview.style.transform =
@@ -3489,7 +3522,15 @@ event.target.dataset.uploadHeroViewport;
 
 if(viewport){
 heroUploadState.viewport = viewport;
-alert("Editing " + viewport + " position");
+applyHeroUploadPreview();
+const tools =
+body.querySelector("#adminHeroUploadPositionTools");
+
+if(tools){
+tools.querySelectorAll("[data-upload-hero-viewport]").forEach(button=>{
+button.classList.toggle("active",button.dataset.uploadHeroViewport === viewport);
+});
+}
 return;
 }
 
@@ -3548,7 +3589,8 @@ formData.append("scale",heroUploadState.scale);
 
 const res = await fetch("/upload-hero",{
 method:"POST",
-body:formData
+body:formData,
+credentials:"same-origin"
 });
 
 const data = await readJsonResponse(res);
@@ -3556,7 +3598,12 @@ alert(data.message || "Hero image added");
 await loadHero();
 closeDialog();
 }catch(err){
-alert(err.message || "Hero image save failed");
+const message =
+err && String(err.message || "").toLowerCase().includes("failed to fetch")
+? "Upload could not reach the server. Please login again, redeploy Railway if needed, and try a smaller image."
+: (err.message || "Hero image save failed");
+
+alert(message);
 this.disabled = false;
 this.innerText = "Save hero image";
 }
