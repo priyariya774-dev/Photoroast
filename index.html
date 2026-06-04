@@ -3534,6 +3534,42 @@ preview.style.transform = heroUploadState.editing
 : "translate(-50%,-50%)";
 }
 
+function clampHeroUploadScale(){
+const preview =
+body.querySelector("#adminHeroUploadPreview");
+const previewFrame =
+body.querySelector(".hero-upload-preview");
+
+if(!preview || !previewFrame || !preview.naturalWidth || !preview.naturalHeight){
+return;
+}
+
+const frameWidth =
+previewFrame.clientWidth || 1;
+
+const frameHeight =
+previewFrame.clientHeight || 1;
+
+const imageWidth =
+preview.naturalWidth;
+
+const imageHeight =
+preview.naturalHeight;
+
+const containScale =
+Math.min(frameWidth / imageWidth,frameHeight / imageHeight);
+
+const coverScale =
+Math.max(frameWidth / imageWidth,frameHeight / imageHeight);
+
+const minManualScale =
+coverScale / containScale;
+
+if(heroUploadState.scale < minManualScale){
+heroUploadState.scale = Number(minManualScale.toFixed(2));
+}
+}
+
 body.querySelector("#adminEditHeroUploadPosition").addEventListener("click",function(){
 heroUploadState.editing = true;
 heroUploadState.cropped = false;
@@ -3567,6 +3603,9 @@ if(viewport){
 heroUploadState.editing = true;
 heroUploadState.cropped = false;
 heroUploadState.viewport = viewport;
+if(heroUploadState.scale > 1){
+clampHeroUploadScale();
+}
 applyHeroUploadPreview();
 const tools =
 body.querySelector("#adminHeroUploadPositionTools");
@@ -3612,6 +3651,7 @@ if(move === "zoom-out"){
 heroUploadState.scale = Math.max(.4,Number((heroUploadState.scale - .05).toFixed(2)));
 }
 
+clampHeroUploadScale();
 applyHeroUploadPreview();
 });
 
