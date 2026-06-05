@@ -197,7 +197,7 @@ target.innerHTML = items.map(item=>{
 const isYoutube = item.youtube || item.type === "youtube";
 const media = isYoutube
 ? `<iframe src="${convertEmbed(item.youtube)}" title="Reel or video link" allowfullscreen></iframe>`
-: `<video controls><source src="/uploads/${item.filename}"></video>`;
+: `<video controls><source src="/media-file/${item.id}"></video>`;
 
 return `
 <article class="card">

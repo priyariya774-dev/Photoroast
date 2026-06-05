@@ -756,7 +756,12 @@ cb(null,path.join("uploads",subfolder));
 },
 
 filename:(req,file,cb)=>{
-const savedName = Date.now() + "-" + file.originalname;
+const extension = path.extname(file.originalname || "");
+const baseName = path.basename(file.originalname || "media",extension)
+.replace(/[^a-z0-9_-]+/gi,"-")
+.replace(/^-+|-+$/g,"")
+.slice(0,80) || "media";
+const savedName = Date.now() + "-" + baseName + extension.toLowerCase();
 file.relativeFilename = file.uploadSubfolder + "/" + savedName;
 cb(null,savedName);
 }
@@ -850,12 +855,37 @@ return null;
 
 function deleteUploadedFiles(files){
 files.forEach(file=>{
-const filePath = path.join(__dirname,"uploads",file.filename);
+const filePath = path.join(__dirname,"uploads",file.relativeFilename || file.filename);
 
 if(fs.existsSync(filePath)){
 fs.unlinkSync(filePath);
 }
 });
+}
+
+function getSafeUploadPath(filename){
+const uploadsRoot = path.resolve(__dirname,"uploads");
+const requested = path.resolve(uploadsRoot,String(filename || ""));
+
+if(requested !== uploadsRoot && requested.startsWith(uploadsRoot + path.sep)){
+return requested;
+}
+
+return null;
+}
+
+function getMediaMime(filePath){
+const ext = path.extname(filePath).toLowerCase();
+const mimeMap = {
+".mp4":"video/mp4",
+".webm":"video/webm",
+".ogg":"video/ogg",
+".ogv":"video/ogg",
+".mov":"video/quicktime",
+".m4v":"video/mp4"
+};
+
+return mimeMap[ext] || "application/octet-stream";
 }
 
 function validateHeroFilesAreCinematic(files){
@@ -2824,6 +2854,75 @@ message:"Review deleted"
 }
 );
 
+});
+
+app.get("/media-file/:id",(req,res)=>{
+const id = Number(req.params.id);
+
+if(!id){
+return res.status(400).send("Invalid media");
+}
+
+db.query(
+`
+SELECT filename,type
+FROM photos
+WHERE id=?
+LIMIT 1
+`,
+[id],
+(err,result)=>{
+if(err){
+return res.status(500).send("Media load failed");
+}
+
+if(!result.length || !result[0].filename){
+return res.status(404).send("Media not found");
+}
+
+const filePath = getSafeUploadPath(result[0].filename);
+
+if(!filePath || !fs.existsSync(filePath)){
+return res.status(404).send("Media file not found");
+}
+
+const stat = fs.statSync(filePath);
+const fileSize = stat.size;
+const mimeType = getMediaMime(filePath);
+const range = req.headers.range;
+
+res.setHeader("Accept-Ranges","bytes");
+res.setHeader("Content-Type",mimeType);
+
+if(range){
+const parts = range.replace(/bytes=/,"").split("-");
+const start = parseInt(parts[0],10);
+const end = parts[1] ? parseInt(parts[1],10) : fileSize - 1;
+
+if(Number.isNaN(start) || Number.isNaN(end) || start >= fileSize || end >= fileSize){
+res.setHeader("Content-Range",`bytes */${fileSize}`);
+return res.status(416).end();
+}
+
+const chunkSize = end - start + 1;
+res.writeHead(206,{
+"Content-Range":`bytes ${start}-${end}/${fileSize}`,
+"Accept-Ranges":"bytes",
+"Content-Length":chunkSize,
+"Content-Type":mimeType
+});
+
+return fs.createReadStream(filePath,{start,end}).pipe(res);
+}
+
+res.writeHead(200,{
+"Content-Length":fileSize,
+"Content-Type":mimeType
+});
+
+fs.createReadStream(filePath).pipe(res);
+}
+);
 });
 
 // ======================
