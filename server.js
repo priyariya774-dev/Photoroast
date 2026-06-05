@@ -175,6 +175,8 @@ ensureColumn("hero_slides","desktopPosY","INT DEFAULT NULL");
 ensureColumn("hero_slides","desktopScale","FLOAT DEFAULT NULL");
 ensureColumn("photos","featured","INT DEFAULT 0");
 ensureColumn("photos","featuredOrder","INT DEFAULT 0");
+ensureColumn("photos","mediaMime","VARCHAR(120) DEFAULT NULL");
+ensureColumn("photos","mediaData","LONGBLOB");
 ensureColumn("users","mobile","VARCHAR(20) DEFAULT NULL");
 
 db.query(`
@@ -886,6 +888,43 @@ const mimeMap = {
 };
 
 return mimeMap[ext] || "application/octet-stream";
+}
+
+function sendMediaBuffer(req,res,buffer,mimeType){
+const fileSize = buffer.length;
+const range = req.headers.range;
+
+res.setHeader("Accept-Ranges","bytes");
+res.setHeader("Content-Type",mimeType || "application/octet-stream");
+
+if(range){
+const parts = range.replace(/bytes=/,"").split("-");
+const start = parseInt(parts[0],10);
+const end = parts[1] ? parseInt(parts[1],10) : fileSize - 1;
+
+if(Number.isNaN(start) || Number.isNaN(end) || start >= fileSize || end >= fileSize){
+res.setHeader("Content-Range",`bytes */${fileSize}`);
+return res.status(416).end();
+}
+
+const chunk = buffer.subarray(start,end + 1);
+
+res.writeHead(206,{
+"Content-Range":`bytes ${start}-${end}/${fileSize}`,
+"Accept-Ranges":"bytes",
+"Content-Length":chunk.length,
+"Content-Type":mimeType || "application/octet-stream"
+});
+
+return res.end(chunk);
+}
+
+res.writeHead(200,{
+"Content-Length":fileSize,
+"Content-Type":mimeType || "application/octet-stream"
+});
+
+return res.end(buffer);
 }
 
 function validateHeroFilesAreCinematic(files){
@@ -2065,6 +2104,8 @@ ids:insertedIds
 app.post("/upload",mediaUpload.single("media"),(req,res)=>{
 
 const filename = req.file ? (req.file.relativeFilename || req.file.filename) : null;
+let mediaMime = null;
+let mediaData = null;
 
 const {
 title,
@@ -2077,6 +2118,15 @@ let type = "youtube";
 
 if(req.file){
 type = req.file.mimetype.startsWith("video") ? "video" : "photo";
+
+if(type === "video"){
+const savedPath = getSafeUploadPath(filename);
+
+if(savedPath && fs.existsSync(savedPath)){
+mediaMime = req.file.mimetype || getMediaMime(savedPath);
+mediaData = fs.readFileSync(savedPath);
+}
+}
 }
 
 db.query(
@@ -2089,12 +2139,16 @@ description,
 category,
 type,
 youtube,
+mediaMime,
+mediaData,
 posX,
 posY,
 scale
 )
 VALUES
 (
+?,
+?,
 ?,
 ?,
 ?,
@@ -2112,7 +2166,9 @@ title,
 description,
 category,
 type,
-youtube
+youtube,
+mediaMime,
+mediaData
 ],
 (err)=>{
 
@@ -2865,7 +2921,11 @@ return res.status(400).send("Invalid media");
 
 db.query(
 `
-SELECT filename,type
+SELECT
+filename,
+type,
+mediaData,
+mediaMime
 FROM photos
 WHERE id=?
 LIMIT 1
@@ -2880,10 +2940,20 @@ if(!result.length || !result[0].filename){
 return res.status(404).send("Media not found");
 }
 
-const filePath = getSafeUploadPath(result[0].filename);
+const media = result[0];
+const filePath = getSafeUploadPath(media.filename);
 
 if(!filePath || !fs.existsSync(filePath)){
-return res.status(404).send("Media file not found");
+if(media.mediaData){
+return sendMediaBuffer(
+req,
+res,
+media.mediaData,
+media.mediaMime || "video/mp4"
+);
+}
+
+return res.status(404).send("Media file not found. Please re-upload this video.");
 }
 
 const stat = fs.statSync(filePath);
