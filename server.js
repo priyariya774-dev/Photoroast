@@ -1910,7 +1910,7 @@ db.query(
 `
 SELECT *
 FROM hero_slides
-ORDER BY id ASC
+ORDER BY id DESC
 `,
 (err,result)=>{
 
