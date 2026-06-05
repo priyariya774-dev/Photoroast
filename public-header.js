@@ -171,14 +171,6 @@ aria-label="Open Instagram">
 </a>
 <a
 class="social-icon"
-href="#"
-aria-label="Open Facebook">
-<svg viewBox="0 0 24 24" aria-hidden="true">
-<path d="M14 8.2V6.7c0-.72.48-.89.82-.89H17V2h-3.02C10.63 2 9.9 4.51 9.9 6.12V8.2H7v3.93h2.9V22H14v-9.87h2.78l.44-3.93H14Z"/>
-</svg>
-</a>
-<a
-class="social-icon"
 href="https://www.youtube.com/@photoroast"
 target="_blank"
 rel="noopener"

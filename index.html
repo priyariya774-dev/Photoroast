@@ -943,6 +943,28 @@ letter-spacing:2px;
 margin-bottom:12px;
 }
 
+.star-rating{
+display:flex;
+gap:6px;
+align-items:center;
+}
+
+.star-rating button{
+width:auto;
+padding:4px 2px;
+border:0;
+background:transparent;
+color:#c9c0ad;
+font-size:30px;
+line-height:1;
+box-shadow:none;
+cursor:pointer;
+}
+
+.star-rating button.active{
+color:#d99a00;
+}
+
 .review-form{
 max-width:720px;
 margin:34px auto 0;
@@ -1676,13 +1698,14 @@ Loading...
 <form class="review-form" id="reviewForm">
 <h3>Add Your Review</h3>
 <input id="reviewName" placeholder="Your name" required>
-<select id="reviewRating" required>
-<option value="5">5 stars</option>
-<option value="4">4 stars</option>
-<option value="3">3 stars</option>
-<option value="2">2 stars</option>
-<option value="1">1 star</option>
-</select>
+<input type="hidden" id="reviewRating" value="5">
+<div class="star-rating" id="reviewStarRating" aria-label="Choose star rating">
+<button type="button" data-rating="1" aria-label="1 star">★</button>
+<button type="button" data-rating="2" aria-label="2 stars">★</button>
+<button type="button" data-rating="3" aria-label="3 stars">★</button>
+<button type="button" data-rating="4" aria-label="4 stars">★</button>
+<button type="button" data-rating="5" aria-label="5 stars">★</button>
+</div>
 <textarea id="reviewText" placeholder="Write your review" required></textarea>
 <button type="submit">Submit Review</button>
 <p class="review-message" id="reviewMessage"></p>
@@ -1717,14 +1740,6 @@ rel="noopener"
 aria-label="Open Instagram">
 <svg viewBox="0 0 24 24" aria-hidden="true">
 <path d="M7.8 2h8.4A5.8 5.8 0 0 1 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8A5.8 5.8 0 0 1 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2Zm0 2A3.8 3.8 0 0 0 4 7.8v8.4A3.8 3.8 0 0 0 7.8 20h8.4a3.8 3.8 0 0 0 3.8-3.8V7.8A3.8 3.8 0 0 0 16.2 4H7.8Zm8.95 1.55a1.35 1.35 0 1 1 0 2.7 1.35 1.35 0 0 1 0-2.7ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/>
-</svg>
-</a>
-<a
-class="social-icon"
-href="#"
-aria-label="Open Facebook">
-<svg viewBox="0 0 24 24" aria-hidden="true">
-<path d="M14 8.2V6.7c0-.72.48-.89.82-.89H17V2h-3.02C10.63 2 9.9 4.51 9.9 6.12V8.2H7v3.93h2.9V22H14v-9.87h2.78l.44-3.93H14Z"/>
 </svg>
 </a>
 <a
@@ -2381,6 +2396,32 @@ document.getElementById("reviewsGrid").innerHTML =
 }
 
 loadReviews();
+
+function setReviewRating(rating){
+const safeRating =
+Math.max(1,Math.min(5,Number(rating) || 5));
+
+document.getElementById("reviewRating").value = safeRating;
+
+document
+.querySelectorAll("#reviewStarRating button")
+.forEach(button=>{
+button.classList.toggle(
+"active",
+Number(button.dataset.rating) <= safeRating
+);
+});
+}
+
+document
+.querySelectorAll("#reviewStarRating button")
+.forEach(button=>{
+button.addEventListener("click",function(){
+setReviewRating(this.dataset.rating);
+});
+});
+
+setReviewRating(5);
 
 document.getElementById("reviewForm").addEventListener("submit",async function(e){
 e.preventDefault();

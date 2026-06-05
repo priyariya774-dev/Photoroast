@@ -189,6 +189,15 @@ ensureColumn("reviews","rating","INT DEFAULT 5");
 
 db.query(
 `
+DELETE FROM reviews
+WHERE video IS NOT NULL
+AND video <> ''
+`,
+()=>{}
+);
+
+db.query(
+`
 UPDATE users
 SET mobile=?
 WHERE mobile IS NULL OR mobile=''
@@ -667,6 +676,10 @@ message:"Logged out"
 app.use((req,res,next)=>{
 
 if(req.method === "POST" && req.path === "/reviews"){
+return next();
+}
+
+if(req.method === "POST" && req.path === "/bookings"){
 return next();
 }
 
@@ -2479,6 +2492,52 @@ message:"Thank you. Your review has been added."
 });
 }
 );
+});
+
+app.post("/bookings",(req,res)=>{
+const {
+name,
+phone,
+location,
+events,
+eventDates,
+email,
+message
+} = req.body;
+
+const safeName =
+String(name || "").trim();
+
+const safePhone =
+String(phone || "").trim();
+
+if(!safeName || !safePhone){
+return res.status(400).json({
+message:"Enter name and phone number"
+});
+}
+
+const dates =
+Array.isArray(eventDates)
+? eventDates.filter(Boolean).join(", ")
+: String(eventDates || "");
+
+const text =
+[
+"Hi PhotoRoast, I would like to book a shoot.",
+`Name: ${safeName}`,
+`Phone: ${safePhone}`,
+`Location: ${String(location || "").trim()}`,
+`Events: ${String(events || "").trim()}`,
+`Dates: ${dates}`,
+`Email: ${String(email || "").trim()}`,
+`Message: ${String(message || "").trim()}`
+].join("\n");
+
+res.json({
+message:"Booking details received",
+whatsapp:"https://wa.me/919043103301?text=" + encodeURIComponent(text)
+});
 });
 
 // ======================
