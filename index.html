@@ -2107,7 +2107,7 @@ slider.innerHTML += `
 class="hero-slide">
 
 <img
-src="/uploads/${item.image}"
+src="/hero-image/${item.id}?t=${Date.now()}"
 style="
 transform:
 translate(-50%,-50%)
@@ -2900,7 +2900,7 @@ title,
 <div class="admin-image-choice-grid">
 ${slides.map(slide=>`
 <button type="button" data-hero-select="${slide.id}" data-hero-mode="${mode}">
-<img src="/uploads/${slide.image}" alt="">
+<img src="/hero-image/${slide.id}?t=${Date.now()}" alt="">
 <span>${slide.heading || "Hero image"}</span>
 </button>
 `).join("")}
@@ -2933,7 +2933,7 @@ showDialog(
 <button type="button" data-action="hero-position-viewport" data-viewport="desktop">Desktop</button>
 </div>
 <div class="admin-preview-frame">
-<img id="adminHeroPositionPreview" src="/uploads/${slide.image}" alt="Hero preview">
+<img id="adminHeroPositionPreview" src="/hero-image/${slide.id}?t=${Date.now()}" alt="Hero preview">
 </div>
 <div class="admin-position-grid">
 <button type="button" data-hero-move="up">Up</button>

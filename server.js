@@ -173,6 +173,8 @@ ensureColumn("hero_slides","mobileScale","FLOAT DEFAULT NULL");
 ensureColumn("hero_slides","desktopPosX","INT DEFAULT NULL");
 ensureColumn("hero_slides","desktopPosY","INT DEFAULT NULL");
 ensureColumn("hero_slides","desktopScale","FLOAT DEFAULT NULL");
+ensureColumn("hero_slides","imageMime","VARCHAR(120) DEFAULT NULL");
+ensureColumn("hero_slides","imageData","LONGBLOB");
 ensureColumn("photos","featured","INT DEFAULT 0");
 ensureColumn("photos","featuredOrder","INT DEFAULT 0");
 ensureColumn("photos","mediaMime","VARCHAR(120) DEFAULT NULL");
@@ -890,6 +892,20 @@ const mimeMap = {
 return mimeMap[ext] || "application/octet-stream";
 }
 
+function getImageMime(filePath){
+const ext = path.extname(filePath).toLowerCase();
+const mimeMap = {
+".jpg":"image/jpeg",
+".jpeg":"image/jpeg",
+".png":"image/png",
+".webp":"image/webp",
+".gif":"image/gif",
+".avif":"image/avif"
+};
+
+return mimeMap[ext] || "image/jpeg";
+}
+
 function sendMediaBuffer(req,res,buffer,mimeType){
 const fileSize = buffer.length;
 const range = req.headers.range;
@@ -1479,6 +1495,8 @@ const values = req.files.map(file=>[
 heading,
 description,
 file.filename,
+file.mimetype || getImageMime(path.join(__dirname,"uploads",file.filename)),
+fs.readFileSync(path.join(__dirname,"uploads",file.filename)),
 heroPosX,
 heroPosY,
 heroScale,
@@ -1497,6 +1515,8 @@ INSERT INTO hero_slides
 heading,
 description,
 image,
+imageMime,
+imageData,
 posX,
 posY,
 scale,
@@ -1590,9 +1610,12 @@ message:"Gallery image file not found"
 const extension = path.extname(sourceName) || ".jpg";
 const heroFilename = `hero-gallery-${Date.now()}${extension}`;
 const heroPath = path.join(uploadsRoot,heroFilename);
+let heroImageData = null;
+let heroImageMime = getImageMime(sourcePath);
 
 try{
 fs.copyFileSync(sourcePath,heroPath);
+heroImageData = fs.readFileSync(heroPath);
 }catch(copyErr){
 return res.status(500).json({
 message:"Could not add gallery image to hero",
@@ -1607,6 +1630,8 @@ INSERT INTO hero_slides
 heading,
 description,
 image,
+imageMime,
+imageData,
 posX,
 posY,
 scale,
@@ -1619,6 +1644,8 @@ desktopScale
 )
 VALUES
 (
+?,
+?,
 ?,
 ?,
 ?,
@@ -1636,7 +1663,9 @@ VALUES
 [
 String(heading || "").trim(),
 String(description || "").trim(),
-heroFilename
+heroFilename,
+heroImageMime,
+heroImageData
 ],
 insertErr=>{
 if(insertErr){
@@ -1809,6 +1838,13 @@ message:"Choose only cinematic view pic for hero images"
 
 const oldImage = result[0].image;
 const newImage = req.file ? req.file.filename : oldImage;
+const newImagePath = req.file ? path.join(__dirname,"uploads",req.file.filename) : null;
+const newImageMime = req.file && newImagePath && fs.existsSync(newImagePath)
+? (req.file.mimetype || getImageMime(newImagePath))
+: result[0].imageMime;
+const newImageData = req.file && newImagePath && fs.existsSync(newImagePath)
+? fs.readFileSync(newImagePath)
+: result[0].imageData;
 
 const updateQuery = isMobileHero
 ? `
@@ -1817,6 +1853,8 @@ SET
 heading=?,
 description=?,
 image=?,
+imageMime=?,
+imageData=?,
 mobilePosX=?,
 mobilePosY=?,
 mobileScale=?,
@@ -1831,6 +1869,8 @@ SET
 heading=?,
 description=?,
 image=?,
+imageMime=?,
+imageData=?,
 desktopPosX=?,
 desktopPosY=?,
 desktopScale=?
@@ -1842,6 +1882,8 @@ const updateValues = isMobileHero
 heading,
 description,
 newImage,
+newImageMime,
+newImageData,
 heroPosX,
 heroPosY,
 heroScale,
@@ -1854,6 +1896,8 @@ id
 heading,
 description,
 newImage,
+newImageMime,
+newImageData,
 heroPosX,
 heroPosY,
 heroScale,
@@ -2005,6 +2049,48 @@ res.json(updated);
 }
 );
 
+});
+
+app.get("/hero-image/:id",(req,res)=>{
+const id = Number(req.params.id);
+
+if(!id){
+return res.status(400).send("Invalid hero image");
+}
+
+db.query(
+`
+SELECT image,imageMime,imageData
+FROM hero_slides
+WHERE id=?
+LIMIT 1
+`,
+[id],
+(err,result)=>{
+if(err){
+return res.status(500).send("Hero image load failed");
+}
+
+if(!result.length){
+return res.status(404).send("Hero image not found");
+}
+
+const hero = result[0];
+const filePath = path.join(__dirname,"uploads",String(hero.image || ""));
+
+if(hero.image && fs.existsSync(filePath)){
+res.type(getImageMime(filePath));
+return res.sendFile(filePath);
+}
+
+if(hero.imageData){
+res.type(hero.imageMime || "image/jpeg");
+return res.send(hero.imageData);
+}
+
+return res.status(404).send("Hero image file not found. Please re-upload this hero image.");
+}
+);
 });
 
 // ======================
