@@ -32,6 +32,7 @@ aria-expanded="false">
 <nav class="public-menu" id="publicMenu">
 <a href="index.html">Home</a>
 <a href="client-gallery.html">Gallery</a>
+<a href="videos.html">Video</a>
 <a href="reels.html">Reels</a>
 <a href="index.html#about">About</a>
 <a href="index.html#client-reviews">Client Review/Testimonial</a>

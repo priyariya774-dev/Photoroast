@@ -304,6 +304,7 @@ app.get([
 "/booking.html",
 "/career.html",
 "/client-gallery.html",
+"/videos.html",
 "/reels.html",
 "/style.css",
 "/public-header.js",

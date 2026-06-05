@@ -17,6 +17,7 @@ h2{font-size:24px;margin-bottom:8px}
 .hint{font-size:13px;color:#6f675e;line-height:1.55}
 .button-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px}
 .big-btn{min-height:58px;padding:15px;background:#fff;border:1px solid #e2dbcf;color:#171717;font-size:16px;font-weight:800;text-align:left;cursor:pointer}
+.uploads-btn{background:#000;color:#fff;border-color:#000}
 .panel{display:none;background:#fff;border:1px solid #e4dfd4;padding:14px;margin-bottom:14px}
 .panel.show{display:block}
 input,textarea,select{width:100%;padding:12px;margin-top:10px;border:1px solid #d8d1c6;background:#fff;color:#171717;font-size:14px}
@@ -56,7 +57,7 @@ h1{font-size:30px}
 <button class="big-btn" type="button" onclick="showPanel('videoPanel')">Upload Video</button>
 <button class="big-btn" type="button" onclick="showPanel('youtubePanel')">Upload YouTube Link</button>
 <button class="big-btn" type="button" onclick="showPanel('reelPanel')">Upload Reels</button>
-<button class="big-btn" type="button" onclick="showPanel('uploadsPanel')">Uploads</button>
+<button class="big-btn uploads-btn" type="button" onclick="showPanel('uploadsPanel')">Uploads</button>
 </div>
 
 <section class="panel" id="videoPanel">

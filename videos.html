@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reels - PhotoRoast</title>
+<title>Videos - PhotoRoast</title>
 <script src="error-handler.js"></script>
 <script src="public-header.js" defer></script>
 <link rel="stylesheet" href="style.css">
@@ -18,7 +17,9 @@ box-sizing:border-box;
 
 body{
 min-height:100vh;
-padding:16px;
+padding:92px 16px 28px;
+background:#ffffff;
+color:#171717;
 }
 
 .page-shell{
@@ -38,45 +39,31 @@ margin-bottom:24px;
 h1{
 font-size:30px;
 line-height:1.1;
+font-family:Georgia,'Times New Roman',serif;
 }
 
-.back-link{
-display:inline-flex;
-align-items:center;
-justify-content:center;
-min-height:42px;
-padding:10px 14px;
-border-radius:14px;
-text-decoration:none;
-color:#160d0f;
-background:linear-gradient(135deg,var(--accent-3),var(--accent-2),var(--accent));
-font-weight:800;
-box-shadow:0 12px 28px var(--shadow);
-}
-
-.reels-grid{
+.videos-grid{
 display:grid;
 grid-template-columns:1fr;
 gap:18px;
 }
 
-.reel-card{
-border-radius:18px;
+.video-card{
 overflow:hidden;
 background:#ffffff;
 border:1px solid var(--line);
 box-shadow:0 16px 42px rgba(0,0,0,.08);
 }
 
-.reel-media{
+.video-media{
 width:100%;
 aspect-ratio:16/10;
 background:#f1f1ed;
 display:block;
 }
 
-.reel-media video,
-.reel-media iframe{
+.video-media video,
+.video-media iframe{
 width:100%;
 height:100%;
 border:0;
@@ -84,45 +71,45 @@ display:block;
 object-fit:cover;
 }
 
-.reel-content{
+.video-content{
 padding:16px;
 }
 
-.reel-content h3{
+.video-content h3{
 font-size:18px;
 margin-bottom:8px;
 }
 
-.reel-content p{
+.video-content p{
 font-size:14px;
 line-height:1.7;
+color:var(--text-soft);
 }
 
 .empty{
 padding:28px;
 text-align:center;
-border-radius:18px;
-background:rgba(255,255,255,.06);
+background:#ffffff;
 border:1px solid var(--line);
 color:var(--text-soft);
 }
 
 @media(min-width:768px){
 body{
-padding:24px;
+padding:104px 24px 36px;
 }
 
 h1{
 font-size:42px;
 }
 
-.reels-grid{
+.videos-grid{
 grid-template-columns:repeat(2,minmax(0,1fr));
 }
 }
 
 @media(min-width:1100px){
-.reels-grid{
+.videos-grid{
 grid-template-columns:repeat(3,minmax(0,1fr));
 }
 }
@@ -132,11 +119,11 @@ grid-template-columns:repeat(3,minmax(0,1fr));
 <body>
 <div class="page-shell">
 <div class="topbar">
-<h1>Reels</h1>
+<h1>Videos</h1>
 </div>
 
-<div class="reels-grid" id="reelsGrid">
-<div class="empty">Loading reels...</div>
+<div class="videos-grid" id="videosGrid">
+<div class="empty">Loading videos...</div>
 </div>
 </div>
 
@@ -144,15 +131,6 @@ grid-template-columns:repeat(3,minmax(0,1fr));
 function convertEmbed(url){
 if(!url){
 return "";
-}
-
-if(url.includes("instagram.com/")){
-const cleanUrl =
-url.split("?")[0].replace(/\/?$/,"/");
-
-return cleanUrl.endsWith("/embed/")
-? cleanUrl
-: cleanUrl + "embed/";
 }
 
 let videoId = "";
@@ -170,27 +148,35 @@ return url;
 return `https://www.youtube.com/embed/${videoId}?rel=0`;
 }
 
-function renderReels(videos){
-const grid = document.getElementById("reelsGrid");
-const reels =
-(videos || []).filter(item=>
-String(item.category || "").trim().toLowerCase() === "reels"
-);
+function escapeText(value){
+return String(value || "")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+}
 
-if(reels.length===0){
-grid.innerHTML = `<div class="empty">No reel uploaded</div>`;
+function renderVideos(items){
+const grid = document.getElementById("videosGrid");
+const videos =
+(items || []).filter(item=>{
+const category = String(item.category || "").trim().toLowerCase();
+return category !== "reels" && (item.type === "video" || item.type === "youtube" || item.youtube);
+});
+
+if(videos.length===0){
+grid.innerHTML = `<div class="empty">No video uploaded</div>`;
 return;
 }
 
-grid.innerHTML = "";
-
-reels.forEach(item=>{
-const media =
-item.type === "youtube"
+grid.innerHTML = videos.map(item=>{
+const isYoutube = item.type === "youtube" || item.youtube;
+const media = isYoutube
 ? `
 <iframe
 src="${convertEmbed(item.youtube)}"
-title="Reel"
+title="Video"
 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
 referrerpolicy="strict-origin-when-cross-origin"
 allowfullscreen>
@@ -202,34 +188,35 @@ allowfullscreen>
 </video>
 `;
 
-grid.innerHTML += `
-<div class="reel-card">
-<div class="reel-media">
-${media}
+return `
+<article class="video-card">
+<div class="video-media">${media}</div>
+<div class="video-content">
+<h3>${escapeText(item.title || "Untitled Video")}</h3>
+<p>${escapeText(item.description || "")}</p>
 </div>
-<div class="reel-content">
-<h3>${item.title || "Untitled Reel"}</h3>
-<p>${item.description || ""}</p>
-<p>${item.category || ""}</p>
-</div>
-</div>
+</article>
 `;
-});
+}).join("");
 }
 
-async function loadReels(){
+async function loadVideos(){
 try{
-const res = await fetch("/videos?t=" + new Date().getTime());
+const res = await fetch("/videos?t=" + Date.now());
 const data = await res.json();
-renderReels(data);
+
+if(!res.ok){
+throw new Error(data.message || "Videos load failed");
+}
+
+renderVideos(data);
 }catch(err){
-console.log(err);
-alert("Reels load failed");
+document.getElementById("videosGrid").innerHTML =
+`<div class="empty">${err.message || "Videos load failed"}</div>`;
 }
 }
 
-loadReels();
+loadVideos();
 </script>
 </body>
-
 </html>
