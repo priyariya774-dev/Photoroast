@@ -1313,34 +1313,6 @@ background:#f7f7f4;
 border:1px solid var(--line);
 }
 
-.admin-preview-frame.hero-upload-preview{
-width:100%;
-aspect-ratio:16 / 9;
-min-height:0;
-overflow:hidden;
-background:#f7f7f4;
-}
-
-.admin-preview-frame.hero-upload-preview.full-image{
-overflow:visible;
-}
-
-.admin-preview-frame.hero-upload-preview.mobile{
-aspect-ratio:auto;
-width:min(360px,100%);
-height:clamp(430px,64vh,560px);
-height:clamp(430px,64svh,560px);
-margin-left:auto;
-margin-right:auto;
-}
-
-.admin-preview-frame.hero-upload-preview.desktop{
-aspect-ratio:16 / 9;
-max-width:680px;
-margin-left:auto;
-margin-right:auto;
-}
-
 .admin-preview-frame img{
 position:absolute;
 left:50%;
@@ -1349,10 +1321,6 @@ max-width:none;
 width:100%;
 height:100%;
 object-fit:cover;
-}
-
-.admin-preview-frame.hero-upload-preview img{
-object-fit:fill;
 }
 
 .admin-logo-preview{
@@ -3467,10 +3435,7 @@ return;
 const body = dialog.querySelector("#adminHeroUpdateBody");
 
 body.innerHTML = `
-<p>${files.length} image${files.length > 1 ? "s" : ""} selected. Edit position if needed, then save to add to homepage hero.</p>
-<div class="admin-preview-frame hero-upload-preview ${getHeroViewport()}">
-<img id="adminHeroUploadPreview" src="${URL.createObjectURL(files[0])}" alt="Hero upload preview">
-</div>
+<p>${files.length} image${files.length > 1 ? "s" : ""} selected. Save to add to homepage hero.</p>
 <div class="admin-image-choice-grid">
 ${files.map(file=>`
 <button type="button">
@@ -3480,185 +3445,9 @@ ${files.map(file=>`
 `).join("")}
 </div>
 <div class="admin-dialog-actions">
-<button type="button" id="adminEditHeroUploadPosition">Edit position</button>
 <button type="button" id="adminSaveHeroUpload">Save hero image</button>
 </div>
-<div id="adminHeroUploadPositionTools"></div>
 `;
-
-const heroUploadState = {
-viewport:getHeroViewport(),
-posX:0,
-posY:0,
-scale:1,
-editing:false,
-cropped:false
-};
-
-function applyHeroUploadPreview(){
-const preview =
-body.querySelector("#adminHeroUploadPreview");
-const previewFrame =
-body.querySelector(".hero-upload-preview");
-
-if(!preview){
-return;
-}
-
-if(previewFrame){
-previewFrame.classList.toggle("editing",heroUploadState.editing);
-previewFrame.classList.toggle("cropped",heroUploadState.cropped);
-previewFrame.classList.toggle("full-image",!heroUploadState.cropped);
-previewFrame.classList.toggle("mobile",heroUploadState.viewport === "mobile");
-previewFrame.classList.toggle("desktop",heroUploadState.viewport === "desktop");
-}
-
-if(previewFrame && preview.naturalWidth && preview.naturalHeight){
-const frameWidth =
-previewFrame.clientWidth || 1;
-
-const frameHeight =
-previewFrame.clientHeight || 1;
-
-const imageWidth =
-preview.naturalWidth;
-
-const imageHeight =
-preview.naturalHeight;
-
-const fitScale = heroUploadState.editing
-? Math.max(frameWidth / imageWidth,frameHeight / imageHeight)
-: Math.min(frameWidth / imageWidth,frameHeight / imageHeight);
-
-preview.style.width = imageWidth * fitScale + "px";
-preview.style.height = imageHeight * fitScale + "px";
-preview.style.objectFit = "fill";
-}
-
-preview.style.transform = heroUploadState.editing
-? `translate(-50%,-50%) translate(${heroUploadState.posX}px, ${heroUploadState.posY}px) scale(${heroUploadState.scale})`
-: "translate(-50%,-50%)";
-}
-
-function clampHeroUploadScale(){
-const preview =
-body.querySelector("#adminHeroUploadPreview");
-const previewFrame =
-body.querySelector(".hero-upload-preview");
-
-if(!preview || !previewFrame || !preview.naturalWidth || !preview.naturalHeight){
-return;
-}
-
-const frameWidth =
-previewFrame.clientWidth || 1;
-
-const frameHeight =
-previewFrame.clientHeight || 1;
-
-const imageWidth =
-preview.naturalWidth;
-
-const imageHeight =
-preview.naturalHeight;
-
-if(heroUploadState.scale < 1){
-heroUploadState.scale = 1;
-}
-}
-
-body.querySelector("#adminEditHeroUploadPosition").addEventListener("click",function(){
-heroUploadState.editing = true;
-heroUploadState.cropped = true;
-heroUploadState.scale = Math.max(1,heroUploadState.scale);
-applyHeroUploadPreview();
-
-const tools =
-body.querySelector("#adminHeroUploadPositionTools");
-
-tools.innerHTML = `
-<p>Choose which layout you want to adjust.</p>
-<div class="admin-dialog-actions">
-<button type="button" data-upload-hero-viewport="mobile">Mobile</button>
-<button type="button" data-upload-hero-viewport="desktop">Desktop</button>
-</div>
-<div class="admin-position-grid">
-<button type="button" data-upload-hero-move="up">Up</button>
-<button type="button" data-upload-hero-move="down">Down</button>
-<button type="button" data-upload-hero-move="left">Left</button>
-<button type="button" data-upload-hero-move="right">Right</button>
-<button type="button" data-upload-hero-move="zoom-in">Zoom in</button>
-<button type="button" data-upload-hero-move="zoom-out">Zoom out</button>
-</div>
-`;
-});
-
-body.addEventListener("click",function(event){
-const viewport =
-event.target.dataset.uploadHeroViewport;
-
-if(viewport){
-heroUploadState.editing = true;
-heroUploadState.cropped = true;
-heroUploadState.viewport = viewport;
-clampHeroUploadScale();
-applyHeroUploadPreview();
-const tools =
-body.querySelector("#adminHeroUploadPositionTools");
-
-if(tools){
-tools.querySelectorAll("[data-upload-hero-viewport]").forEach(button=>{
-button.classList.toggle("active",button.dataset.uploadHeroViewport === viewport);
-});
-}
-return;
-}
-
-const move =
-event.target.dataset.uploadHeroMove;
-
-if(!move){
-return;
-}
-
-heroUploadState.editing = true;
-
-if(move === "up"){
-heroUploadState.posY += 8;
-}
-
-if(move === "down"){
-heroUploadState.posY -= 8;
-}
-
-if(move === "left"){
-heroUploadState.posX += 8;
-}
-
-if(move === "right"){
-heroUploadState.posX -= 8;
-}
-
-if(move === "zoom-in"){
-heroUploadState.scale = Math.min(3,Number((heroUploadState.scale + .05).toFixed(2)));
-}
-
-if(move === "zoom-out"){
-heroUploadState.scale = Math.max(1,Number((heroUploadState.scale - .05).toFixed(2)));
-}
-
-clampHeroUploadScale();
-applyHeroUploadPreview();
-});
-
-applyHeroUploadPreview();
-
-const uploadPreviewImage =
-body.querySelector("#adminHeroUploadPreview");
-
-if(uploadPreviewImage){
-uploadPreviewImage.addEventListener("load",applyHeroUploadPreview,{once:true});
-}
 
 body.querySelector("#adminSaveHeroUpload").addEventListener("click",async function(){
 try{
@@ -3672,10 +3461,10 @@ const formData = new FormData();
 files.forEach(file=>formData.append("heroImages",file));
 formData.append("heading",text.heading);
 formData.append("description",text.description);
-formData.append("viewport",heroUploadState.viewport);
-formData.append("posX",heroUploadState.posX);
-formData.append("posY",heroUploadState.posY);
-formData.append("scale",heroUploadState.scale);
+formData.append("viewport",getHeroViewport());
+formData.append("posX",0);
+formData.append("posY",0);
+formData.append("scale",1);
 
 const res = await fetch("/upload-hero",{
 method:"POST",
