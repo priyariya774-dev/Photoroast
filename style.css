@@ -720,37 +720,6 @@ background:rgba(255,211,110,.1);
 color:var(--accent);
 }
 
-.public-back-row{
-width:100%;
-max-width:1180px;
-margin:0 auto 18px;
-padding:0 18px;
-display:flex;
-justify-content:flex-start;
-}
-
-.public-back-button{
-min-height:38px;
-padding:9px 15px;
-border:1px solid var(--line);
-border-radius:0;
-background:#ffffff;
-color:var(--text-main);
-font-family:var(--site-font);
-font-size:13px;
-font-weight:700;
-letter-spacing:.3px;
-cursor:pointer;
-box-shadow:none;
-}
-
-.public-back-button:hover{
-background:#f7f7f4;
-transform:none;
-box-shadow:none;
-filter:none;
-}
-
 .floating-whatsapp,
 .floating-contact{
 position:fixed;
@@ -886,17 +855,6 @@ line-height:1;
 .public-menu-toggle{
 width:42px;
 height:42px;
-}
-
-.public-back-row{
-margin-bottom:14px;
-padding:0 12px;
-}
-
-.public-back-button{
-min-height:36px;
-padding:8px 13px;
-font-size:12px;
 }
 
 .floating-whatsapp,

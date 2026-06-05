@@ -42,22 +42,11 @@ aria-expanded="false">
 `;
 
 document.body.prepend(header);
-header.insertAdjacentHTML(
-"afterend",
-`
-<div class="public-back-row">
-<button type="button" class="public-back-button" id="publicBackButton">
-Back
-</button>
-</div>
-`
-);
 injectWhatsAppButton();
 injectPublicFooter();
 
 const toggle = document.getElementById("publicMenuToggle");
 const menu = document.getElementById("publicMenu");
-const backButton = document.getElementById("publicBackButton");
 
 function updatePublicHeaderBackground(){
 header.classList.toggle(
@@ -91,17 +80,6 @@ closeMenu();
 
 window.addEventListener("scroll",updatePublicHeaderBackground,{passive:true});
 updatePublicHeaderBackground();
-
-if(backButton){
-backButton.addEventListener("click",function(){
-if(document.referrer && new URL(document.referrer).origin === window.location.origin){
-window.history.back();
-return;
-}
-
-window.location.href = "index.html";
-});
-}
 
 loadPublicLogo();
 }
