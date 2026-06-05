@@ -229,6 +229,35 @@ verified INT DEFAULT 0
 )
 `,()=>{});
 
+db.query(`
+CREATE TABLE IF NOT EXISTS career_jobs (
+id INT AUTO_INCREMENT PRIMARY KEY,
+title VARCHAR(255) NOT NULL,
+description TEXT DEFAULT NULL,
+createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+`,()=>{
+const defaultJobs = [
+["Traditional Video Editor","Capture weddings, events and cinematic shoots"],
+["Candid Video Editor","Edit cinematic reels and wedding films"],
+["Photo Editing","Edit pictures with a clean, premium finish"]
+];
+
+defaultJobs.forEach(([title,description])=>{
+db.query(
+`
+INSERT INTO career_jobs (title,description)
+SELECT ?,?
+WHERE NOT EXISTS (
+SELECT 1 FROM career_jobs WHERE title=? LIMIT 1
+)
+`,
+[title,description,title],
+()=>{}
+);
+});
+});
+
 }
 
 });
@@ -2538,6 +2567,94 @@ res.json({
 message:"Booking details received",
 whatsapp:"https://wa.me/919043103301?text=" + encodeURIComponent(text)
 });
+});
+
+app.get("/jobs",(req,res)=>{
+db.query(
+`
+SELECT id,title,description
+FROM career_jobs
+ORDER BY id ASC
+`,
+(err,result)=>{
+if(err){
+return res.status(500).json({
+message:"Failed to load jobs"
+});
+}
+
+res.json(result);
+}
+);
+});
+
+app.post("/jobs",(req,res)=>{
+const title =
+String(req.body.title || "").trim();
+
+const description =
+String(req.body.description || "").trim();
+
+if(!title){
+return res.status(400).json({
+message:"Enter job title"
+});
+}
+
+db.query(
+`
+INSERT INTO career_jobs (title,description)
+VALUES (?,?)
+`,
+[title,description],
+(err,result)=>{
+if(err){
+return res.status(500).json({
+message:"Failed to add job"
+});
+}
+
+res.json({
+message:"Job added",
+id:result.insertId
+});
+}
+);
+});
+
+app.delete("/jobs/:id",(req,res)=>{
+const id = Number(req.params.id);
+
+if(!id){
+return res.status(400).json({
+message:"Choose a valid job"
+});
+}
+
+db.query(
+`
+DELETE FROM career_jobs
+WHERE id=?
+`,
+[id],
+(err,result)=>{
+if(err){
+return res.status(500).json({
+message:"Failed to delete job"
+});
+}
+
+if(result.affectedRows === 0){
+return res.status(404).json({
+message:"Job not found"
+});
+}
+
+res.json({
+message:"Job deleted"
+});
+}
+);
 });
 
 // ======================

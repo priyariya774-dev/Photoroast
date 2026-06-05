@@ -1,238 +1,506 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Career - PhotoRoast</title>
 <script src="error-handler.js"></script>
 <script src="public-header.js" defer></script>
 
 <style>
+*{
+box-sizing:border-box;
+}
 
 body{
-font-family:Arial;
+font-family:Arial,sans-serif;
 background:#ffffff;
 color:#171717;
-padding:14px;
+margin:0;
 min-height:100vh;
+padding:90px 14px 28px;
+}
+
+.page{
+width:100%;
+max-width:920px;
+margin:0 auto;
 }
 
 h1{
-color:#ffd56b;
+color:#171717;
 text-align:center;
-margin-bottom:18px;
-font-size:28px;
+margin:0 0 18px;
+font-size:30px;
 line-height:1.15;
+font-family:Georgia,'Times New Roman',serif;
 }
 
-.jobs, .form-box{
-max-width:800px;
-margin:auto;
+.admin-tools{
+display:none;
+position:sticky;
+top:72px;
+z-index:30;
+background:#ffffff;
+border:1px solid #e4dfd4;
+box-shadow:0 10px 28px rgba(0,0,0,.08);
+padding:10px;
+margin-bottom:16px;
+gap:8px;
+grid-template-columns:1fr;
+}
+
+body.admin-mode .admin-tools{
+display:grid;
+}
+
+.admin-tools a,
+.admin-tools button,
+.dialog button,
+.back,
+.submit-btn{
+min-height:44px;
+padding:12px 14px;
+border:1px solid #d8d1c6;
+background:#ffffff;
+color:#171717;
+font-weight:800;
+text-decoration:none;
+cursor:pointer;
+border-radius:0;
+font-size:14px;
+}
+
+.admin-tools button.primary,
+.submit-btn{
+background:#171717;
+color:#ffffff;
+border-color:#171717;
+}
+
+.notice{
+display:none;
+margin:0 0 14px;
+padding:12px;
+border:1px solid #e4dfd4;
+background:#fffaf0;
+color:#171717;
+font-size:14px;
+line-height:1.45;
+}
+
+.notice.show{
+display:block;
+}
+
+.jobs,
+.form-box{
 width:100%;
+max-width:800px;
+margin:0 auto;
+}
+
+.jobs{
+display:grid;
+grid-template-columns:1fr;
+gap:12px;
 }
 
 .job-card{
 background:#ffffff;
 padding:16px;
-margin-bottom:15px;
-border-radius:12px;
-border:1px solid rgba(255,215,120,.1);
+border:1px solid #e4dfd4;
 cursor:pointer;
-transition:0.3s;
+transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+min-height:116px;
 }
 
 .job-card:hover{
 transform:translateY(-2px);
-border-color:#ffd56b;
+border-color:#171717;
+box-shadow:0 10px 24px rgba(0,0,0,.08);
 }
 
 .job-card h3{
-color:#ffd56b;
-margin-bottom:5px;
+color:#171717;
+margin:0 0 8px;
+font-size:19px;
+line-height:1.2;
 }
 
 .job-card p{
-color:#ccc;
+color:#5f5a52;
 font-size:14px;
+line-height:1.45;
+margin:0;
 }
 
 .form-box{
 display:none;
 background:#ffffff;
 padding:16px;
-border-radius:12px;
-margin-top:20px;
+border:1px solid #e4dfd4;
+margin-top:16px;
 }
 
-input, textarea{
+.form-box h2{
+margin:0 0 12px;
+font-family:Georgia,'Times New Roman',serif;
+font-size:24px;
+}
+
+input,
+textarea{
 width:100%;
 padding:13px;
 margin-top:10px;
-border:none;
-border-radius:8px;
+border:1px solid #d8d1c6;
 background:#ffffff;
 color:#171717;
 outline:none;
 font-size:15px;
-box-sizing:border-box;
 }
 
-button{
-margin-top:15px;
-padding:12px;
+.submit-btn{
 width:100%;
-background:linear-gradient(135deg,#ff1e1e,#ff8a00);
-border:none;
-color:#171717;
-font-weight:bold;
-border-radius:8px;
-cursor:pointer;
+margin-top:12px;
 }
 
-@media(min-width:768px){
-
-body{
-padding:24px;
+.back{
+width:100%;
+margin-bottom:10px;
 }
 
-h1{
-font-size:36px;
-margin-bottom:26px;
+.dialog-backdrop{
+display:none;
+position:fixed;
+inset:0;
+z-index:10050;
+background:rgba(0,0,0,.42);
+padding:16px;
+align-items:center;
+justify-content:center;
+}
+
+.dialog-backdrop.show{
+display:flex;
+}
+
+.dialog{
+width:100%;
+max-width:430px;
+background:#ffffff;
+border:1px solid #e4dfd4;
+padding:16px;
+box-shadow:0 20px 50px rgba(0,0,0,.22);
+}
+
+.dialog h2{
+margin:0 0 12px;
+font-family:Georgia,'Times New Roman',serif;
+font-size:24px;
+}
+
+.dialog-actions,
+.delete-list{
+display:grid;
+gap:8px;
+margin-top:12px;
+}
+
+.delete-list button{
+text-align:left;
+font-weight:700;
+}
+
+.empty{
+text-align:center;
+padding:18px;
+border:1px solid #e4dfd4;
+color:#5f5a52;
+background:#ffffff;
+}
+
+@media(min-width:640px){
+.admin-tools{
+grid-template-columns:auto auto 1fr;
+align-items:center;
+}
+
+.admin-tools button:last-child{
+justify-self:end;
 }
 
 .jobs{
-display:grid;
 grid-template-columns:repeat(2,minmax(0,1fr));
-gap:16px;
+gap:14px;
+}
 }
 
-.job-card{
-margin-bottom:0;
+@media(min-width:960px){
+body{
+padding:104px 24px 40px;
 }
 
-.form-box{
-padding:24px;
+h1{
+font-size:38px;
+margin-bottom:26px;
 }
-
-}
-
-@media(min-width:1024px){
 
 .jobs{
 grid-template-columns:repeat(3,minmax(0,1fr));
 }
 
+.form-box{
+padding:24px;
 }
-
-.back{
-background:#ffffff;
-margin-bottom:10px;
 }
-
 </style>
 
 <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
-
-<h1>Career at PhotoRoast</h1>
-
-<!-- JOB LIST -->
-<div class="jobs" id="jobList">
-
-    <div class="job-card" onclick="openForm('Photographer')">
-        <h3>Traditional Video Editor</h3>
-        <p>Capture weddings, events and cinematic shoots</p>
-    </div>
-
-    <div class="job-card" onclick="openForm('Video Editor')">
-        <h3>Candid Video Editor</h3>
-        <p>Edit cinematic reels and wedding films</p>
-    </div>
-
-    <div class="job-card" onclick="openForm('Intern')">
-        <h3>Photo Editing</h3>
-        <p>Edit Pictures </p>
-    </div>
-
+<main class="page">
+<div class="admin-tools" id="adminTools" aria-label="Career admin tools">
+<a href="admin/dashboard.html">Admin Dashboard</a>
+<button type="button" class="primary" onclick="openJobDialog()">Add New Job</button>
+<button type="button" onclick="openDeleteDialog()">Delete Job</button>
 </div>
 
-<!-- APPLICATION FORM -->
+<h1>Career at PhotoRoast</h1>
+<div class="notice" id="notice"></div>
+
+<div class="jobs" id="jobList"></div>
+
 <div class="form-box" id="formBox">
+<button class="back" type="button" onclick="goBack()">Back to Jobs</button>
+<h2 id="jobTitle">Apply</h2>
+<form onsubmit="submitForm(event)">
+<input type="text" id="name" placeholder="Your Name" required>
+<input type="email" id="email" placeholder="Email">
+<textarea id="details" placeholder="Why do you want this job?" rows="5"></textarea>
+<input type="file" id="resume" accept=".pdf,.doc,.docx" required>
+<button class="submit-btn" type="submit">Submit Application</button>
+</form>
+</div>
+</main>
 
-    <button class="back" onclick="goBack()">← Back to Jobs</button>
+<div class="dialog-backdrop" id="jobDialog">
+<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="jobDialogTitle">
+<h2 id="jobDialogTitle">Add New Job</h2>
+<input type="text" id="newJobTitle" placeholder="Job title">
+<textarea id="newJobDescription" rows="4" placeholder="Short job description"></textarea>
+<div class="dialog-actions">
+<button type="button" class="primary" onclick="saveJob()">Save Job</button>
+<button type="button" onclick="closeDialogs()">Cancel</button>
+</div>
+</div>
+</div>
 
-    <h2 id="jobTitle">Apply</h2>
-
-    <form onsubmit="submitForm(event)">
-
-        <input type="text" id="name" placeholder="Your Name" required>
-
-        <input type="email" id="email" placeholder="Email">
-
-        <textarea id="details" placeholder="Why do you want this job?" rows="5"></textarea>
-
-        <input type="file" id="resume" accept=".pdf,.doc,.docx" required>
-
-        <button type="submit">Submit Application</button>
-
-    </form>
-
+<div class="dialog-backdrop" id="deleteDialog">
+<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="deleteDialogTitle">
+<h2 id="deleteDialogTitle">Which job should be deleted?</h2>
+<div class="delete-list" id="deleteList"></div>
+<div class="dialog-actions">
+<button type="button" onclick="closeDialogs()">Cancel</button>
+</div>
+</div>
 </div>
 
 <script>
-
 let selectedJob = "";
+let jobs = [];
+
+const fallbackJobs = [
+{ id:"fallback-1", title:"Traditional Video Editor", description:"Capture weddings, events and cinematic shoots" },
+{ id:"fallback-2", title:"Candid Video Editor", description:"Edit cinematic reels and wedding films" },
+{ id:"fallback-3", title:"Photo Editing", description:"Edit pictures with a clean, premium finish" }
+];
+
+const params = new URLSearchParams(window.location.search);
+const isAdminMode =
+params.get("adminEdit") === "1" &&
+localStorage.getItem("auth") === "true";
+
+if(isAdminMode){
+document.body.classList.add("admin-mode");
+}
+
+function showNotice(message){
+const notice = document.getElementById("notice");
+notice.textContent = message || "";
+notice.classList.toggle("show",Boolean(message));
+}
+
+function escapeText(value){
+return String(value || "")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+}
+
+function renderJobs(){
+const list = document.getElementById("jobList");
+
+if(!jobs.length){
+list.innerHTML = '<div class="empty">No jobs are available right now.</div>';
+return;
+}
+
+list.innerHTML = jobs.map(job => `
+<div class="job-card" onclick="openFormById('${escapeText(job.id)}')">
+<h3>${escapeText(job.title)}</h3>
+<p>${escapeText(job.description || "Apply to work with PhotoRoast.")}</p>
+</div>
+`).join("");
+}
+
+async function loadJobs(){
+try{
+const response = await fetch("/jobs");
+
+if(!response.ok){
+throw new Error("Jobs could not be loaded");
+}
+
+jobs = await response.json();
+
+if(!Array.isArray(jobs) || !jobs.length){
+jobs = fallbackJobs;
+}
+
+renderJobs();
+}catch(error){
+jobs = fallbackJobs;
+renderJobs();
+showNotice("Jobs are showing from the saved page list because the server did not respond.");
+}
+}
+
+function openFormById(id){
+const job = jobs.find(item => String(item.id) === String(id));
+
+if(!job){
+return;
+}
+
+openForm(job.title);
+}
 
 function openForm(job){
-
 selectedJob = job;
-
 document.getElementById("jobList").style.display = "none";
-
 document.getElementById("formBox").style.display = "block";
-
 document.getElementById("jobTitle").innerText = "Apply for " + job;
-
 }
 
 function goBack(){
-
-document.getElementById("jobList").style.display = "block";
-
+document.getElementById("jobList").style.display = "";
 document.getElementById("formBox").style.display = "none";
-
 }
 
-function submitForm(e){
-
-e.preventDefault();
-
-const name = document.getElementById("name").value;
-
-const email = document.getElementById("email").value;
-
-const details = document.getElementById("details").value;
-
-const resume = document.getElementById("resume").files[0];
-
-console.log("JOB:", selectedJob);
-console.log("NAME:", name);
-console.log("EMAIL:", email);
-console.log("DETAILS:", details);
-console.log("RESUME FILE:", resume);
-
+function submitForm(event){
+event.preventDefault();
 alert("Application submitted successfully!");
-
 goBack();
-
-e.target.reset();
-
+event.target.reset();
 }
 
-</script>
+function openJobDialog(){
+if(!isAdminMode){
+return;
+}
 
+document.getElementById("newJobTitle").value = "";
+document.getElementById("newJobDescription").value = "";
+document.getElementById("jobDialog").classList.add("show");
+}
+
+function openDeleteDialog(){
+if(!isAdminMode){
+return;
+}
+
+const deleteList = document.getElementById("deleteList");
+
+if(!jobs.length){
+deleteList.innerHTML = '<div class="empty">No jobs to delete.</div>';
+}else{
+deleteList.innerHTML = jobs.map(job => `
+<button type="button" onclick="deleteJob('${job.id}')">
+${escapeText(job.title)}
+</button>
+`).join("");
+}
+
+document.getElementById("deleteDialog").classList.add("show");
+}
+
+function closeDialogs(){
+document.getElementById("jobDialog").classList.remove("show");
+document.getElementById("deleteDialog").classList.remove("show");
+}
+
+async function saveJob(){
+const title = document.getElementById("newJobTitle").value.trim();
+const description = document.getElementById("newJobDescription").value.trim();
+
+if(!title){
+showNotice("Please enter the job title.");
+return;
+}
+
+try{
+const response = await fetch("/jobs",{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({ title, description })
+});
+
+const data = await response.json().catch(()=>({}));
+
+if(!response.ok){
+throw new Error(data.message || "Failed to add job");
+}
+
+closeDialogs();
+showNotice("Job added successfully.");
+await loadJobs();
+}catch(error){
+showNotice(error.message || "Failed to add job. Please login again and try.");
+}
+}
+
+async function deleteJob(id){
+const job = jobs.find(item => String(item.id) === String(id));
+
+if(!job || !confirm(`Delete "${job.title}"?`)){
+return;
+}
+
+try{
+const response = await fetch(`/jobs/${encodeURIComponent(id)}`,{
+method:"DELETE"
+});
+
+const data = await response.json().catch(()=>({}));
+
+if(!response.ok){
+throw new Error(data.message || "Failed to delete job");
+}
+
+closeDialogs();
+showNotice("Job deleted successfully.");
+await loadJobs();
+}catch(error){
+showNotice(error.message || "Failed to delete job. Please login again and try.");
+}
+}
+
+loadJobs();
+</script>
 </body>
 </html>
