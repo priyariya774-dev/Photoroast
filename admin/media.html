@@ -30,6 +30,7 @@ button{min-height:40px;padding:10px 12px;border:1px solid #d8d1c6;background:#ff
 .card{background:#fff;border:1px solid #e4dfd4;overflow:hidden}
 .media-box{width:100%;aspect-ratio:16/10;background:#f1f1ed}
 .media-box video,.media-box iframe{width:100%;height:100%;display:block;border:0;object-fit:cover}
+.video-error{display:flex;align-items:center;justify-content:center;height:100%;padding:14px;text-align:center;font-size:13px;line-height:1.5;color:#b00020;background:#fff4f4}
 .content{padding:12px}
 .content h3{font-size:17px;margin-bottom:6px}
 .content p{font-size:13px;line-height:1.5;color:#5f5850;margin-bottom:6px}
@@ -197,7 +198,7 @@ target.innerHTML = items.map(item=>{
 const isYoutube = item.youtube || item.type === "youtube";
 const media = isYoutube
 ? `<iframe src="${convertEmbed(item.youtube)}" title="Reel or video link" allowfullscreen></iframe>`
-: `<video controls><source src="/media-file/${item.id}"></video>`;
+: `<video controls playsinline preload="metadata" src="${item.streamUrl || `/media-file/${item.id}`}" onerror="showVideoError(this)"></video>`;
 
 return `
 <article class="card">
@@ -282,6 +283,16 @@ alert(data.message || "Deleted");
 await loadUploads();
 }catch(err){
 alert(err.message || "Delete failed");
+}
+
+function showVideoError(video){
+const box = video.closest(".media-box");
+
+if(!box){
+return;
+}
+
+box.innerHTML = `<div class="video-error">This uploaded video cannot play. Re-upload as MP4 H.264, or add it as a YouTube/Instagram link.</div>`;
 }
 }
 

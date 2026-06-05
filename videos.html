@@ -71,6 +71,19 @@ display:block;
 object-fit:cover;
 }
 
+.video-error{
+display:flex;
+align-items:center;
+justify-content:center;
+height:100%;
+padding:16px;
+text-align:center;
+font-size:13px;
+line-height:1.5;
+color:#b00020;
+background:#fff4f4;
+}
+
 .video-content{
 padding:16px;
 }
@@ -183,8 +196,12 @@ allowfullscreen>
 </iframe>
 `
 : `
-<video controls>
-<source src="/media-file/${item.id}">
+<video
+controls
+playsinline
+preload="metadata"
+src="${item.streamUrl || `/media-file/${item.id}`}"
+onerror="showVideoError(this)">
 </video>
 `;
 
@@ -217,6 +234,17 @@ document.getElementById("videosGrid").innerHTML =
 }
 
 loadVideos();
+
+function showVideoError(video){
+const box = video.closest(".video-media");
+
+if(!box){
+return;
+}
+
+box.innerHTML =
+`<div class="video-error">This uploaded video cannot play here. Please re-upload it as MP4 H.264, or upload it as a YouTube link.</div>`;
+}
 </script>
 </body>
 </html>

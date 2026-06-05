@@ -1439,8 +1439,12 @@ media = `
 
 <video
 controls
+playsinline
+preload="metadata"
+src="/media-file/${p.id}"
 class="media"
 onloadedmetadata="setMediaRatio(this)"
+onerror="this.closest('.media-box').innerHTML='<div class=&quot;empty&quot;>This uploaded video cannot play. Please re-upload as MP4 H.264.</div>'"
 
 style="
 transform:
@@ -1448,13 +1452,6 @@ translate(${p.posX || 0}px,
 ${p.posY || 0}px)
 scale(${p.scale || 1});
 "
-
->
-
-<source
-
-src=
-"/media-file/${p.id}"
 
 >
 

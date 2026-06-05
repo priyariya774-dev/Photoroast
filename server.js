@@ -2323,7 +2323,10 @@ if(err){
 return res.status(500).json(err);
 }
 
-res.json(result);
+res.json(result.map(item=>({
+...item,
+streamUrl:item.type === "video" ? `/media-file/${item.id}` : null
+})));
 
 }
 );

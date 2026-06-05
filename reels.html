@@ -84,6 +84,19 @@ display:block;
 object-fit:cover;
 }
 
+.video-error{
+display:flex;
+align-items:center;
+justify-content:center;
+height:100%;
+padding:16px;
+text-align:center;
+font-size:13px;
+line-height:1.5;
+color:#b00020;
+background:#fff4f4;
+}
+
 .reel-content{
 padding:16px;
 }
@@ -197,8 +210,12 @@ allowfullscreen>
 </iframe>
 `
 : `
-<video controls>
-<source src="/media-file/${item.id}">
+<video
+controls
+playsinline
+preload="metadata"
+src="${item.streamUrl || `/media-file/${item.id}`}"
+onerror="showVideoError(this)">
 </video>
 `;
 
@@ -229,6 +246,17 @@ alert("Reels load failed");
 }
 
 loadReels();
+
+function showVideoError(video){
+const box = video.closest(".reel-media");
+
+if(!box){
+return;
+}
+
+box.innerHTML =
+`<div class="video-error">This uploaded reel cannot play here. Please re-upload it as MP4 H.264, or add it as an Instagram/YouTube link.</div>`;
+}
 </script>
 </body>
 
