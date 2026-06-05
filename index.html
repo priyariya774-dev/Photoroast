@@ -1550,7 +1550,7 @@ font-size:30px;
 
 <img
 id="siteLogo"
-src="/uploads/logo.png">
+src="/logo-image">
 
 </div>
 
@@ -1874,7 +1874,7 @@ document.getElementById(
 );
 
 logo.src =
-"/uploads/logo.png?t="
+"/logo-image?t="
 +
 new Date().getTime();
 
@@ -2569,7 +2569,7 @@ showDialog(
 <p>Choose the new logo, preview it, then save.</p>
 <input id="adminLogoFile" type="file" accept="image/*">
 <div class="admin-preview-frame admin-logo-preview">
-<img id="adminLogoPreview" src="/uploads/logo.png?t=${Date.now()}" alt="Logo preview">
+<img id="adminLogoPreview" src="/logo-image?t=${Date.now()}" alt="Logo preview">
 </div>
 <div class="admin-dialog-actions">
 <button type="button" data-action="save-logo-upload">Save logo</button>
@@ -2601,7 +2601,7 @@ showDialog(
 `
 <p>Adjust the logo inside the homepage logo area, then save.</p>
 <div class="admin-preview-frame admin-logo-preview">
-<img id="adminLogoPositionPreview" src="/uploads/logo.png?t=${Date.now()}" alt="Logo preview">
+<img id="adminLogoPositionPreview" src="/logo-image?t=${Date.now()}" alt="Logo preview">
 </div>
 <div class="admin-position-grid">
 <button type="button" data-logo-move="up">Up</button>

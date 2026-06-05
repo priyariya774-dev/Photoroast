@@ -12,7 +12,7 @@ header.className = "public-header";
 header.innerHTML = `
 <a class="public-logo-area" href="index.html">
 <div class="public-logo-frame">
-<img id="publicSiteLogo" src="/uploads/logo.png" alt="PhotoRoast">
+<img id="publicSiteLogo" src="/logo-image" alt="PhotoRoast">
 </div>
 </a>
 
@@ -232,7 +232,7 @@ const data = await res.json();
 const logo = document.getElementById("publicSiteLogo");
 
 logo.src =
-"/uploads/logo.png?t=" +
+"/logo-image?t=" +
 new Date().getTime();
 
 const posX = Number(data.posX) || 0;

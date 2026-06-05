@@ -119,6 +119,8 @@ ADD COLUMN IF NOT EXISTS scale FLOAT DEFAULT 1
 ensureColumn("site_settings","fontStyle","VARCHAR(80) DEFAULT 'Poppins'");
 ensureColumn("site_settings","aboutTitle","VARCHAR(255) DEFAULT NULL");
 ensureColumn("site_settings","aboutText","TEXT DEFAULT NULL");
+ensureColumn("site_settings","logoMime","VARCHAR(80) DEFAULT 'image/png'");
+ensureColumn("site_settings","logoData","LONGBLOB");
 
 db.query(`
 ALTER TABLE hero_slides
@@ -905,6 +907,8 @@ message:"No logo selected"
 }
 
 const finalLogoPath = path.join(__dirname,"uploads","logo.png");
+let logoBuffer = null;
+const logoMime = req.file.mimetype || "image/png";
 
 try{
 if(fs.existsSync(finalLogoPath)){
@@ -913,6 +917,7 @@ fs.unlinkSync(finalLogoPath);
 
 fs.renameSync(req.file.path,finalLogoPath);
 req.file.filename = "logo.png";
+logoBuffer = fs.readFileSync(finalLogoPath);
 }catch(fileErr){
 if(req.file && fs.existsSync(req.file.path)){
 fs.unlinkSync(req.file.path);
@@ -940,6 +945,8 @@ INSERT INTO site_settings
 (
 id,
 logo,
+logoMime,
+logoData,
 posX,
 posY,
 scale
@@ -948,12 +955,14 @@ VALUES
 (
 1,
 ?,
+?,
+?,
 0,
 0,
 1
 )
 `,
-["logo.png"],
+["logo.png",logoMime,logoBuffer],
 (err2)=>{
 
 if(err2){
@@ -972,10 +981,13 @@ message:"Logo uploaded"
 db.query(
 `
 UPDATE site_settings
-SET logo=?
+SET
+logo=?,
+logoMime=?,
+logoData=?
 WHERE id=1
 `,
-["logo.png"],
+["logo.png",logoMime,logoBuffer],
 (err2)=>{
 
 if(err2){
@@ -1126,6 +1138,32 @@ fontStyle:result[0].fontStyle || "Poppins"
 
 });
 
+app.get("/logo-image",(req,res)=>{
+res.set("Cache-Control","no-store, no-cache, must-revalidate, proxy-revalidate");
+res.set("Pragma","no-cache");
+res.set("Expires","0");
+
+db.query(
+"SELECT logoData,logoMime FROM site_settings WHERE id=1 LIMIT 1",
+(err,result)=>{
+if(!err && result.length && result[0].logoData){
+res.type(result[0].logoMime || "image/png");
+return res.send(result[0].logoData);
+}
+
+const fallbackLogo = path.join(__dirname,"uploads","logo.png");
+
+if(fs.existsSync(fallbackLogo)){
+return res.sendFile(fallbackLogo);
+}
+
+return res.status(404).json({
+message:"Logo not found"
+});
+}
+);
+});
+
 // ======================
 // SAVE PUBLIC FONT STYLE
 // ======================
@@ -1216,6 +1254,8 @@ db.query(
 UPDATE site_settings
 SET
 logo=NULL,
+logoMime='image/png',
+logoData=NULL,
 posX=0,
 posY=0,
 scale=1
