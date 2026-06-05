@@ -2571,6 +2571,7 @@ location,
 events,
 eventDates,
 email,
+budget,
 message
 } = req.body;
 
@@ -2600,6 +2601,7 @@ const text =
 `Events: ${String(events || "").trim()}`,
 `Dates: ${dates}`,
 `Email: ${String(email || "").trim()}`,
+`Expected budget: ${String(budget || "").trim()}`,
 `Message: ${String(message || "").trim()}`
 ].join("\n");
 

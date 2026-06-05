@@ -959,10 +959,12 @@ font-size:30px;
 line-height:1;
 box-shadow:none;
 cursor:pointer;
+text-shadow:none;
 }
 
 .star-rating button.active{
 color:#d99a00;
+background:transparent;
 }
 
 .review-form{
@@ -1006,6 +1008,23 @@ background:#171717;
 color:#fff;
 font-weight:700;
 cursor:pointer;
+}
+
+.review-form .star-rating button{
+background:transparent;
+border:0;
+color:#c9c0ad;
+padding:4px 2px;
+box-shadow:none;
+}
+
+.review-form .star-rating button.active{
+background:transparent;
+color:#d99a00;
+}
+
+body.admin-review-view .review-form{
+display:none;
 }
 
 .review-message{
@@ -2424,6 +2443,10 @@ setReviewRating(this.dataset.rating);
 
 setReviewRating(5);
 
+if(localStorage.getItem("auth") === "true"){
+document.body.classList.add("admin-review-view");
+}
+
 document.getElementById("reviewForm").addEventListener("submit",async function(e){
 e.preventDefault();
 
@@ -2447,8 +2470,9 @@ text:document.getElementById("reviewText").value
 const data =
 await getJsonOrThrow(res,"Review submit failed");
 
-message.innerText = data.message || "Review added";
+message.innerText = data.message || "Thank you for your review.";
 this.reset();
+setReviewRating(5);
 await loadReviews();
 }catch(err){
 message.innerText = "Review submit failed";
@@ -2984,7 +3008,7 @@ content += `<button type="button" data-action="edit-about">Edit about text here<
 }
 
 if(area === "reviews"){
-content += `<a href="#client-reviews">Use review form on this page</a>`;
+content += `<a href="#client-reviews">View reviews</a>`;
 }
 
 if(area === "cta"){
