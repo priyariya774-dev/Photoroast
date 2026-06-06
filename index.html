@@ -3399,7 +3399,7 @@ showDialog(
 <p>Choose a new video for this section.</p>
 <input id="storyVideoUploadInput" type="file" accept="video/*">
 <div class="admin-dialog-actions">
-<button type="button" data-action="save-story-video">Replace video</button>
+<button type="button" data-action="save-story-video">Save video</button>
 </div>
 `
 );
@@ -3474,7 +3474,7 @@ content += `<button type="button" data-action="edit-story-caption">Edit caption<
 }
 
 if(area === "story-video-media"){
-content += `<button type="button" data-action="replace-story-video">Replace video</button>`;
+content += `<button type="button" data-action="replace-story-video">Replace / save video</button>`;
 content += `<button type="button" data-action="delete-story-video">Delete video</button>`;
 }
 
