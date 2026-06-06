@@ -859,6 +859,104 @@ transform:translateX(-50%);
 }
 }
 
+/* ABOUT BRIEF */
+
+.about-brief{
+padding:68px 20px;
+background:#ffffff;
+}
+
+.about-brief-inner{
+width:100%;
+max-width:1120px;
+margin:0 auto;
+display:grid;
+grid-template-columns:1fr;
+gap:28px;
+align-items:center;
+}
+
+.about-brief-copy{
+text-align:left;
+}
+
+.about-brief-copy h2{
+font-family:var(--display-font);
+font-size:38px;
+line-height:1.05;
+color:var(--text-main);
+margin-bottom:16px;
+}
+
+.about-brief-copy p{
+font-size:15px;
+line-height:1.85;
+color:var(--text-soft);
+max-width:680px;
+}
+
+.branch-list{
+display:grid;
+grid-template-columns:1fr;
+gap:10px;
+margin-top:24px;
+padding:0;
+list-style:none;
+}
+
+.branch-list li{
+padding:12px 14px;
+border:1px solid var(--line);
+background:#f7f7f4;
+font-size:14px;
+font-weight:700;
+color:var(--text-main);
+}
+
+.about-brief-logo{
+display:flex;
+align-items:center;
+justify-content:center;
+min-height:220px;
+border:1px solid var(--line);
+background:#f7f7f4;
+}
+
+.about-brief-logo img{
+width:min(240px,68vw);
+height:auto;
+display:block;
+object-fit:contain;
+}
+
+@media(min-width:768px){
+.about-brief{
+padding:86px 28px;
+}
+
+.about-brief-inner{
+grid-template-columns:minmax(0,1.35fr) minmax(260px,.65fr);
+gap:48px;
+}
+
+.about-brief-copy h2{
+font-size:52px;
+}
+
+.branch-list{
+grid-template-columns:repeat(2,minmax(0,1fr));
+max-width:620px;
+}
+
+.about-brief-logo{
+min-height:330px;
+}
+
+.about-brief-logo img{
+width:min(300px,28vw);
+}
+}
+
 /* ABOUT */
 
 .about{
@@ -1814,6 +1912,37 @@ Luxury cinematic moments captured beautifully
 <div
 class="gallery-slider-track"
 id="galleryTrack">
+</div>
+
+</div>
+
+</section>
+
+<section class="about-brief" data-admin-edit="about-brief">
+
+<div class="about-brief-inner">
+
+<div class="about-brief-copy">
+
+<h2>
+About Us Brief
+</h2>
+
+<p>
+PhotoRoast is a wedding storytelling studio shaped by emotion, elegance, and the quiet beauty of real moments. From intimate rituals to grand celebrations, our team creates timeless photographs and cinematic films with a calm, premium, and heartfelt approach.
+</p>
+
+<ul class="branch-list" aria-label="PhotoRoast branches">
+<li>Chennai, India</li>
+<li>Kumbakonam, India</li>
+<li>Thanjavur, India</li>
+<li>Dubai</li>
+</ul>
+
+</div>
+
+<div class="about-brief-logo">
+<img src="/logo-image" alt="PhotoRoast logo">
 </div>
 
 </div>
@@ -3121,6 +3250,7 @@ const labels = {
 logo:"Logo Area",
 hero:"Hero Images",
 featured:"Featured Gallery",
+"about-brief":"About Us Brief",
 about:"About Section",
 reviews:"Client Reviews",
 cta:"Booking Section"
