@@ -476,6 +476,8 @@ position:relative;
 overflow:hidden;
 
 margin-top:0;
+margin-left:calc(50% - 50vw);
+margin-right:calc(50% - 50vw);
 
 display:flex;
 align-items:center;
@@ -1450,7 +1452,7 @@ min-height:100vh;
 height:100vh;
 min-height:100svh;
 height:100svh;
-width:100%;
+width:100vw;
 max-width:none;
 margin-left:0;
 margin-right:0;
@@ -1559,8 +1561,11 @@ bottom:80px;
 }
 
 .hero{
-min-height:0;
-height:clamp(560px,86svh,740px);
+min-height:100vh;
+height:100vh;
+min-height:100svh;
+height:100svh;
+width:100vw;
 border-radius:0;
 padding:0;
 }
@@ -1594,8 +1599,11 @@ text-align:left;
 @media(min-width:481px) and (max-width:767px){
 
 .hero{
-min-height:0;
-height:clamp(620px,88svh,780px);
+min-height:100vh;
+height:100vh;
+min-height:100svh;
+height:100svh;
+width:100vw;
 padding:0;
 }
 
