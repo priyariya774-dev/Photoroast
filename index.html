@@ -957,6 +957,78 @@ width:min(300px,28vw);
 }
 }
 
+/* STORY VIDEO */
+
+.story-video{
+padding:0 20px 76px;
+background:#ffffff;
+}
+
+.story-video-inner{
+width:100%;
+max-width:1120px;
+margin:0 auto;
+display:grid;
+grid-template-columns:1fr;
+gap:28px;
+align-items:center;
+}
+
+.story-video-copy{
+text-align:left;
+}
+
+.story-video-copy h2{
+font-family:var(--display-font);
+font-size:34px;
+line-height:1.1;
+color:var(--text-main);
+margin-bottom:16px;
+}
+
+.story-video-copy p{
+font-size:15px;
+line-height:1.85;
+color:var(--text-soft);
+max-width:640px;
+margin-bottom:14px;
+}
+
+.story-video-frame{
+width:100%;
+aspect-ratio:9 / 12;
+background:#111;
+overflow:hidden;
+border:1px solid var(--line);
+box-shadow:0 18px 48px rgba(0,0,0,.12);
+}
+
+.story-video-frame video{
+width:100%;
+height:100%;
+display:block;
+object-fit:cover;
+}
+
+@media(min-width:768px){
+.story-video{
+padding:0 28px 92px;
+}
+
+.story-video-inner{
+grid-template-columns:minmax(0,1fr) minmax(300px,.82fr);
+gap:52px;
+}
+
+.story-video-copy h2{
+font-size:46px;
+}
+
+.story-video-frame{
+aspect-ratio:4 / 5;
+}
+}
+
 /* ABOUT */
 
 .about{
@@ -1943,6 +2015,36 @@ PhotoRoast is a wedding storytelling studio shaped by emotion, elegance, and the
 
 <div class="about-brief-logo">
 <img src="/logo-image" alt="PhotoRoast logo">
+</div>
+
+</div>
+
+</section>
+
+<section class="story-video" data-admin-edit="story-video">
+
+<div class="story-video-inner">
+
+<div class="story-video-copy">
+
+<h2>
+A GRAND ENTRY INTO FOREVER &#10024;
+</h2>
+
+<p>
+As the lights dimmed and all eyes turned towards them, they walked in not just as bride and groom, but as two souls ready to begin a beautiful new chapter together.
+</p>
+
+<p>
+With elegance in every step and love shining in every glance, this reception entry was nothing short of magical &mdash; a moment filled with celebration, admiration, and unforgettable memories.
+</p>
+
+</div>
+
+<div class="story-video-frame">
+<video controls playsinline preload="metadata" poster="/logo-image">
+<source src="/uploads/entrance-animation.mp4" type="video/mp4">
+</video>
 </div>
 
 </div>
@@ -3251,6 +3353,7 @@ logo:"Logo Area",
 hero:"Hero Images",
 featured:"Featured Gallery",
 "about-brief":"About Us Brief",
+"story-video":"Story Video",
 about:"About Section",
 reviews:"Client Reviews",
 cta:"Booking Section"
