@@ -3700,6 +3700,11 @@ alert(data.message || "Hero text updated");
 closeAdminMenu();
 }
 }catch(err){
+if(e.target && e.target.dataset.action === "save-story-video"){
+e.target.disabled = false;
+e.target.innerText = "Save video";
+}
+
 alert(explainFetchError(err,"Admin save"));
 }
 });
@@ -3741,6 +3746,7 @@ return;
 }
 
 if(action === "save-story-video"){
+const saveButton = e.target;
 const input = dialog.querySelector("#storyVideoUploadInput");
 const file = input && input.files && input.files[0];
 
@@ -3748,6 +3754,9 @@ if(!file){
 alert("Choose a video first");
 return;
 }
+
+saveButton.disabled = true;
+saveButton.innerText = "Saving...";
 
 const formData = new FormData();
 formData.append("storyVideo",file);

@@ -126,6 +126,7 @@ ensureColumn("site_settings","storyTextOne","TEXT DEFAULT NULL");
 ensureColumn("site_settings","storyTextTwo","TEXT DEFAULT NULL");
 ensureColumn("site_settings","storyVideoMime","VARCHAR(120) DEFAULT 'video/mp4'");
 ensureColumn("site_settings","storyVideoData","LONGBLOB");
+ensureColumn("site_settings","storyVideoPath","VARCHAR(255) DEFAULT NULL");
 
 db.query(`
 ALTER TABLE hero_slides
@@ -1486,26 +1487,45 @@ message:"Choose a video first"
 }
 
 const filePath = path.join(__dirname,"uploads",req.file.filename);
-const videoData = fs.readFileSync(filePath);
 const videoMime = req.file.mimetype || getMediaMime(filePath);
+const videoPath = req.file.filename;
+
+db.query(
+`
+SELECT storyVideoPath
+FROM site_settings
+WHERE id=1
+LIMIT 1
+`,
+(selectErr,selectResult)=>{
+if(selectErr){
+return res.status(500).json(selectErr);
+}
+
+const oldVideoPath = selectResult[0]?.storyVideoPath;
 
 db.query(
 `
 INSERT INTO site_settings
-(id,storyVideoMime,storyVideoData)
-VALUES (1,?,?)
+(id,storyVideoMime,storyVideoPath,storyVideoData)
+VALUES (1,?,?,NULL)
 ON DUPLICATE KEY UPDATE
 storyVideoMime=VALUES(storyVideoMime),
-storyVideoData=VALUES(storyVideoData)
+storyVideoPath=VALUES(storyVideoPath),
+storyVideoData=NULL
 `,
-[videoMime,videoData],
+[videoMime,videoPath],
 err=>{
-if(fs.existsSync(filePath)){
-fs.unlinkSync(filePath);
-}
-
 if(err){
 return res.status(500).json(err);
+}
+
+if(oldVideoPath && oldVideoPath !== videoPath){
+const oldPath = path.join(__dirname,"uploads",oldVideoPath);
+
+if(fs.existsSync(oldPath)){
+fs.unlinkSync(oldPath);
+}
 }
 
 res.json({
@@ -1513,15 +1533,32 @@ message:"Story video updated"
 });
 }
 );
+}
+);
 });
 
 app.delete("/story-video",requireAdmin,(req,res)=>{
 db.query(
 `
+SELECT storyVideoPath
+FROM site_settings
+WHERE id=1
+LIMIT 1
+`,
+(selectErr,selectResult)=>{
+if(selectErr){
+return res.status(500).json(selectErr);
+}
+
+const oldVideoPath = selectResult[0]?.storyVideoPath;
+
+db.query(
+`
 UPDATE site_settings
 SET
 storyVideoMime='video/mp4',
-storyVideoData=NULL
+storyVideoData=NULL,
+storyVideoPath=NULL
 WHERE id=1
 `,
 err=>{
@@ -1529,9 +1566,19 @@ if(err){
 return res.status(500).json(err);
 }
 
+if(oldVideoPath){
+const oldPath = path.join(__dirname,"uploads",oldVideoPath);
+
+if(fs.existsSync(oldPath)){
+fs.unlinkSync(oldPath);
+}
+}
+
 res.json({
 message:"Story video deleted"
 });
+}
+);
 }
 );
 });
@@ -1539,13 +1586,24 @@ message:"Story video deleted"
 app.get("/story-video",(req,res)=>{
 db.query(
 `
-SELECT storyVideoMime,storyVideoData
+SELECT storyVideoMime,storyVideoData,storyVideoPath
 FROM site_settings
 WHERE id=1
 `,
 (err,result)=>{
 if(err){
 return res.status(500).send("Story video load failed");
+}
+
+const storyVideoPath = result[0]?.storyVideoPath;
+
+if(storyVideoPath){
+const savedVideoPath = path.join(__dirname,"uploads",storyVideoPath);
+
+if(fs.existsSync(savedVideoPath)){
+res.type(result[0].storyVideoMime || getMediaMime(savedVideoPath));
+return fs.createReadStream(savedVideoPath).pipe(res);
+}
 }
 
 if(result[0]?.storyVideoData){
