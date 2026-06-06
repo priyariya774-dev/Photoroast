@@ -121,6 +121,11 @@ ensureColumn("site_settings","aboutTitle","VARCHAR(255) DEFAULT NULL");
 ensureColumn("site_settings","aboutText","TEXT DEFAULT NULL");
 ensureColumn("site_settings","logoMime","VARCHAR(80) DEFAULT 'image/png'");
 ensureColumn("site_settings","logoData","LONGBLOB");
+ensureColumn("site_settings","storyTitle","VARCHAR(255) DEFAULT NULL");
+ensureColumn("site_settings","storyTextOne","TEXT DEFAULT NULL");
+ensureColumn("site_settings","storyTextTwo","TEXT DEFAULT NULL");
+ensureColumn("site_settings","storyVideoMime","VARCHAR(120) DEFAULT 'video/mp4'");
+ensureColumn("site_settings","storyVideoData","LONGBLOB");
 
 db.query(`
 ALTER TABLE hero_slides
@@ -1413,6 +1418,153 @@ return res.status(500).json(err);
 res.json({
 message:"About section updated"
 });
+}
+);
+});
+
+app.get("/story-content",(req,res)=>{
+db.query(
+`
+SELECT storyTitle,storyTextOne,storyTextTwo,storyVideoData
+FROM site_settings
+WHERE id=1
+`,
+(err,result)=>{
+if(err){
+return res.status(500).json(err);
+}
+
+res.json({
+storyTitle:result[0]?.storyTitle || "A GRAND ENTRY INTO FOREVER ✨",
+storyTextOne:result[0]?.storyTextOne || "As the lights dimmed and all eyes turned towards them, they walked in not just as bride and groom, but as two souls ready to begin a beautiful new chapter together.",
+storyTextTwo:result[0]?.storyTextTwo || "With elegance in every step and love shining in every glance, this reception entry was nothing short of magical — a moment filled with celebration, admiration, and unforgettable memories.",
+hasVideo:Boolean(result[0]?.storyVideoData)
+});
+}
+);
+});
+
+app.put("/story-caption",requireAdmin,(req,res)=>{
+const {
+storyTitle,
+storyTextOne,
+storyTextTwo
+} = req.body;
+
+db.query(
+`
+INSERT INTO site_settings
+(id,storyTitle,storyTextOne,storyTextTwo)
+VALUES (1,?,?,?)
+ON DUPLICATE KEY UPDATE
+storyTitle=VALUES(storyTitle),
+storyTextOne=VALUES(storyTextOne),
+storyTextTwo=VALUES(storyTextTwo)
+`,
+[
+String(storyTitle || "").trim(),
+String(storyTextOne || "").trim(),
+String(storyTextTwo || "").trim()
+],
+err=>{
+if(err){
+return res.status(500).json(err);
+}
+
+res.json({
+message:"Story caption updated"
+});
+}
+);
+});
+
+app.put("/story-video",requireAdmin,upload.single("storyVideo"),(req,res)=>{
+if(!req.file){
+return res.status(400).json({
+message:"Choose a video first"
+});
+}
+
+const filePath = path.join(__dirname,"uploads",req.file.filename);
+const videoData = fs.readFileSync(filePath);
+const videoMime = req.file.mimetype || getMediaMime(filePath);
+
+db.query(
+`
+INSERT INTO site_settings
+(id,storyVideoMime,storyVideoData)
+VALUES (1,?,?)
+ON DUPLICATE KEY UPDATE
+storyVideoMime=VALUES(storyVideoMime),
+storyVideoData=VALUES(storyVideoData)
+`,
+[videoMime,videoData],
+err=>{
+if(fs.existsSync(filePath)){
+fs.unlinkSync(filePath);
+}
+
+if(err){
+return res.status(500).json(err);
+}
+
+res.json({
+message:"Story video updated"
+});
+}
+);
+});
+
+app.delete("/story-video",requireAdmin,(req,res)=>{
+db.query(
+`
+UPDATE site_settings
+SET
+storyVideoMime='video/mp4',
+storyVideoData=NULL
+WHERE id=1
+`,
+err=>{
+if(err){
+return res.status(500).json(err);
+}
+
+res.json({
+message:"Story video deleted"
+});
+}
+);
+});
+
+app.get("/story-video",(req,res)=>{
+db.query(
+`
+SELECT storyVideoMime,storyVideoData
+FROM site_settings
+WHERE id=1
+`,
+(err,result)=>{
+if(err){
+return res.status(500).send("Story video load failed");
+}
+
+if(result[0]?.storyVideoData){
+return sendMediaBuffer(
+req,
+res,
+result[0].storyVideoData,
+result[0].storyVideoMime || "video/mp4"
+);
+}
+
+const fallback = path.join(__dirname,"uploads","entrance-animation.mp4");
+
+if(fs.existsSync(fallback)){
+res.type("video/mp4");
+return fs.createReadStream(fallback).pipe(res);
+}
+
+return res.status(404).send("Story video not found");
 }
 );
 });

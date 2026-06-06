@@ -2021,29 +2021,29 @@ PhotoRoast is a wedding storytelling studio shaped by emotion, elegance, and the
 
 </section>
 
-<section class="story-video" data-admin-edit="story-video">
+<section class="story-video">
 
 <div class="story-video-inner">
 
-<div class="story-video-copy">
+<div class="story-video-copy" data-admin-edit="story-caption">
 
-<h2>
+<h2 id="storyVideoTitle">
 A GRAND ENTRY INTO FOREVER &#10024;
 </h2>
 
-<p>
+<p id="storyVideoTextOne">
 As the lights dimmed and all eyes turned towards them, they walked in not just as bride and groom, but as two souls ready to begin a beautiful new chapter together.
 </p>
 
-<p>
+<p id="storyVideoTextTwo">
 With elegance in every step and love shining in every glance, this reception entry was nothing short of magical &mdash; a moment filled with celebration, admiration, and unforgettable memories.
 </p>
 
 </div>
 
-<div class="story-video-frame">
-<video controls playsinline preload="metadata" poster="/logo-image">
-<source src="/uploads/entrance-animation.mp4" type="video/mp4">
+<div class="story-video-frame" data-admin-edit="story-video-media">
+<video id="storyVideoPlayer" controls playsinline preload="metadata" poster="/logo-image">
+<source id="storyVideoSource" src="/story-video" type="video/mp4">
 </video>
 </div>
 
@@ -2872,6 +2872,37 @@ console.log(err);
 
 loadSiteContent();
 
+async function loadStoryContent(){
+try{
+const res = await fetch("/story-content?t=" + Date.now());
+const data = await readJsonResponse(res,"Story content load failed");
+
+document.getElementById("storyVideoTitle").innerText =
+data.storyTitle || "A GRAND ENTRY INTO FOREVER ✨";
+
+document.getElementById("storyVideoTextOne").innerText =
+data.storyTextOne || "";
+
+document.getElementById("storyVideoTextTwo").innerText =
+data.storyTextTwo || "";
+
+const video = document.getElementById("storyVideoPlayer");
+const source = document.getElementById("storyVideoSource");
+
+if(source){
+source.src = "/story-video?t=" + Date.now();
+}
+
+if(video){
+video.load();
+}
+}catch(err){
+console.log(err);
+}
+}
+
+loadStoryContent();
+
 function isAdminEditMode(){
 return (
 localStorage.getItem("auth") === "true"
@@ -3347,13 +3378,67 @@ applyHeroPosition();
 applyHeroPosition();
 }
 
+function openStoryCaptionDialog(){
+showDialog(
+"Edit Story Caption",
+`
+<input id="storyCaptionTitleInput" value="${document.getElementById("storyVideoTitle").innerText.replace(/"/g,"&quot;")}" placeholder="Caption title">
+<textarea id="storyCaptionTextOneInput" rows="5" placeholder="First paragraph">${document.getElementById("storyVideoTextOne").innerText}</textarea>
+<textarea id="storyCaptionTextTwoInput" rows="5" placeholder="Second paragraph">${document.getElementById("storyVideoTextTwo").innerText}</textarea>
+<div class="admin-dialog-actions">
+<button type="button" data-action="save-story-caption">Save caption</button>
+</div>
+`
+);
+}
+
+function openStoryVideoReplaceDialog(){
+showDialog(
+"Replace Story Video",
+`
+<p>Choose a new video for this section.</p>
+<input id="storyVideoUploadInput" type="file" accept="video/*">
+<div class="admin-dialog-actions">
+<button type="button" data-action="save-story-video">Replace video</button>
+</div>
+`
+);
+}
+
+function deleteStoryVideo(){
+if(!confirm("Delete the story video from this section?")){
+return;
+}
+
+fetch("/story-video",{method:"DELETE"})
+.then(res=>readJsonResponse(res))
+.then(data=>{
+const video = document.getElementById("storyVideoPlayer");
+const source = document.getElementById("storyVideoSource");
+
+if(source){
+source.removeAttribute("src");
+}
+
+if(video){
+video.removeAttribute("src");
+video.load();
+}
+
+alert(data.message || "Story video deleted");
+closeAdminMenu();
+})
+.catch(err=>alert(err.message || "Story video delete failed"));
+}
+
 function setMenuContent(area){
 const labels = {
 logo:"Logo Area",
 hero:"Hero Images",
 featured:"Featured Gallery",
 "about-brief":"About Us Brief",
-"story-video":"Story Video",
+"story-caption":"Story Caption",
+"story-video-media":"Story Video",
 about:"About Section",
 reviews:"Client Reviews",
 cta:"Booking Section"
@@ -3382,6 +3467,15 @@ content += `<a href="client-gallery.html?adminEdit=1">Edit gallery</a>`;
 
 if(area === "about"){
 content += `<button type="button" data-action="edit-about">Edit about text here</button>`;
+}
+
+if(area === "story-caption"){
+content += `<button type="button" data-action="edit-story-caption">Edit caption</button>`;
+}
+
+if(area === "story-video-media"){
+content += `<button type="button" data-action="replace-story-video">Replace video</button>`;
+content += `<button type="button" data-action="delete-story-video">Delete video</button>`;
 }
 
 if(area === "reviews"){
@@ -3490,6 +3584,23 @@ await openFeaturedDeleteDialog();
 return;
 }
 
+if(action === "edit-story-caption"){
+closeAdminMenu();
+openStoryCaptionDialog();
+return;
+}
+
+if(action === "replace-story-video"){
+closeAdminMenu();
+openStoryVideoReplaceDialog();
+return;
+}
+
+if(action === "delete-story-video"){
+deleteStoryVideo();
+return;
+}
+
 if(action === "edit-about"){
 const title =
 prompt("About title",document.getElementById("aboutTitle").innerText);
@@ -3592,6 +3703,68 @@ return;
 const action = e.target.dataset.action;
 
 try{
+if(action === "save-story-caption"){
+const title = dialog.querySelector("#storyCaptionTitleInput").value.trim();
+const textOne = dialog.querySelector("#storyCaptionTextOneInput").value.trim();
+const textTwo = dialog.querySelector("#storyCaptionTextTwoInput").value.trim();
+
+const res = await fetch("/story-caption",{
+method:"PUT",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+storyTitle:title,
+storyTextOne:textOne,
+storyTextTwo:textTwo
+})
+});
+
+const data = await readJsonResponse(res);
+
+document.getElementById("storyVideoTitle").innerText = title || "A GRAND ENTRY INTO FOREVER ✨";
+document.getElementById("storyVideoTextOne").innerText = textOne;
+document.getElementById("storyVideoTextTwo").innerText = textTwo;
+alert(data.message || "Story caption updated");
+closeDialog();
+return;
+}
+
+if(action === "save-story-video"){
+const input = dialog.querySelector("#storyVideoUploadInput");
+const file = input && input.files && input.files[0];
+
+if(!file){
+alert("Choose a video first");
+return;
+}
+
+const formData = new FormData();
+formData.append("storyVideo",file);
+
+const res = await fetch("/story-video",{
+method:"PUT",
+body:formData
+});
+
+const data = await readJsonResponse(res);
+const video = document.getElementById("storyVideoPlayer");
+const source = document.getElementById("storyVideoSource");
+
+if(source){
+source.src = "/story-video?t=" + Date.now();
+}
+
+if(video){
+video.removeAttribute("src");
+video.load();
+}
+
+alert(data.message || "Story video updated");
+closeDialog();
+return;
+}
+
 if(action === "save-logo-upload"){
 const input = dialog.querySelector("#adminLogoFile");
 const file = input && input.files && input.files[0];
