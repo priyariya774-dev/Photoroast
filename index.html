@@ -2988,6 +2988,16 @@ throw new Error(data.message || "Update failed");
 return data;
 }
 
+function explainFetchError(err,actionName){
+const message = String(err && err.message ? err.message : err || "");
+
+if(message.toLowerCase().includes("failed to fetch")){
+return `${actionName} could not reach the server. Please make sure the latest server update is deployed, login again as admin, and try a smaller MP4 video if you are uploading video.`;
+}
+
+return message || `${actionName} failed`;
+}
+
 function getLogoTransform(posX,posY,scale){
 return `translate(-50%,-50%) translate(${posX}px, ${posY}px) scale(${scale})`;
 }
@@ -3690,7 +3700,7 @@ alert(data.message || "Hero text updated");
 closeAdminMenu();
 }
 }catch(err){
-alert(err.message || "Update failed");
+alert(explainFetchError(err,"Admin save"));
 }
 });
 
