@@ -33,6 +33,7 @@ await fetch("/logout",{method:"POST"});
 }catch(err){}
 
 localStorage.removeItem("auth");
+localStorage.removeItem("adminToken");
 window.location.href = "login.html";
 }
 </script>

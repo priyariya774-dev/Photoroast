@@ -2978,8 +2978,7 @@ const data = await res.json().catch(()=>({}));
 
 if(!res.ok){
 if(res.status === 401){
-localStorage.removeItem("auth");
-throw new Error("Admin login expired. Please login again, then open Manage Homepage.");
+throw new Error("Please login as admin, then try again.");
 }
 
 throw new Error(data.message || "Update failed");

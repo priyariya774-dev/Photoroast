@@ -139,6 +139,28 @@ window.showFriendlyError = function(){
 showPopup(WRONG_ACTION_MESSAGE,"Action not allowed");
 };
 
+const nativeFetch = window.fetch.bind(window);
+window.fetch = function(input,init){
+const options = init ? { ...init } : {};
+const token =
+localStorage.getItem("adminToken");
+
+const url =
+typeof input === "string" ? input : input && input.url;
+
+const isSameOrigin =
+!url ||
+String(url).startsWith("/") ||
+String(url).startsWith(window.location.origin);
+
+if(token && isSameOrigin){
+options.headers = new Headers(options.headers || {});
+options.headers.set("x-admin-token",token);
+}
+
+return nativeFetch(input,options);
+};
+
 const nativeAlert = window.alert.bind(window);
 window.alert = function(message){
 showPopup(message || DEFAULT_MESSAGE);

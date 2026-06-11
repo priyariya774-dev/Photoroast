@@ -8,6 +8,7 @@ const path = require("path");
 const fs = require("fs");
 const session = require("express-session");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 
 const app = express();
 const DEFAULT_ADMIN_MOBILE = "9043103301";
@@ -27,8 +28,42 @@ if(req.session && req.session.isAdmin){
 return next();
 }
 
+const adminToken =
+String(req.get("x-admin-token") || req.body?.adminToken || "").trim();
+
+if(adminToken){
+db.query(
+`
+SELECT username
+FROM admin_tokens
+WHERE token=?
+LIMIT 1
+`,
+[adminToken],
+(err,result)=>{
+if(err){
+return res.status(500).json({
+message:"Admin check failed"
+});
+}
+
+if(result.length){
+req.session.isAdmin = true;
+req.session.username = result[0].username;
+req.session.adminToken = adminToken;
+return next();
+}
+
 return res.status(401).json({
-message:"Please login again"
+message:"Please login as admin"
+});
+}
+);
+return;
+}
+
+return res.status(401).json({
+message:"Please login as admin"
 });
 }
 
@@ -42,7 +77,8 @@ saveUninitialized:false,
 cookie:{
 httpOnly:true,
 sameSite:"lax",
-secure:process.env.NODE_ENV === "production"
+secure:process.env.NODE_ENV === "production",
+maxAge:1000 * 60 * 60 * 24 * 365
 }
 }));
 
@@ -242,6 +278,14 @@ verified INT DEFAULT 0
 `,()=>{});
 
 db.query(`
+CREATE TABLE IF NOT EXISTS admin_tokens (
+token VARCHAR(128) PRIMARY KEY,
+username VARCHAR(255) NOT NULL,
+createdAt BIGINT NOT NULL
+)
+`,()=>{});
+
+db.query(`
 CREATE TABLE IF NOT EXISTS career_jobs (
 id INT AUTO_INCREMENT PRIMARY KEY,
 title VARCHAR(255) NOT NULL,
@@ -327,14 +371,7 @@ app.use(
 "/admin",
 function(req,res,next){
 
-const page =
-String(req.path || "").toLowerCase();
-
-if(page === "/login.html" || page === "/" || req.session?.isAdmin){
 return next();
-}
-
-return res.redirect("/admin/login.html");
 
 },
 express.static(path.join(__dirname,"admin"))
@@ -371,13 +408,36 @@ const storedPassword =
 String(user.password || "");
 
 const finishLogin = ()=>{
+const adminToken =
+crypto.randomBytes(32).toString("hex");
+
 req.session.isAdmin = true;
 req.session.username = user.username;
+req.session.adminToken = adminToken;
+
+db.query(
+`
+INSERT INTO admin_tokens
+(token,username,createdAt)
+VALUES (?,?,?)
+`,
+[
+adminToken,
+user.username,
+Date.now()
+],
+tokenErr=>{
+if(tokenErr){
+return res.status(500).json(tokenErr);
+}
 
 res.json({
 login:true,
-message:"Login success"
+message:"Login success",
+adminToken
 });
+}
+);
 };
 
 if(storedPassword.startsWith("$2")){
@@ -706,12 +766,30 @@ message:"Password changed successfully"
 });
 
 app.post("/logout",(req,res)=>{
+const adminToken =
+String(req.get("x-admin-token") || req.session?.adminToken || req.body?.adminToken || "").trim();
 
+function finishLogout(){
 req.session.destroy(()=>{
 res.json({
 message:"Logged out"
 });
 });
+}
+
+if(adminToken){
+db.query(
+`
+DELETE FROM admin_tokens
+WHERE token=?
+`,
+[adminToken],
+()=>finishLogout()
+);
+return;
+}
+
+finishLogout();
 
 });
 
