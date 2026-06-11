@@ -1426,20 +1426,18 @@ message:"About section updated"
 app.get("/story-content",(req,res)=>{
 db.query(
 `
-SELECT storyTitle,storyTextOne,storyTextTwo,storyVideoData
+SELECT storyTitle,storyTextOne,storyTextTwo
 FROM site_settings
 WHERE id=1
 `,
 (err,result)=>{
-if(err){
-return res.status(500).json(err);
-}
+const row = err ? null : result[0];
 
 res.json({
-storyTitle:result[0]?.storyTitle || "A GRAND ENTRY INTO FOREVER ✨",
-storyTextOne:result[0]?.storyTextOne || "As the lights dimmed and all eyes turned towards them, they walked in not just as bride and groom, but as two souls ready to begin a beautiful new chapter together.",
-storyTextTwo:result[0]?.storyTextTwo || "With elegance in every step and love shining in every glance, this reception entry was nothing short of magical — a moment filled with celebration, admiration, and unforgettable memories.",
-hasVideo:Boolean(result[0]?.storyVideoData)
+storyTitle:row?.storyTitle || "A GRAND ENTRY INTO FOREVER ✨",
+storyTextOne:row?.storyTextOne || "As the lights dimmed and all eyes turned towards them, they walked in not just as bride and groom, but as two souls ready to begin a beautiful new chapter together.",
+storyTextTwo:row?.storyTextTwo || "With elegance in every step and love shining in every glance, this reception entry was nothing short of magical — a moment filled with celebration, admiration, and unforgettable memories.",
+hasVideo:true
 });
 }
 );
@@ -1583,6 +1581,17 @@ message:"Story video deleted"
 );
 });
 
+function sendDefaultStoryVideo(res){
+const fallback = path.join(__dirname,"uploads","entrance-animation.mp4");
+
+if(fs.existsSync(fallback)){
+res.type("video/mp4");
+return fs.createReadStream(fallback).pipe(res);
+}
+
+return res.status(404).send("Story video not found");
+}
+
 app.get("/story-video",(req,res)=>{
 db.query(
 `
@@ -1592,7 +1601,7 @@ WHERE id=1
 `,
 (err,result)=>{
 if(err){
-return res.status(500).send("Story video load failed");
+return sendDefaultStoryVideo(res);
 }
 
 const storyVideoPath = result[0]?.storyVideoPath;
@@ -1615,14 +1624,7 @@ result[0].storyVideoMime || "video/mp4"
 );
 }
 
-const fallback = path.join(__dirname,"uploads","entrance-animation.mp4");
-
-if(fs.existsSync(fallback)){
-res.type("video/mp4");
-return fs.createReadStream(fallback).pipe(res);
-}
-
-return res.status(404).send("Story video not found");
+return sendDefaultStoryVideo(res);
 }
 );
 });
