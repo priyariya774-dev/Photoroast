@@ -1029,6 +1029,233 @@ aspect-ratio:4 / 5;
 }
 }
 
+/* FEATURE STORIES */
+
+.home-story-flow{
+background:#ffffff;
+padding:0 20px 74px;
+}
+
+.story-feature,
+.proposal-feature{
+width:100%;
+max-width:1120px;
+margin:0 auto 58px;
+display:grid;
+grid-template-columns:1fr;
+gap:24px;
+align-items:center;
+}
+
+.story-feature-media,
+.proposal-feature-media{
+position:relative;
+overflow:hidden;
+background:#f1f1ed;
+border:1px solid var(--line);
+min-height:320px;
+}
+
+.story-feature-media img,
+.proposal-feature-media img{
+width:100%;
+height:100%;
+display:block;
+object-fit:cover;
+aspect-ratio:4 / 5;
+}
+
+.story-feature-copy,
+.proposal-feature-copy{
+text-align:left;
+}
+
+.story-kicker{
+display:block;
+font-size:12px;
+font-weight:800;
+letter-spacing:1.8px;
+text-transform:uppercase;
+color:var(--text-muted);
+margin-bottom:12px;
+}
+
+.story-feature-copy h2,
+.proposal-feature-copy h2,
+.work-preview h2{
+font-family:var(--display-font);
+font-size:36px;
+line-height:1.05;
+color:var(--text-main);
+margin-bottom:16px;
+}
+
+.story-feature-copy p,
+.proposal-feature-copy p{
+font-size:15px;
+line-height:1.85;
+color:var(--text-soft);
+margin-bottom:18px;
+}
+
+.story-link{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+min-height:42px;
+padding:10px 16px;
+border:1px solid var(--text-main);
+color:var(--text-main);
+text-decoration:none;
+font-size:13px;
+font-weight:800;
+letter-spacing:.6px;
+text-transform:uppercase;
+}
+
+.story-link:hover{
+background:#171717;
+color:#ffffff;
+}
+
+.work-preview{
+width:100%;
+max-width:1120px;
+margin:0 auto 58px;
+text-align:left;
+}
+
+.work-preview h2{
+text-align:center;
+margin-bottom:26px;
+}
+
+.work-card-grid{
+display:grid;
+grid-template-columns:1fr;
+gap:16px;
+}
+
+.work-card{
+position:relative;
+min-height:300px;
+overflow:hidden;
+border:1px solid var(--line);
+color:#ffffff;
+text-decoration:none;
+display:flex;
+align-items:flex-end;
+padding:18px;
+background:#111;
+}
+
+.work-card img{
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
+object-fit:cover;
+transition:transform .45s ease;
+}
+
+.work-card::after{
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.72));
+}
+
+.work-card span,
+.work-card strong{
+position:relative;
+z-index:1;
+display:block;
+}
+
+.work-card span{
+font-size:12px;
+font-weight:800;
+letter-spacing:1.5px;
+text-transform:uppercase;
+margin-bottom:8px;
+}
+
+.work-card strong{
+font-family:var(--display-font);
+font-size:28px;
+line-height:1.05;
+}
+
+.work-card:hover img{
+transform:scale(1.06);
+}
+
+.love-quote{
+width:100%;
+max-width:920px;
+margin:0 auto;
+padding:44px 22px;
+border-top:1px solid var(--line);
+border-bottom:1px solid var(--line);
+text-align:center;
+}
+
+.love-quote blockquote{
+font-family:var(--display-font);
+font-size:30px;
+line-height:1.18;
+color:var(--text-main);
+margin:0;
+}
+
+.love-quote p{
+margin-top:18px;
+font-size:12px;
+font-weight:800;
+letter-spacing:1.6px;
+text-transform:uppercase;
+color:var(--text-muted);
+}
+
+@media(min-width:768px){
+.home-story-flow{
+padding:0 28px 96px;
+}
+
+.story-feature,
+.proposal-feature{
+grid-template-columns:1fr 1fr;
+gap:48px;
+margin-bottom:76px;
+}
+
+.proposal-feature-media{
+order:2;
+}
+
+.story-feature-copy h2,
+.proposal-feature-copy h2,
+.work-preview h2{
+font-size:50px;
+}
+
+.work-card-grid{
+grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+.work-card{
+min-height:380px;
+}
+
+.love-quote{
+padding:58px 42px;
+}
+
+.love-quote blockquote{
+font-size:44px;
+}
+}
+
 /* ABOUT */
 
 .about{
@@ -2047,6 +2274,85 @@ With elegance in every step and love shining in every glance, this reception ent
 </video>
 </div>
 
+</div>
+
+</section>
+
+<section class="home-story-flow">
+
+<div class="story-feature" data-admin-edit="home-story">
+
+<div class="story-feature-media">
+<img src="images/Wedding%20(1).jpeg" alt="Wedding story by PhotoRoast">
+</div>
+
+<div class="story-feature-copy">
+<span class="story-kicker">Wedding Story</span>
+<h2>
+Love, Light, and Every Little Promise
+</h2>
+<p>
+Every celebration carries a rhythm of its own: the quiet prayers, the joyful rush, the laughter between families, and the moments that happen when no one is posing. PhotoRoast turns those fleeting emotions into wedding stories that feel honest, elegant, and alive.
+</p>
+<a class="story-link" href="client-gallery.html">View wedding stories</a>
+</div>
+
+</div>
+
+<div class="proposal-feature" data-admin-edit="home-proposal">
+
+<div class="proposal-feature-media">
+<img src="images/Post%20Wedding%20(1).jpeg" alt="Cinematic couple moment by PhotoRoast">
+</div>
+
+<div class="proposal-feature-copy">
+<span class="story-kicker">Cinematic Moment</span>
+<h2>
+A Frame That Feels Like Forever
+</h2>
+<p>
+Some moments arrive softly and stay forever. A glance, a smile, a walk through warm lights, a hand held a little tighter. We film and photograph these memories with a cinematic eye, so your story feels just as beautiful years later.
+</p>
+<a class="story-link" href="videos.html">Watch films</a>
+</div>
+
+</div>
+
+<div class="work-preview" data-admin-edit="home-work">
+<h2>
+See My Work
+</h2>
+
+<div class="work-card-grid">
+
+<a class="work-card" href="client-gallery.html">
+<img src="images/Wedding%20(3).jpeg" alt="Wedding gallery">
+<span>Wedding</span>
+<strong>The Big Day</strong>
+</a>
+
+<a class="work-card" href="videos.html">
+<img src="images/h1.jpeg" alt="Wedding films">
+<span>Films</span>
+<strong>Creativity Show</strong>
+</a>
+
+<a class="work-card" href="client-gallery.html">
+<img src="images/Prewed%20(1).jpeg" alt="Outdoor couple shoot">
+<span>Outdoors</span>
+<strong>Beginning of a Journey</strong>
+</a>
+
+</div>
+</div>
+
+<div class="love-quote" data-admin-edit="home-quote">
+<blockquote>
+“My heart overflows with the love we created. It feels like sunshine.”
+</blockquote>
+<p>
+PhotoRoast wedding stories
+</p>
 </div>
 
 </section>
@@ -3452,6 +3758,10 @@ featured:"Featured Gallery",
 "about-brief":"About Us Brief",
 "story-caption":"Story Caption",
 "story-video-media":"Story Video",
+"home-story":"Wedding Story",
+"home-proposal":"Cinematic Moment",
+"home-work":"See My Work",
+"home-quote":"Love Quote",
 about:"About Section",
 reviews:"Client Reviews",
 cta:"Booking Section"
