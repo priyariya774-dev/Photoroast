@@ -14,6 +14,7 @@ const app = express();
 const DEFAULT_ADMIN_MOBILE = "9043103301";
 const PORT = process.env.PORT || 3000;
 const MAX_UPLOAD_SIZE = Number(process.env.MAX_UPLOAD_MB || 100) * 1024 * 1024;
+const MAX_STORY_VIDEO_DB_SIZE = Number(process.env.MAX_STORY_VIDEO_DB_MB || 40) * 1024 * 1024;
 
 if(process.env.NODE_ENV === "production"){
 app.set("trust proxy",1);
@@ -1565,6 +1566,19 @@ message:"Choose a video first"
 const filePath = path.join(__dirname,"uploads",req.file.filename);
 const videoMime = req.file.mimetype || getMediaMime(filePath);
 const videoPath = req.file.filename;
+const videoSize = fs.statSync(filePath).size;
+
+if(videoSize > MAX_STORY_VIDEO_DB_SIZE){
+if(fs.existsSync(filePath)){
+fs.unlinkSync(filePath);
+}
+
+return res.status(413).json({
+message:`Video is too large to save permanently. Please upload a compressed MP4 below ${Math.floor(MAX_STORY_VIDEO_DB_SIZE / 1024 / 1024)} MB.`
+});
+}
+
+const videoData = fs.readFileSync(filePath);
 
 db.query(
 `
@@ -1584,13 +1598,13 @@ db.query(
 `
 INSERT INTO site_settings
 (id,storyVideoMime,storyVideoPath,storyVideoData)
-VALUES (1,?,?,NULL)
+VALUES (1,?,?,?)
 ON DUPLICATE KEY UPDATE
 storyVideoMime=VALUES(storyVideoMime),
 storyVideoPath=VALUES(storyVideoPath),
-storyVideoData=NULL
+storyVideoData=VALUES(storyVideoData)
 `,
-[videoMime,videoPath],
+[videoMime,videoPath,videoData],
 err=>{
 if(err){
 return res.status(500).json(err);
