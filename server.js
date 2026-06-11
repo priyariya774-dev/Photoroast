@@ -1708,6 +1708,137 @@ message:"Story video updated"
 );
 });
 
+app.post("/story-video/start",requireAdmin,(req,res)=>{
+const mime =
+String(req.body.mime || "video/mp4").trim();
+
+db.query("DELETE FROM story_video_chunks",deleteErr=>{
+if(deleteErr){
+return res.status(500).json(deleteErr);
+}
+
+db.query(
+`
+INSERT INTO site_settings
+(id,storyVideoMime,storyVideoPath,storyVideoData)
+VALUES (1,?,NULL,NULL)
+ON DUPLICATE KEY UPDATE
+storyVideoMime=VALUES(storyVideoMime),
+storyVideoPath=NULL,
+storyVideoData=NULL
+`,
+[mime],
+err=>{
+if(err){
+return res.status(500).json(err);
+}
+
+res.json({
+message:"Story video upload started"
+});
+}
+);
+});
+});
+
+app.post("/story-video/chunk",requireAdmin,upload.single("chunk"),(req,res)=>{
+if(!req.file){
+return res.status(400).json({
+message:"Video chunk missing"
+});
+}
+
+const chunkIndex =
+Number(req.body.chunkIndex);
+
+const mime =
+String(req.body.mime || req.file.mimetype || "video/mp4").trim();
+
+const filePath =
+path.join(__dirname,"uploads",req.file.filename);
+
+const chunkData =
+fs.readFileSync(filePath);
+
+if(fs.existsSync(filePath)){
+fs.unlinkSync(filePath);
+}
+
+if(!Number.isFinite(chunkIndex) || chunkIndex < 0){
+return res.status(400).json({
+message:"Invalid video chunk"
+});
+}
+
+db.query(
+`
+INSERT INTO story_video_chunks
+(chunkIndex,mime,chunkData)
+VALUES (?,?,?)
+`,
+[chunkIndex,mime,chunkData],
+err=>{
+if(err){
+return res.status(500).json(err);
+}
+
+res.json({
+message:"Chunk saved"
+});
+}
+);
+});
+
+app.post("/story-video/finish",requireAdmin,(req,res)=>{
+const totalChunks =
+Number(req.body.totalChunks);
+
+const mime =
+String(req.body.mime || "video/mp4").trim();
+
+db.query(
+`
+SELECT COUNT(*) AS total
+FROM story_video_chunks
+`,
+(countErr,countResult)=>{
+if(countErr){
+return res.status(500).json(countErr);
+}
+
+const savedChunks =
+Number(countResult[0]?.total) || 0;
+
+if(totalChunks && savedChunks !== totalChunks){
+return res.status(400).json({
+message:`Video save incomplete. Saved ${savedChunks} of ${totalChunks} parts. Please try again.`
+});
+}
+
+db.query(
+`
+UPDATE site_settings
+SET
+storyVideoMime=?,
+storyVideoPath=NULL,
+storyVideoData=NULL
+WHERE id=1
+`,
+[mime],
+err=>{
+if(err){
+return res.status(500).json(err);
+}
+
+res.json({
+message:"Story video updated"
+});
+}
+);
+}
+);
+});
+
 app.delete("/story-video",requireAdmin,(req,res)=>{
 db.query(
 `

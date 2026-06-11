@@ -4078,25 +4078,51 @@ return;
 saveButton.disabled = true;
 saveButton.innerText = "Saving...";
 
-const formData = new FormData();
-formData.append("storyVideo",file);
+const chunkSize = 4 * 1024 * 1024;
+const totalChunks = Math.ceil(file.size / chunkSize);
+const mime = file.type || "video/mp4";
 
-const controller = new AbortController();
-const uploadTimer = setTimeout(()=>{
-controller.abort();
-},240000);
-
-let res;
-
-try{
-res = await fetch("/story-video",{
-method:"PUT",
-body:formData,
-signal:controller.signal
+let res = await fetch("/story-video/start",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+mime
+})
 });
-}finally{
-clearTimeout(uploadTimer);
+
+await readJsonResponse(res);
+
+for(let index = 0; index < totalChunks; index++){
+saveButton.innerText = `Saving ${index + 1}/${totalChunks}`;
+
+const formData = new FormData();
+const chunk = file.slice(index * chunkSize,Math.min((index + 1) * chunkSize,file.size));
+formData.append("chunk",chunk,`story-video-${index}.part`);
+formData.append("chunkIndex",String(index));
+formData.append("mime",mime);
+
+res = await fetch("/story-video/chunk",{
+method:"POST",
+body:formData
+});
+
+await readJsonResponse(res);
 }
+
+saveButton.innerText = "Finishing...";
+
+res = await fetch("/story-video/finish",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+totalChunks,
+mime
+})
+});
 
 const data = await readJsonResponse(res);
 const video = document.getElementById("storyVideoPlayer");
