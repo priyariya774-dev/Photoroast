@@ -287,6 +287,15 @@ createdAt BIGINT NOT NULL
 `,()=>{});
 
 db.query(`
+CREATE TABLE IF NOT EXISTS story_video_chunks (
+id INT AUTO_INCREMENT PRIMARY KEY,
+chunkIndex INT NOT NULL,
+mime VARCHAR(120) DEFAULT 'video/mp4',
+chunkData LONGBLOB NOT NULL
+)
+`,()=>{});
+
+db.query(`
 CREATE TABLE IF NOT EXISTS career_jobs (
 id INT AUTO_INCREMENT PRIMARY KEY,
 title VARCHAR(255) NOT NULL,
@@ -1028,6 +1037,69 @@ res.writeHead(200,{
 return res.end(buffer);
 }
 
+function saveStoryVideoChunks(buffer,mime,done){
+const chunkSize = 4 * 1024 * 1024;
+
+db.query("DELETE FROM story_video_chunks",deleteErr=>{
+if(deleteErr){
+return done(deleteErr);
+}
+
+const chunks = [];
+
+for(let start = 0; start < buffer.length; start += chunkSize){
+chunks.push(buffer.subarray(start,Math.min(start + chunkSize,buffer.length)));
+}
+
+function insertNext(index){
+if(index >= chunks.length){
+return done(null);
+}
+
+db.query(
+`
+INSERT INTO story_video_chunks
+(chunkIndex,mime,chunkData)
+VALUES (?,?,?)
+`,
+[index,mime,chunks[index]],
+insertErr=>{
+if(insertErr){
+return done(insertErr);
+}
+
+insertNext(index + 1);
+}
+);
+}
+
+insertNext(0);
+});
+}
+
+function loadStoryVideoChunks(done){
+db.query(
+`
+SELECT mime,chunkData
+FROM story_video_chunks
+ORDER BY chunkIndex ASC
+`,
+(err,rows)=>{
+if(err){
+return done(err);
+}
+
+if(!rows.length){
+return done(null,null,null);
+}
+
+const mime = rows[0].mime || "video/mp4";
+const buffer = Buffer.concat(rows.map(row=>row.chunkData));
+return done(null,buffer,mime);
+}
+);
+}
+
 function validateHeroFilesAreCinematic(files){
 for(const file of files){
 const filePath = path.join(__dirname,"uploads",file.filename);
@@ -1598,16 +1670,24 @@ db.query(
 `
 INSERT INTO site_settings
 (id,storyVideoMime,storyVideoPath,storyVideoData)
-VALUES (1,?,?,?)
+VALUES (1,?,?,NULL)
 ON DUPLICATE KEY UPDATE
 storyVideoMime=VALUES(storyVideoMime),
 storyVideoPath=VALUES(storyVideoPath),
-storyVideoData=VALUES(storyVideoData)
+storyVideoData=NULL
 `,
-[videoMime,videoPath,videoData],
+[videoMime,videoPath],
 err=>{
 if(err){
 return res.status(500).json(err);
+}
+
+saveStoryVideoChunks(videoData,videoMime,chunkErr=>{
+if(chunkErr){
+return res.status(500).json({
+message:"Video save failed while storing chunks. Please try a smaller compressed MP4.",
+error:chunkErr.message
+});
 }
 
 if(oldVideoPath && oldVideoPath !== videoPath){
@@ -1620,6 +1700,7 @@ fs.unlinkSync(oldPath);
 
 res.json({
 message:"Story video updated"
+});
 });
 }
 );
@@ -1664,6 +1745,8 @@ fs.unlinkSync(oldPath);
 }
 }
 
+db.query("DELETE FROM story_video_chunks",()=>{});
+
 res.json({
 message:"Story video deleted"
 });
@@ -1685,6 +1768,11 @@ return res.status(404).send("Story video not found");
 }
 
 app.get("/story-video",(req,res)=>{
+loadStoryVideoChunks((chunkErr,chunkBuffer,chunkMime)=>{
+if(!chunkErr && chunkBuffer){
+return sendMediaBuffer(req,res,chunkBuffer,chunkMime || "video/mp4");
+}
+
 db.query(
 `
 SELECT storyVideoMime,storyVideoData,storyVideoPath
@@ -1719,6 +1807,7 @@ result[0].storyVideoMime || "video/mp4"
 return sendDefaultStoryVideo(res);
 }
 );
+});
 });
 
 // ======================
