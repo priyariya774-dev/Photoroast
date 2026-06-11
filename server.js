@@ -14,7 +14,7 @@ const app = express();
 const DEFAULT_ADMIN_MOBILE = "9043103301";
 const PORT = process.env.PORT || 3000;
 const MAX_UPLOAD_SIZE = Number(process.env.MAX_UPLOAD_MB || 100) * 1024 * 1024;
-const MAX_STORY_VIDEO_DB_SIZE = Number(process.env.MAX_STORY_VIDEO_DB_MB || 40) * 1024 * 1024;
+const MAX_STORY_VIDEO_DB_SIZE = Number(process.env.MAX_STORY_VIDEO_DB_MB || 90) * 1024 * 1024;
 
 if(process.env.NODE_ENV === "production"){
 app.set("trust proxy",1);
