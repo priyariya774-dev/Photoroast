@@ -2991,6 +2991,10 @@ return data;
 function explainFetchError(err,actionName){
 const message = String(err && err.message ? err.message : err || "");
 
+if(err && err.name === "AbortError"){
+return `${actionName} took too long. Please upload a smaller MP4 video below 80 MB and try again.`;
+}
+
 if(message.toLowerCase().includes("failed to fetch")){
 return `${actionName} could not reach the server. Please make sure the latest server update is deployed, login again as admin, and try a smaller MP4 video if you are uploading video.`;
 }
@@ -3755,16 +3759,35 @@ alert("Choose a video first");
 return;
 }
 
+const maxStoryVideoSize = 80 * 1024 * 1024;
+
+if(file.size > maxStoryVideoSize){
+alert("Video is too large. Please upload a video below 80 MB, or compress it first.");
+return;
+}
+
 saveButton.disabled = true;
 saveButton.innerText = "Saving...";
 
 const formData = new FormData();
 formData.append("storyVideo",file);
 
-const res = await fetch("/story-video",{
+const controller = new AbortController();
+const uploadTimer = setTimeout(()=>{
+controller.abort();
+},90000);
+
+let res;
+
+try{
+res = await fetch("/story-video",{
 method:"PUT",
-body:formData
+body:formData,
+signal:controller.signal
 });
+}finally{
+clearTimeout(uploadTimer);
+}
 
 const data = await readJsonResponse(res);
 const video = document.getElementById("storyVideoPlayer");
