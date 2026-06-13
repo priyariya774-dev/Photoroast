@@ -2264,8 +2264,8 @@ With elegance in every step and love shining in every glance, this reception ent
 </div>
 
 <div class="story-video-frame" data-admin-edit="story-video-media">
-<video id="storyVideoPlayer" controls playsinline preload="metadata" poster="images/h1.jpeg">
-<source id="storyVideoSource" src="/story-video" type="video/mp4">
+<video id="storyVideoPlayer" controls playsinline preload="metadata">
+<source id="storyVideoSource" src="/story-video#t=0.1" type="video/mp4">
 </video>
 </div>
 
@@ -3173,29 +3173,6 @@ console.log(err);
 
 loadSiteContent();
 
-const defaultStoryVideoCover = "images/h1.jpeg";
-
-function setStoryVideoCover(){
-const video = document.getElementById("storyVideoPlayer");
-
-if(!video){
-return;
-}
-
-fetch("/story-video-cover?t=" + Date.now(),{
-method:"GET",
-cache:"no-store"
-})
-.then(res=>{
-video.poster = res.ok
-? "/story-video-cover?t=" + Date.now()
-: defaultStoryVideoCover;
-})
-.catch(()=>{
-video.poster = defaultStoryVideoCover;
-});
-}
-
 async function loadStoryContent(){
 try{
 const res = await fetch("/story-content?t=" + Date.now());
@@ -3214,11 +3191,10 @@ const video = document.getElementById("storyVideoPlayer");
 const source = document.getElementById("storyVideoSource");
 
 if(source){
-source.src = "/story-video?t=" + Date.now();
+source.src = "/story-video?t=" + Date.now() + "#t=0.1";
 }
 
 if(video){
-setStoryVideoCover();
 video.load();
 }
 }catch(err){
@@ -3743,38 +3719,6 @@ showDialog(
 );
 }
 
-function openStoryVideoCoverDialog(){
-showDialog(
-"Update Video Cover",
-`
-<p>Choose a cover photo to show before the story video plays.</p>
-<input id="storyVideoCoverInput" type="file" accept="image/*">
-<div class="admin-dialog-actions">
-<button type="button" data-action="save-story-video-cover">Save cover photo</button>
-</div>
-`
-);
-}
-
-function refreshStoryVideoCover(){
-setStoryVideoCover();
-}
-
-function deleteStoryVideoCover(){
-if(!confirm("Remove the cover photo from this video?")){
-return;
-}
-
-fetch("/story-video-cover",{method:"DELETE"})
-.then(res=>readJsonResponse(res))
-.then(data=>{
-refreshStoryVideoCover();
-alert(data.message || "Story video cover removed");
-closeAdminMenu();
-})
-.catch(err=>alert(err.message || "Story video cover remove failed"));
-}
-
 function deleteStoryVideo(){
 if(!confirm("Delete the story video from this section?")){
 return;
@@ -3849,8 +3793,6 @@ content += `<button type="button" data-action="edit-story-caption">Edit caption<
 
 if(area === "story-video-media"){
 content += `<button type="button" data-action="replace-story-video">Replace / save video</button>`;
-content += `<button type="button" data-action="update-story-video-cover">Update cover photo</button>`;
-content += `<button type="button" data-action="delete-story-video-cover">Remove cover photo</button>`;
 content += `<button type="button" data-action="delete-story-video">Delete video</button>`;
 }
 
@@ -3969,17 +3911,6 @@ return;
 if(action === "replace-story-video"){
 closeAdminMenu();
 openStoryVideoReplaceDialog();
-return;
-}
-
-if(action === "update-story-video-cover"){
-closeAdminMenu();
-openStoryVideoCoverDialog();
-return;
-}
-
-if(action === "delete-story-video-cover"){
-deleteStoryVideoCover();
 return;
 }
 
@@ -4202,30 +4133,6 @@ video.load();
 }
 
 alert(data.message || "Story video updated");
-closeDialog();
-return;
-}
-
-if(action === "save-story-video-cover"){
-const input = dialog.querySelector("#storyVideoCoverInput");
-const file = input && input.files && input.files[0];
-
-if(!file){
-alert("Choose a cover photo first");
-return;
-}
-
-const formData = new FormData();
-formData.append("storyVideoCover",file);
-
-const res = await fetch("/story-video-cover",{
-method:"PUT",
-body:formData
-});
-
-const data = await readJsonResponse(res);
-refreshStoryVideoCover();
-alert(data.message || "Story video cover updated");
 closeDialog();
 return;
 }
