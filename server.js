@@ -363,6 +363,9 @@ express.static(path.join(__dirname,"images"))
 );
 
 app.get("/",(req,res)=>{
+res.set("Cache-Control","no-store, no-cache, must-revalidate, proxy-revalidate");
+res.set("Pragma","no-cache");
+res.set("Expires","0");
 res.sendFile(path.join(__dirname,"index.html"));
 });
 
@@ -377,12 +380,23 @@ app.get([
 "/public-header.js",
 "/error-handler.js"
 ],(req,res)=>{
+if(req.path.endsWith(".html") || req.path === "/index.html"){
+res.set("Cache-Control","no-store, no-cache, must-revalidate, proxy-revalidate");
+res.set("Pragma","no-cache");
+res.set("Expires","0");
+}
+
 res.sendFile(path.join(__dirname,req.path));
 });
 
 app.use(
 "/admin",
 function(req,res,next){
+if(req.path.endsWith(".html")){
+res.set("Cache-Control","no-store, no-cache, must-revalidate, proxy-revalidate");
+res.set("Pragma","no-cache");
+res.set("Expires","0");
+}
 
 return next();
 

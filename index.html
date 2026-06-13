@@ -1469,6 +1469,10 @@ background:transparent;
 color:#d99a00;
 }
 
+body.admin-homepage-view .review-form{
+display:none;
+}
+
 .review-message{
 font-size:13px;
 color:var(--text-soft);
@@ -3240,6 +3244,26 @@ new URLSearchParams(window.location.search).get("adminEdit") === "1"
 );
 }
 
+function isAdminHomepageView(){
+const params = new URLSearchParams(window.location.search);
+
+return (
+localStorage.getItem("auth") === "true"
+&&
+(
+params.get("adminEdit") === "1"
+||
+params.get("adminPreview") === "1"
+)
+);
+}
+
+function setupAdminHomepageView(){
+if(isAdminHomepageView()){
+document.body.classList.add("admin-homepage-view");
+}
+}
+
 function setupHomepagePreviewBar(){
 if(new URLSearchParams(window.location.search).get("adminPreview") !== "1"){
 return;
@@ -4537,6 +4561,7 @@ setTimeout(()=>openAdminMenuForArea(requestedArea),500);
 }
 }
 
+setupAdminHomepageView();
 setupHomepagePreviewBar();
 setupAdminHomepageEditor();
 

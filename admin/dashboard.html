@@ -36,6 +36,20 @@ localStorage.removeItem("auth");
 localStorage.removeItem("adminToken");
 window.location.href = "login.html";
 }
+
+document.addEventListener("click",function(e){
+const link = e.target.closest("a[data-cache-bust]");
+
+if(!link){
+return;
+}
+
+e.preventDefault();
+
+const url = new URL(link.getAttribute("href"),window.location.href);
+url.searchParams.set("_",Date.now());
+window.location.href = url.toString();
+});
 </script>
 
 <main class="shell">
@@ -45,13 +59,13 @@ window.location.href = "login.html";
 </div>
 
 <nav class="button-grid" aria-label="Admin sections">
-<a class="dash-button" href="../index.html?adminEdit=1">Manage Homepage <span>&gt;</span></a>
+<a class="dash-button" href="../index.html?adminEdit=1" data-cache-bust="1">Manage Homepage <span>&gt;</span></a>
 <a class="dash-button" href="../client-gallery.html?adminEdit=1">Manage Gallery <span>&gt;</span></a>
 <a class="dash-button" href="media.html?mode=videos">Manage Videos / YouTube Links <span>&gt;</span></a>
 <a class="dash-button" href="catagories.html">Manage Category <span>&gt;</span></a>
-<a class="dash-button" href="../index.html?adminEdit=1&editArea=reviews#client-reviews">Manage Reviews <span>&gt;</span></a>
+<a class="dash-button" href="../index.html?adminEdit=1&editArea=reviews#client-reviews" data-cache-bust="1">Manage Reviews <span>&gt;</span></a>
 <a class="dash-button" href="../career.html?adminEdit=1">Manage Career <span>&gt;</span></a>
-<a class="dash-button" href="../index.html?adminPreview=1">Homepage Preview <span>&gt;</span></a>
+<a class="dash-button" href="../index.html?adminPreview=1" data-cache-bust="1">Homepage Preview <span>&gt;</span></a>
 </nav>
 </main>
 </body>
