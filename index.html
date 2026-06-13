@@ -864,6 +864,7 @@ transform:translateX(-50%);
 .about-brief{
 padding:68px 20px;
 background:#ffffff;
+scroll-margin-top:78px;
 }
 
 .about-brief-inner{
@@ -896,21 +897,22 @@ max-width:680px;
 }
 
 .branch-list{
-display:grid;
-grid-template-columns:1fr;
-gap:10px;
 margin-top:24px;
 padding:0;
 list-style:none;
+font-size:15px;
+line-height:1.8;
+color:var(--text-main);
 }
 
 .branch-list li{
-padding:12px 14px;
-border:1px solid var(--line);
-background:#f7f7f4;
-font-size:14px;
+display:inline;
 font-weight:700;
-color:var(--text-main);
+color:inherit;
+}
+
+.branch-list li:not(:last-child)::after{
+content:", ";
 }
 
 .about-brief-logo{
@@ -918,8 +920,6 @@ display:flex;
 align-items:center;
 justify-content:center;
 min-height:220px;
-border:1px solid var(--line);
-background:#f7f7f4;
 }
 
 .about-brief-logo img{
@@ -944,7 +944,6 @@ font-size:52px;
 }
 
 .branch-list{
-grid-template-columns:repeat(2,minmax(0,1fr));
 max-width:620px;
 }
 
@@ -2177,7 +2176,7 @@ Click to see pictures
 
 <section
 class="about"
-id="about"
+id="about-story"
 data-admin-edit="about">
 
 <h2 id="aboutTitle">
@@ -2217,7 +2216,7 @@ id="galleryTrack">
 
 </section>
 
-<section class="about-brief" data-admin-edit="about-brief">
+<section class="about-brief" id="about" data-admin-edit="about-brief">
 
 <div class="about-brief-inner">
 
@@ -2232,7 +2231,7 @@ PhotoRoast is a wedding storytelling studio shaped by emotion, elegance, and the
 </p>
 
 <ul class="branch-list" aria-label="PhotoRoast branches">
-<li>Chennai, India</li>
+<li>Our branches: Chennai, India</li>
 <li>Kumbakonam, India</li>
 <li>Thanjavur, India</li>
 <li>Dubai</li>
