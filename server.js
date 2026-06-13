@@ -164,6 +164,9 @@ ensureColumn("site_settings","storyTextTwo","TEXT DEFAULT NULL");
 ensureColumn("site_settings","storyVideoMime","VARCHAR(120) DEFAULT 'video/mp4'");
 ensureColumn("site_settings","storyVideoData","LONGBLOB");
 ensureColumn("site_settings","storyVideoPath","VARCHAR(255) DEFAULT NULL");
+ensureColumn("site_settings","storyVideoCoverMime","VARCHAR(120) DEFAULT NULL");
+ensureColumn("site_settings","storyVideoCoverData","LONGBLOB");
+ensureColumn("site_settings","storyVideoCoverPath","VARCHAR(255) DEFAULT NULL");
 
 db.query(`
 ALTER TABLE hero_slides
@@ -1887,6 +1890,115 @@ message:"Story video deleted"
 );
 });
 
+app.put("/story-video-cover",requireAdmin,upload.single("storyVideoCover"),(req,res)=>{
+if(!req.file){
+return res.status(400).json({
+message:"Choose a cover photo first"
+});
+}
+
+const filePath = path.join(__dirname,"uploads",req.file.filename);
+const coverMime = req.file.mimetype || getMediaMime(filePath);
+const coverPath = req.file.filename;
+const coverData = fs.readFileSync(filePath);
+
+db.query(
+`
+SELECT storyVideoCoverPath
+FROM site_settings
+WHERE id=1
+LIMIT 1
+`,
+(selectErr,selectResult)=>{
+if(selectErr){
+return res.status(500).json(selectErr);
+}
+
+const oldCoverPath = selectResult[0]?.storyVideoCoverPath;
+
+db.query(
+`
+INSERT INTO site_settings
+(id,storyVideoCoverMime,storyVideoCoverPath,storyVideoCoverData)
+VALUES (1,?,?,?)
+ON DUPLICATE KEY UPDATE
+storyVideoCoverMime=VALUES(storyVideoCoverMime),
+storyVideoCoverPath=VALUES(storyVideoCoverPath),
+storyVideoCoverData=VALUES(storyVideoCoverData)
+`,
+[
+coverMime,
+coverPath,
+coverData
+],
+err=>{
+if(err){
+return res.status(500).json(err);
+}
+
+if(oldCoverPath && oldCoverPath !== coverPath){
+const oldPath = path.join(__dirname,"uploads",oldCoverPath);
+
+if(fs.existsSync(oldPath)){
+fs.unlinkSync(oldPath);
+}
+}
+
+res.json({
+message:"Story video cover updated"
+});
+}
+);
+}
+);
+});
+
+app.delete("/story-video-cover",requireAdmin,(req,res)=>{
+db.query(
+`
+SELECT storyVideoCoverPath
+FROM site_settings
+WHERE id=1
+LIMIT 1
+`,
+(selectErr,selectResult)=>{
+if(selectErr){
+return res.status(500).json(selectErr);
+}
+
+const oldCoverPath = selectResult[0]?.storyVideoCoverPath;
+
+db.query(
+`
+UPDATE site_settings
+SET
+storyVideoCoverMime=NULL,
+storyVideoCoverData=NULL,
+storyVideoCoverPath=NULL
+WHERE id=1
+`,
+err=>{
+if(err){
+return res.status(500).json(err);
+}
+
+if(oldCoverPath){
+const oldPath = path.join(__dirname,"uploads",oldCoverPath);
+
+if(fs.existsSync(oldPath)){
+fs.unlinkSync(oldPath);
+}
+}
+
+res.json({
+message:"Story video cover removed"
+});
+}
+);
+}
+);
+});
+
 function sendDefaultStoryVideo(res){
 const fallback = path.join(__dirname,"uploads","entrance-animation.mp4");
 
@@ -1939,6 +2051,41 @@ return sendDefaultStoryVideo(res);
 }
 );
 });
+});
+
+app.get("/story-video-cover",(req,res)=>{
+db.query(
+`
+SELECT storyVideoCoverMime,storyVideoCoverData,storyVideoCoverPath
+FROM site_settings
+WHERE id=1
+LIMIT 1
+`,
+(err,result)=>{
+if(err){
+return res.status(404).send("Story video cover not found");
+}
+
+const row = result[0] || {};
+const storyVideoCoverPath = row.storyVideoCoverPath;
+
+if(storyVideoCoverPath){
+const savedCoverPath = path.join(__dirname,"uploads",storyVideoCoverPath);
+
+if(fs.existsSync(savedCoverPath)){
+res.type(row.storyVideoCoverMime || getMediaMime(savedCoverPath));
+return res.sendFile(savedCoverPath);
+}
+}
+
+if(row.storyVideoCoverData){
+res.type(row.storyVideoCoverMime || "image/jpeg");
+return res.send(row.storyVideoCoverData);
+}
+
+return res.status(404).send("Story video cover not found");
+}
+);
 });
 
 // ======================
@@ -3214,6 +3361,7 @@ message:"Moved"
 });
 
 app.post("/reviews",(req,res)=>{
+function savePublicReview(){
 const name =
 String(req.body.name || "").trim();
 
@@ -3261,6 +3409,46 @@ message:"Thank you. Your review has been added."
 });
 }
 );
+}
+
+if(req.session && req.session.isAdmin){
+return res.status(403).json({
+message:"Admin cannot add public reviews"
+});
+}
+
+const adminToken =
+String(req.get("x-admin-token") || req.body?.adminToken || "").trim();
+
+if(adminToken){
+db.query(
+`
+SELECT token
+FROM admin_tokens
+WHERE token=?
+LIMIT 1
+`,
+[adminToken],
+(err,result)=>{
+if(err){
+return res.status(500).json({
+message:"Review submit failed"
+});
+}
+
+if(result.length){
+return res.status(403).json({
+message:"Admin cannot add public reviews"
+});
+}
+
+savePublicReview();
+}
+);
+return;
+}
+
+savePublicReview();
 });
 
 app.post("/bookings",(req,res)=>{
