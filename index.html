@@ -3238,7 +3238,11 @@ loadStoryContent();
 
 function isAdminEditMode(){
 return (
+(
 localStorage.getItem("auth") === "true"
+||
+localStorage.getItem("adminToken")
+)
 &&
 new URLSearchParams(window.location.search).get("adminEdit") === "1"
 );
@@ -3248,7 +3252,11 @@ function isAdminHomepageView(){
 const params = new URLSearchParams(window.location.search);
 
 return (
+(
 localStorage.getItem("auth") === "true"
+||
+localStorage.getItem("adminToken")
+)
 &&
 (
 params.get("adminEdit") === "1"
@@ -4517,8 +4525,7 @@ const errorData =
 await res.json().catch(()=>({}));
 
 if(res.status === 401){
-localStorage.removeItem("auth");
-throw new Error("Admin login expired. Please login again, then open Manage Homepage.");
+throw new Error("Admin save was not accepted. Please refresh once and try again.");
 }
 
 throw new Error(

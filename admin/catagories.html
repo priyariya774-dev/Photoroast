@@ -299,6 +299,8 @@ max-width:800px;
 if(
 localStorage.getItem("auth")
 !== "true"
+&&
+!localStorage.getItem("adminToken")
 ){
 
 window.location.href =
@@ -384,6 +386,7 @@ try{
 await fetch("/logout",{method:"POST"});
 }catch(err){}
 localStorage.removeItem("auth");
+localStorage.removeItem("adminToken");
 window.location.href="login.html";
 }
 

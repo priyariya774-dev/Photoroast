@@ -123,7 +123,7 @@ grid-template-columns:repeat(3,minmax(0,1fr));
 
 <script>
 
-if(localStorage.getItem("auth")!=="true"){
+if(localStorage.getItem("auth")!=="true" && !localStorage.getItem("adminToken")){
 window.location.href="login.html";
 }
 
@@ -152,6 +152,7 @@ try{
 await fetch("/logout",{method:"POST"});
 }catch(err){}
 localStorage.removeItem("auth");
+localStorage.removeItem("adminToken");
 window.location.href="login.html";
 }
 
