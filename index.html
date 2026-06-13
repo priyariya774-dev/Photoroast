@@ -1468,10 +1468,6 @@ background:transparent;
 color:#d99a00;
 }
 
-body.admin-review-view .review-form{
-display:none;
-}
-
 .review-message{
 font-size:13px;
 color:var(--text-soft);
@@ -2268,7 +2264,7 @@ With elegance in every step and love shining in every glance, this reception ent
 </div>
 
 <div class="story-video-frame" data-admin-edit="story-video-media">
-<video id="storyVideoPlayer" controls playsinline preload="metadata" poster="/story-video-cover">
+<video id="storyVideoPlayer" controls playsinline preload="metadata" poster="images/h1.jpeg">
 <source id="storyVideoSource" src="/story-video" type="video/mp4">
 </video>
 </div>
@@ -3124,27 +3120,22 @@ setReviewRating(this.dataset.rating);
 
 setReviewRating(5);
 
-if(localStorage.getItem("auth") === "true" || localStorage.getItem("adminToken")){
-document.body.classList.add("admin-review-view");
-}
-
 document.getElementById("reviewForm").addEventListener("submit",async function(e){
 e.preventDefault();
 
 const message =
 document.getElementById("reviewMessage");
 
-if(document.body.classList.contains("admin-review-view")){
-message.innerText = "Admin cannot add public reviews.";
-return;
-}
-
 try{
+const adminToken =
+localStorage.getItem("adminToken") || "";
+
 const res =
 await fetch("/reviews",{
 method:"POST",
 headers:{
-"Content-Type":"application/json"
+"Content-Type":"application/json",
+...(adminToken ? {"x-admin-token":adminToken} : {})
 },
 body:JSON.stringify({
 name:document.getElementById("reviewName").value,
@@ -3182,6 +3173,29 @@ console.log(err);
 
 loadSiteContent();
 
+const defaultStoryVideoCover = "images/h1.jpeg";
+
+function setStoryVideoCover(){
+const video = document.getElementById("storyVideoPlayer");
+
+if(!video){
+return;
+}
+
+fetch("/story-video-cover?t=" + Date.now(),{
+method:"GET",
+cache:"no-store"
+})
+.then(res=>{
+video.poster = res.ok
+? "/story-video-cover?t=" + Date.now()
+: defaultStoryVideoCover;
+})
+.catch(()=>{
+video.poster = defaultStoryVideoCover;
+});
+}
+
 async function loadStoryContent(){
 try{
 const res = await fetch("/story-content?t=" + Date.now());
@@ -3204,7 +3218,7 @@ source.src = "/story-video?t=" + Date.now();
 }
 
 if(video){
-video.poster = "/story-video-cover?t=" + Date.now();
+setStoryVideoCover();
 video.load();
 }
 }catch(err){
@@ -3743,11 +3757,7 @@ showDialog(
 }
 
 function refreshStoryVideoCover(){
-const video = document.getElementById("storyVideoPlayer");
-
-if(video){
-video.poster = "/story-video-cover?t=" + Date.now();
-}
+setStoryVideoCover();
 }
 
 function deleteStoryVideoCover(){
