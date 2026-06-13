@@ -2647,6 +2647,7 @@ loadSiteFontStyle();
 
 let heroSliderTimer = null;
 let currentHeroIndex = 0;
+const heroSlideDelay = 5000;
 const defaultHeroHeading = "PhotoRoast";
 const defaultHeroDescription =
 "Where every frame feels like a memory worth keeping";
@@ -2697,6 +2698,7 @@ document.getElementById(
 slider.innerHTML = "";
 
 if(!data || data.length===0){
+stopHeroSlideshow();
 
 slider.innerHTML = `
 
@@ -2774,6 +2776,7 @@ currentHeroIndex = 0;
 setHeroSlideClasses();
 updateHeroText();
 setupHeroClickNavigation();
+startHeroSlideshow();
 
 }catch(err){
 
@@ -2781,6 +2784,31 @@ console.log(err);
 
 }
 
+}
+
+function stopHeroSlideshow(){
+if(heroSliderTimer){
+clearInterval(heroSliderTimer);
+heroSliderTimer = null;
+}
+}
+
+function startHeroSlideshow(){
+const slides =
+document.querySelectorAll(
+".hero-slide"
+);
+
+stopHeroSlideshow();
+
+if(slides.length <= 1){
+return;
+}
+
+heroSliderTimer =
+setInterval(()=>{
+showNextHeroSlide(false);
+},heroSlideDelay);
 }
 
 function setHeroSlideClasses(){
@@ -2831,7 +2859,7 @@ counter.innerText =
 }
 }
 
-function showNextHeroSlide(){
+function showNextHeroSlide(restartTimer = true){
 const slides =
 document.querySelectorAll(
 ".hero-slide"
@@ -2841,16 +2869,15 @@ if(slides.length <= 1){
 return;
 }
 
-if(heroSliderTimer){
-clearInterval(heroSliderTimer);
-heroSliderTimer = null;
-}
-
 currentHeroIndex =
 (currentHeroIndex + 1) % slides.length;
 
 setHeroSlideClasses();
 updateHeroText();
+
+if(restartTimer){
+startHeroSlideshow();
+}
 }
 
 function setupHeroClickNavigation(){
