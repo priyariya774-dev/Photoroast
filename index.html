@@ -717,9 +717,9 @@ text-transform:uppercase;
 
 .home-gallery{
 
-padding:54px 0 72px;
+padding:70px 20px 92px;
 
-background:var(--section-bg);
+background:#ffffff;
 
 overflow:hidden;
 
@@ -730,23 +730,21 @@ overflow:hidden;
 overflow:visible;
 
 width:100%;
-max-width:none;
-margin:0;
+max-width:1180px;
+margin:0 auto;
 padding:0;
 
 }
 
 .gallery-slider-track{
 
-display:flex;
-
-gap:18px;
-
-width:max-content;
-
-padding-left:18px;
-animation:autoScroll 35s linear infinite;
-will-change:transform;
+display:grid;
+grid-template-columns:1fr;
+gap:16px;
+width:100%;
+padding:0;
+animation:none;
+will-change:auto;
 
 }
 
@@ -756,21 +754,20 @@ animation:none;
 
 .gallery-card{
 
-width:250px;
-min-width:250px;
-height:340px;
+width:100%;
+min-width:0;
+height:clamp(360px,56vw,620px);
 
-border-radius:10px;
+border-radius:0;
 
 overflow:hidden;
 
-background:color-mix(in srgb,var(--page-bg) 82%,white 6%);
+background:#f1f1ed;
 
 position:relative;
 flex-shrink:0;
 
-border:
-1px solid var(--line);
+border:0;
 
 transition:.35s;
 
@@ -796,7 +793,7 @@ transform:scale(1.05);
 text-decoration:none;
 color:inherit;
 display:block;
-flex-shrink:0;
+min-width:0;
 }
 
 .gallery-overlay{
@@ -931,6 +928,23 @@ object-fit:contain;
 }
 
 @media(min-width:768px){
+.home-gallery{
+padding:88px 28px 112px;
+}
+
+.gallery-slider-track{
+grid-template-columns:repeat(3,minmax(0,1fr));
+gap:22px;
+}
+
+.gallery-card{
+height:clamp(480px,44vw,690px);
+}
+
+.gallery-link:nth-child(2) .gallery-card{
+margin-top:58px;
+}
+
 .about-brief{
 padding:86px 28px;
 }
@@ -1260,7 +1274,7 @@ font-size:44px;
 
 .about{
 
-padding:76px 20px 58px;
+padding:92px 20px 70px;
 
 text-align:center;
 
@@ -1293,6 +1307,17 @@ color:var(--text-soft);
 
 font-size:17px;
 
+}
+
+.about p::after{
+content:"Weddings / Events / Portraits / Films / Brands";
+display:block;
+margin-top:24px;
+font-size:12px;
+font-weight:800;
+letter-spacing:2px;
+text-transform:uppercase;
+color:var(--text-muted);
 }
 
 /* REVIEWS */
@@ -2181,12 +2206,12 @@ id="about-story"
 data-admin-edit="about">
 
 <h2 id="aboutTitle">
-Capturing Timeless Wedding Moments
+Capturing Timeless Visual Stories
 </h2>
 
 <p id="aboutText">
 
-PhotoRoast creates heartfelt wedding stories, cinematic portraits, and elegant visual memories with a calm, premium editing style. Every frame is shaped to feel natural, emotional, and easy to relive.
+PhotoRoast creates heartfelt photography and cinematic films for weddings, events, portraits, brands, and every celebration worth remembering. Every frame is shaped to feel natural, emotional, and easy to relive.
 
 </p>
 
@@ -2197,11 +2222,11 @@ PhotoRoast creates heartfelt wedding stories, cinematic portraits, and elegant v
 <div class="section-title">
 
 <h2>
-Featured Gallery
+Featured Stories
 </h2>
 
 <p>
-Luxury cinematic moments captured beautifully
+Editorial frames from recent celebrations and creative shoots
 </p>
 
 </div>
@@ -2284,14 +2309,14 @@ With elegance in every step and love shining in every glance, this reception ent
 </div>
 
 <div class="story-feature-copy">
-<span class="story-kicker">Wedding Story</span>
+<span class="story-kicker">Visual Story</span>
 <h2>
-Love, Light, and Every Little Promise
+Love, Light, and Every Real Moment
 </h2>
 <p>
-Every celebration carries a rhythm of its own: the quiet prayers, the joyful rush, the laughter between families, and the moments that happen when no one is posing. PhotoRoast turns those fleeting emotions into wedding stories that feel honest, elegant, and alive.
+Every celebration carries a rhythm of its own: the quiet prayers, the joyful rush, the laughter between families, and the moments that happen when no one is posing. PhotoRoast turns those fleeting emotions into stories that feel honest, elegant, and alive.
 </p>
-<a class="story-link" href="client-gallery.html">View wedding stories</a>
+<a class="story-link" href="client-gallery.html">View stories</a>
 </div>
 
 </div>
@@ -2303,7 +2328,7 @@ Every celebration carries a rhythm of its own: the quiet prayers, the joyful rus
 </div>
 
 <div class="proposal-feature-copy">
-<span class="story-kicker">Cinematic Moment</span>
+<span class="story-kicker">Cinematic Work</span>
 <h2>
 A Frame That Feels Like Forever
 </h2>
@@ -2324,20 +2349,20 @@ See My Work
 
 <a class="work-card" href="client-gallery.html">
 <img src="images/Wedding%20(3).jpeg" alt="Wedding gallery">
-<span>Wedding</span>
-<strong>The Big Day</strong>
+<span>Events</span>
+<strong>Celebrations</strong>
 </a>
 
 <a class="work-card" href="videos.html">
 <img src="images/h1.jpeg" alt="Wedding films">
 <span>Films</span>
-<strong>Creativity Show</strong>
+<strong>Motion Stories</strong>
 </a>
 
 <a class="work-card" href="client-gallery.html">
 <img src="images/Prewed%20(1).jpeg" alt="Outdoor couple shoot">
-<span>Outdoors</span>
-<strong>Beginning of a Journey</strong>
+<span>Portraits</span>
+<strong>People and Places</strong>
 </a>
 
 </div>
@@ -2348,7 +2373,7 @@ See My Work
 “My heart overflows with the love we created. It feels like sunshine.”
 </blockquote>
 <p>
-PhotoRoast wedding stories
+PhotoRoast visual stories
 </p>
 </div>
 
@@ -2978,9 +3003,7 @@ return;
 track.innerHTML = "";
 
 const scrollingPhotos =
-featuredPhotos.length > 0
-? [...featuredPhotos,...featuredPhotos]
-: [];
+featuredPhotos.slice(0,3);
 
 scrollingPhotos.forEach(photo=>{
 const link =
